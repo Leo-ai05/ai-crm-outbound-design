@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>武汉电销系统 · 方案B 深度绑定嵌合式 · 客户池AI批量外呼</title>
-<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js" async onload="window.__mermaidReady&&window.__mermaidReady()"></script>
 <style>
 
 :root{
@@ -924,9 +924,8 @@ stateDiagram-v2
 <div class="alert ok">完整文档 <span class="mono">docs/scheme-b-system.md</span> · 需求基线融合版 PRD</div>
           </div>
         </div>
-      </div>
-
-      <div class="card" id="crmBindingCardB" style="margin-top:12px">
+      
+<div class="card" id="crmBindingCardB" style="margin-top:12px">
         <div class="card-hd">附录 · 融合版 PRD 落点对照（方案B交付附件）</div>
         <div class="card-bd">
           <p class="small">本方案是对 <span class="mono">/workspace/crm-refs/PRD-AI外呼机器人-CRM融合版.md</span> 与 fusion-proto 的可交付重制，视觉对齐 Element Plus + pure-admin 深色侧栏。</p>
@@ -970,12 +969,6 @@ stateDiagram-v2
           <div class="alert info" style="margin-top:12px">人工外呼流程保持不变；AI 全程不转人工，高意向仅通话结束后推送销售接续。</div>
         </div>
       </div>
-
-    </div>
-  </div>
-</div>
-
-
 <div class="card" style="margin:12px 16px">
   <div class="card-hd">附录 · 节点话术样例（评审可读，非线上配置）</div>
   <div class="card-bd">
@@ -1012,8 +1005,6 @@ stateDiagram-v2
     </table></div>
   </div>
 </div>
-
-
 <div class="card" style="margin:12px 16px">
   <div class="card-hd">附录 · 客户池 42 字段族中与 AI 相关的子集（对齐 ongoing/utils/data）</div>
   <div class="card-bd">
@@ -1065,8 +1056,6 @@ stateDiagram-v2
 }</pre>
   </div>
 </div>
-
-
 <div class="card" style="margin:12px 16px">
   <div class="card-hd">附录 · 录音转译与意向修正交互说明</div>
   <div class="card-bd">
@@ -1107,8 +1096,6 @@ stateDiagram-v2
     <div class="alert ok">打开本页即可评审；静态文件无构建。配套文档见 docs/scheme-b-system.md 与 docs/comparison.md。</div>
   </div>
 </div>
-
-
 <div class="card" style="margin:12px 16px">
   <div class="card-hd">附录 · 意向分布示意（近7日 · 本人）</div>
   <div class="card-bd">
@@ -1130,8 +1117,6 @@ stateDiagram-v2
     </table></div>
   </div>
 </div>
-
-
 <div class="card" style="margin:12px 16px 24px">
   <div class="card-hd">附录 · 合规文案与开场白披露（强制）</div>
   <div class="card-bd">
@@ -1142,6 +1127,34 @@ stateDiagram-v2
     <p class="small" style="line-height:1.8"><b>名额占用确认：</b>提交任务时第三条合规勾选必须明示将占用当日 AI 外呼名额，且线索归属为本人（或配置允许的组内成员）。</p>
   </div>
 </div>
+</div>
+
+      
+
+    
+
+
+
+
+
+</div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 <div class="card" style="margin:0 16px 24px">
@@ -1452,7 +1465,8 @@ stateDiagram-v2
 </div>
 
 <script>
-mermaid.initialize({startOnLoad:false, theme:'neutral', securityLevel:'loose'});
+window.__mermaidReady=function(){try{if(window.mermaid)mermaid.initialize({startOnLoad:false,theme:'neutral',securityLevel:'loose'});}catch(e){}};
+if(window.mermaid)window.__mermaidReady();
 const PATHS={
   pool:['客户池','/WH_CRM_v2/customer/ongoing'],
   tasks:['外呼任务管理','/WH_CRM_v2/aiOutbound/tasks'],

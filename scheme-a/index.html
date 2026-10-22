@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>武汉电销系统 · 方案A 独立板块承接式 · AI外呼中心</title>
-<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js" async onload="window.__mermaidReady&&window.__mermaidReady()"></script>
 <style>
 
 :root{
@@ -848,6 +848,8 @@ body.with-ss .app{flex:1;min-height:0;height:auto}
       </div>
 
       
+      </div><!-- /view-board -->
+
       <!-- ========== VIEW: 记录明细（补充屏，计入≥6） ========== -->
       <div class="view" id="view-records">
         <div class="card">
@@ -1083,14 +1085,6 @@ stateDiagram-v2
 <div class="alert ok">完整 Markdown 文档见仓库 <span class="mono">docs/scheme-a-system.md</span></div>
           </div>
         </div>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-
-
 <div class="card" style="margin:12px 16px">
   <div class="card-hd">附录 · 节点话术样例（评审可读，非线上配置）</div>
   <div class="card-bd">
@@ -1127,50 +1121,7 @@ stateDiagram-v2
     </table></div>
   </div>
 </div>
-
-<div class="mask hidden" id="detailMask">
-  <div class="dialog lg">
-    <div class="dialog-hd">线索详情 · infoUuid 示意 <span class="close" onclick="detailMask.classList.add('hidden')">×</span></div>
-    <div class="dialog-bd">
-      <div class="grid-2">
-        <div>
-          <div class="form-row"><label>onionId</label><input class="inp" value="ON88291033" readonly/></div>
-          <div class="form-row"><label>infoUuid</label><input class="inp" value="iu-6f3a-91bc-20261022" readonly/></div>
-          <div class="form-row"><label>私域分层 / 付费分类</label><input class="inp" value="C · 未付费" readonly/></div>
-          <div class="form-row"><label>来源（入库时）</label><input class="inp" value="抖音信息流" readonly/></div>
-          <div class="form-row"><label>学情报告打开次数</label><input class="inp" value="3" readonly/></div>
-        </div>
-        <div>
-          <div class="form-row"><label>AI 外呼次数 / 接通次数</label><input class="inp" value="2 / 1" readonly/></div>
-          <div class="form-row"><label>最近意向</label><input class="inp" value="意向" readonly/></div>
-          <div class="form-row"><label>加微状态</label><input class="inp" value="已同意 · 承接01" readonly/></div>
-          <div class="form-row"><label>池状态</label><input class="inp" value="意向待分配" readonly/></div>
-          <div class="form-row"><label>额度占用</label><input class="inp" value="否（AI承接豁免）" readonly/></div>
-        </div>
-      </div>
-      <div class="cfg-block">
-        <h4>AI 通话总结</h4>
-        <p class="small" style="line-height:1.7;color:var(--t2)">开场披露机构身份后，家长表示孩子初二数学薄弱，近期考试下滑。对「同步课+学情报告」有兴趣，询问周末是否可试听。价格方面希望先看方案再决定。已在加微节点引导，家长口头同意。建议销售今日内跟进并发送试听安排。</p>
-        <div class="pill-row" style="margin-top:8px">
-          <span class="chip">标签: 初二数学</span><span class="chip">标签: 要试听</span><span class="chip">标签: 价格敏感</span>
-        </div>
-      </div>
-      <div class="cfg-block">
-        <h4>外呼轨迹</h4>
-        <div class="table-wrap"><table class="data"><thead><tr><th>时间</th><th>通道</th><th>结果</th><th>时长</th><th>备注</th></tr></thead>
-        <tbody>
-          <tr><td>10-22 10:12</td><td>火山</td><td>未接通</td><td>0s</td><td>无人接听 · 入重播</td></tr>
-          <tr><td>10-22 15:40</td><td>火山</td><td>有效接通</td><td>96s</td><td>意向 · 已加微</td></tr>
-        </tbody></table></div>
-      </div>
-    </div>
-    <div class="dialog-ft"><button class="btn" onclick="detailMask.classList.add('hidden')">关闭</button><button class="btn primary" onclick="detailMask.classList.add('hidden');openAssign()">去分配</button></div>
-  </div>
-</div>
-
-
-      <div class="view" id="view-appendix" style="display:none"></div>
-      <div class="card" id="crmBindingCard" style="margin-top:12px">
+<div class="card" id="crmBindingCard" style="margin-top:12px">
         <div class="card-hd">附录 · WH_CRM_v2 信息架构对照（方案A交付附件）</div>
         <div class="card-bd">
           <p class="small">以下侧栏结构来自现网历史路由 <span class="mono">shadow.yangcong345.com/WH_CRM_v2/</span>，用于评审时核对挂载点，避免做成通用 SaaS 皮肤。</p>
@@ -1239,6 +1190,60 @@ stateDiagram-v2
 }</pre>
         </div>
       </div>
+
+      </div>
+
+    
+
+
+</div>
+  </div>
+</div>
+
+
+
+
+
+<div class="mask hidden" id="detailMask">
+  <div class="dialog lg">
+    <div class="dialog-hd">线索详情 · infoUuid 示意 <span class="close" onclick="detailMask.classList.add('hidden')">×</span></div>
+    <div class="dialog-bd">
+      <div class="grid-2">
+        <div>
+          <div class="form-row"><label>onionId</label><input class="inp" value="ON88291033" readonly/></div>
+          <div class="form-row"><label>infoUuid</label><input class="inp" value="iu-6f3a-91bc-20261022" readonly/></div>
+          <div class="form-row"><label>私域分层 / 付费分类</label><input class="inp" value="C · 未付费" readonly/></div>
+          <div class="form-row"><label>来源（入库时）</label><input class="inp" value="抖音信息流" readonly/></div>
+          <div class="form-row"><label>学情报告打开次数</label><input class="inp" value="3" readonly/></div>
+        </div>
+        <div>
+          <div class="form-row"><label>AI 外呼次数 / 接通次数</label><input class="inp" value="2 / 1" readonly/></div>
+          <div class="form-row"><label>最近意向</label><input class="inp" value="意向" readonly/></div>
+          <div class="form-row"><label>加微状态</label><input class="inp" value="已同意 · 承接01" readonly/></div>
+          <div class="form-row"><label>池状态</label><input class="inp" value="意向待分配" readonly/></div>
+          <div class="form-row"><label>额度占用</label><input class="inp" value="否（AI承接豁免）" readonly/></div>
+        </div>
+      </div>
+      <div class="cfg-block">
+        <h4>AI 通话总结</h4>
+        <p class="small" style="line-height:1.7;color:var(--t2)">开场披露机构身份后，家长表示孩子初二数学薄弱，近期考试下滑。对「同步课+学情报告」有兴趣，询问周末是否可试听。价格方面希望先看方案再决定。已在加微节点引导，家长口头同意。建议销售今日内跟进并发送试听安排。</p>
+        <div class="pill-row" style="margin-top:8px">
+          <span class="chip">标签: 初二数学</span><span class="chip">标签: 要试听</span><span class="chip">标签: 价格敏感</span>
+        </div>
+      </div>
+      <div class="cfg-block">
+        <h4>外呼轨迹</h4>
+        <div class="table-wrap"><table class="data"><thead><tr><th>时间</th><th>通道</th><th>结果</th><th>时长</th><th>备注</th></tr></thead>
+        <tbody>
+          <tr><td>10-22 10:12</td><td>火山</td><td>未接通</td><td>0s</td><td>无人接听 · 入重播</td></tr>
+          <tr><td>10-22 15:40</td><td>火山</td><td>有效接通</td><td>96s</td><td>意向 · 已加微</td></tr>
+        </tbody></table></div>
+      </div>
+    </div>
+    <div class="dialog-ft"><button class="btn" onclick="detailMask.classList.add('hidden')">关闭</button><button class="btn primary" onclick="detailMask.classList.add('hidden');openAssign()">去分配</button></div>
+  </div>
+</div>
+      
 
 <!-- Assign dialog -->
 
@@ -1404,7 +1409,8 @@ stateDiagram-v2
 </div>
 
 <script>
-mermaid.initialize({startOnLoad:false, theme:'neutral', securityLevel:'loose'});
+window.__mermaidReady=function(){try{if(window.mermaid)mermaid.initialize({startOnLoad:false,theme:'neutral',securityLevel:'loose'});}catch(e){}};
+if(window.mermaid)window.__mermaidReady();
 
 const PATHS = {
   pool:['AI专属外呼池','/WH_CRM_v2/aiOutbound/pool'],
@@ -1441,7 +1447,7 @@ function navigate(view){
   document.getElementById('view-'+view).classList.add('on');
   const [name,path]=PATHS[view];
   crumbName.textContent=name; crumbPath.textContent=path;
-  if(view==='docs'){ setTimeout(()=>{ document.querySelectorAll('#view-docs .mermaid').forEach((el,i)=>{ if(!el.dataset.done){ el.dataset.done=1; mermaid.run({nodes:[el]}); } }); },50); }
+  if(view==='docs'){ setTimeout(()=>{ document.querySelectorAll('#view-docs .mermaid').forEach((el,i)=>{ if(!el.dataset.done){ el.dataset.done=1; window.mermaid&&mermaid.run({nodes:[el]}); } }); },50); }
 }
 document.querySelectorAll('.nav-item[data-view]').forEach(n=>n.addEventListener('click',()=>navigate(n.dataset.view)));
 
