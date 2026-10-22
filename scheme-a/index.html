@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>武汉电销系统 · 方案A 独立板块承接式 · AI外呼中心</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+
+:root{
+  --primary:#409eff;--primary-light:#ecf5ff;--primary-dark:#337ecc;
+  --success:#67c23a;--success-light:#f0f9eb;--warning:#e6a23c;--warning-light:#fdf6ec;
+  --danger:#f56c6c;--danger-light:#fef0f0;--info:#909399;--info-light:#f4f4f5;
+  --purple:#7c3aed;--purple-light:#f5f0ff;
+  --t1:#303133;--t2:#606266;--t3:#909399;--t4:#c0c4cc;
+  --border:#dcdfe6;--border-light:#ebeef5;--bg:#f0f2f5;--card:#fff;
+  --sidebar-bg:#001529;--sidebar-sub:#000c17;--sidebar-text:#a6adb4;
+  --radius:4px;--shadow:0 2px 12px 0 rgb(0 0 0 / 8%);
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;font-size:14px;color:var(--t1);background:var(--bg);-webkit-font-smoothing:antialiased}
+a{color:var(--primary);text-decoration:none}
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{flex:0 0 210px;width:210px;background:var(--sidebar-bg);color:var(--sidebar-text);display:flex;flex-direction:column;overflow-y:auto}
+.sidebar-logo{height:50px;padding:0 16px;display:flex;align-items:center;gap:8px;background:var(--sidebar-sub);color:#fff;font-weight:600;font-size:14px}
+.sidebar-logo .dot{width:8px;height:8px;border-radius:50%;background:var(--primary)}
+.sidebar-logo .sub{font-size:10px;font-weight:400;color:#5c6b7a;margin-left:auto}
+.nav-group{padding:14px 16px 6px;font-size:11px;letter-spacing:.6px;color:#5c6b7a}
+.nav-item{display:flex;align-items:center;gap:8px;padding:10px 16px 10px 24px;font-size:13px;cursor:pointer;transition:.15s}
+.nav-item:hover{color:#fff;background:rgb(255 255 255 / 6%)}
+.nav-item.active{color:#fff;background:var(--primary)}
+.nav-item.disabled{color:#4a5763;cursor:not-allowed}
+.nav-item .badge{margin-left:auto;padding:0 5px;font-size:10px;line-height:15px;border-radius:8px;background:linear-gradient(90deg,#409eff,#7c3aed);color:#fff}
+.nav-item .badge.reuse{background:#67c23a}
+.nav-item .badge.new{background:linear-gradient(90deg,#409eff,#7c3aed)}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.topbar{height:50px;background:#fff;border-bottom:1px solid var(--border-light);display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0}
+.topbar .crumb{font-size:13px;color:var(--t2)}
+.topbar .crumb b{color:var(--t1)}
+.topbar .path{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--t3);background:#f4f4f5;padding:2px 8px;border-radius:4px}
+.topbar .spacer{flex:1}
+.topbar .user{font-size:13px;color:var(--t2);display:flex;align-items:center;gap:8px}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px}
+.content{flex:1;overflow:auto;padding:12px 16px 24px}
+.banner-note{background:#fdf6ec;border:1px solid #f5dab1;color:#b88230;padding:8px 12px;border-radius:4px;font-size:12px;margin-bottom:12px;display:flex;gap:8px;align-items:flex-start}
+.banner-note .tag{flex-shrink:0;background:#e6a23c;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px}
+.card{background:#fff;border:1px solid var(--border-light);border-radius:4px;box-shadow:var(--shadow);margin-bottom:12px}
+.card-hd{padding:12px 16px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px}
+.card-hd .anno{font-size:10px;padding:1px 6px;border-radius:3px;font-weight:500;margin-left:6px}
+.anno.new{background:var(--purple-light);color:var(--purple)}
+.anno.reuse{background:var(--success-light);color:var(--success)}
+.anno.mod{background:var(--warning-light);color:var(--warning)}
+.card-bd{padding:16px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.btn{display:inline-flex;align-items:center;gap:4px;height:32px;padding:0 14px;border:1px solid var(--border);border-radius:4px;background:#fff;color:var(--t1);font-size:13px;cursor:pointer;transition:.15s}
+.btn:hover{color:var(--primary);border-color:var(--primary)}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn.primary:hover{background:var(--primary-dark)}
+.btn.success{background:var(--success);border-color:var(--success);color:#fff}
+.btn.warning{background:var(--warning);border-color:var(--warning);color:#fff}
+.btn.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.btn.ghost{background:transparent}
+.btn:disabled,.btn.disabled{opacity:.45;cursor:not-allowed}
+.btn.sm{height:28px;padding:0 10px;font-size:12px}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+.kpi{background:#fff;border:1px solid var(--border-light);border-radius:4px;padding:14px 16px}
+.kpi .label{font-size:12px;color:var(--t3);margin-bottom:6px}
+.kpi .val{font-size:22px;font-weight:600;color:var(--t1)}
+.kpi .val small{font-size:12px;font-weight:400;color:var(--t3);margin-left:4px}
+.kpi .delta{font-size:11px;margin-top:4px}
+.kpi .delta.up{color:var(--success)}
+.kpi .delta.down{color:var(--danger)}
+.filter-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;padding:12px;background:#fafafa;border:1px solid var(--border-light);border-radius:4px;margin-bottom:12px}
+.filter-item{display:flex;flex-direction:column;gap:4px}
+.filter-item label{font-size:12px;color:var(--t3)}
+.filter-item input,.filter-item select,.inp,select.inp,textarea.inp{
+  height:32px;padding:0 10px;border:1px solid var(--border);border-radius:4px;font-size:13px;min-width:120px;background:#fff;color:var(--t1)
+}
+textarea.inp{height:auto;padding:8px 10px;min-height:72px}
+.filter-item input:focus,.inp:focus,select.inp:focus{outline:none;border-color:var(--primary)}
+.table-wrap{overflow:auto;border:1px solid var(--border-light);border-radius:4px}
+table.data{width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap}
+table.data th{background:#f5f7fa;color:var(--t2);font-weight:500;padding:10px 12px;border-bottom:1px solid var(--border-light);text-align:left;position:sticky;top:0;z-index:1}
+table.data td{padding:10px 12px;border-bottom:1px solid var(--border-lighter,#f2f6fc);color:var(--t1)}
+table.data tr:hover td{background:#f5f7fa}
+table.data .ops{display:flex;gap:6px}
+.tag{display:inline-block;padding:0 6px;height:20px;line-height:20px;border-radius:3px;font-size:11px;background:var(--info-light);color:var(--info)}
+.tag.primary{background:var(--primary-light);color:var(--primary)}
+.tag.success{background:var(--success-light);color:var(--success)}
+.tag.warning{background:var(--warning-light);color:var(--warning)}
+.tag.danger{background:var(--danger-light);color:var(--danger)}
+.tag.purple{background:var(--purple-light);color:var(--purple)}
+.layer-A{background:#fef0f0;color:#f56c6c}.layer-B{background:#fdf6ec;color:#e6a23c}
+.layer-C{background:#ecf5ff;color:#409eff}.layer-D{background:#f4f4f5;color:#909399}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border-light);margin-bottom:12px}
+.tab{padding:10px 16px;font-size:13px;color:var(--t2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab:hover{color:var(--primary)}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:500}
+.steps{display:flex;align-items:center;gap:0;margin-bottom:20px;padding:0 8px}
+.step{display:flex;align-items:center;gap:8px;flex:0 0 auto;color:var(--t3);font-size:13px}
+.step .num{width:24px;height:24px;border-radius:50%;background:var(--info-light);color:var(--info);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
+.step.on{color:var(--primary)}.step.on .num{background:var(--primary);color:#fff}
+.step.done{color:var(--success)}.step.done .num{background:var(--success);color:#fff}
+.step-line{flex:1;height:1px;background:var(--border);margin:0 12px;min-width:24px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.form-row{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.form-row label{font-size:12px;color:var(--t3)}
+.form-row label .req{color:var(--danger)}
+.switch{width:40px;height:20px;border-radius:10px;background:#dcdfe6;position:relative;cursor:pointer;display:inline-block;vertical-align:middle}
+.switch.on{background:var(--primary)}
+.switch::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:2px;left:2px;transition:.15s}
+.switch.on::after{left:22px}
+.checkbox{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;user-select:none}
+.checkbox .box{width:14px;height:14px;border:1px solid var(--border);border-radius:2px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#fff}
+.checkbox.checked .box{background:var(--primary);border-color:var(--primary)}
+.mask{position:fixed;inset:0;background:rgb(0 0 0 / 45%);z-index:1000;display:flex;align-items:center;justify-content:center;padding:24px}
+.dialog{background:#fff;border-radius:8px;width:min(920px,96vw);max-height:90vh;display:flex;flex-direction:column;box-shadow:0 8px 28px rgb(0 0 0 / 14%)}
+.dialog.lg{width:min(1080px,96vw)}
+.dialog-hd{padding:14px 18px;border-bottom:1px solid var(--border-light);font-weight:600;display:flex;align-items:center;gap:8px}
+.dialog-hd .close{margin-left:auto;cursor:pointer;color:var(--t3);font-size:18px;line-height:1;padding:4px}
+.dialog-bd{padding:18px;overflow:auto;flex:1}
+.dialog-ft{padding:12px 18px;border-top:1px solid var(--border-light);display:flex;justify-content:flex-end;gap:8px}
+.alert{padding:10px 12px;border-radius:4px;font-size:12px;display:flex;gap:8px;margin-bottom:12px}
+.alert.info{background:var(--primary-light);color:var(--primary-dark)}
+.alert.warn{background:var(--warning-light);color:#b88230}
+.alert.ok{background:var(--success-light);color:#529b2e}
+.alert.err{background:var(--danger-light);color:#c45656}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px}
+.small{font-size:12px;color:var(--t3)}
+.progress{height:8px;background:#ebeef5;border-radius:4px;overflow:hidden}
+.progress>i{display:block;height:100%;background:var(--primary);border-radius:4px}
+.pill-row{display:flex;flex-wrap:wrap;gap:6px}
+.pill{padding:4px 10px;border:1px solid var(--border);border-radius:14px;font-size:12px;cursor:pointer;background:#fff}
+.pill.on{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
+.stat-funnel{display:flex;flex-direction:column;gap:6px}
+.funnel-bar{display:flex;align-items:center;gap:10px;font-size:12px}
+.funnel-bar .name{width:90px;color:var(--t2);text-align:right}
+.funnel-bar .bar{flex:1;height:22px;background:#ecf5ff;border-radius:3px;position:relative;overflow:hidden}
+.funnel-bar .bar>i{display:block;height:100%;background:var(--primary)}
+.funnel-bar .n{width:70px;color:var(--t1);font-weight:500}
+.split{display:grid;grid-template-columns:240px 1fr;gap:12px;min-height:420px}
+.split-side{border:1px solid var(--border-light);border-radius:4px;background:#fafafa;padding:8px;overflow:auto}
+.split-side .item{padding:8px 10px;border-radius:4px;cursor:pointer;font-size:13px;color:var(--t2)}
+.split-side .item:hover{background:#fff}
+.split-side .item.active{background:var(--primary-light);color:var(--primary);font-weight:500}
+.mermaid-box{background:#fff;border:1px solid var(--border-light);border-radius:4px;padding:16px;overflow:auto;margin-bottom:16px}
+.mermaid-box .title{font-weight:600;margin-bottom:8px;font-size:13px}
+.doc-sec{margin-bottom:20px}
+.doc-sec h3{font-size:15px;margin:0 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border-light)}
+.doc-sec p,.doc-sec li{font-size:13px;line-height:1.7;color:var(--t2)}
+.doc-sec ul{padding-left:18px;margin:6px 0}
+.toast-wrap{position:fixed;top:16px;right:16px;z-index:2000;display:flex;flex-direction:column;gap:8px}
+.toast{background:#fff;border:1px solid var(--border-light);box-shadow:var(--shadow);padding:10px 14px;border-radius:4px;font-size:13px;min-width:220px;display:flex;gap:8px;align-items:center;animation:slide .25s ease}
+.toast.ok{border-left:3px solid var(--success)}
+.toast.err{border-left:3px solid var(--danger)}
+@keyframes slide{from{transform:translateX(20px);opacity:0}to{transform:none;opacity:1}}
+.float-task{position:fixed;right:20px;bottom:20px;z-index:900;background:#fff;border:1px solid var(--border);box-shadow:var(--shadow);border-radius:8px;padding:12px 14px;width:280px;font-size:12px}
+.float-task .hd{font-weight:600;margin-bottom:6px;display:flex;justify-content:space-between}
+.pager{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:10px 0;font-size:12px;color:var(--t2)}
+.hidden{display:none!important}
+
+.radio-card{display:inline-flex;align-items:center;padding:8px 14px;border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:12px;color:var(--t2);margin:0 8px 8px 0}
+.radio-card.on{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
+.flow-mini{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;margin:8px 0}
+.flow-node{border:1px solid var(--border-light);border-radius:4px;padding:8px 10px;min-width:120px;background:#fafafa;font-size:12px}
+.flow-node b{display:block;margin-bottom:4px}
+.flow-node.start{border-color:var(--success);background:var(--success-light)}
+.flow-node.branch{border-color:var(--warning);background:var(--warning-light)}
+.flow-node.end{border-color:var(--danger);background:var(--danger-light)}
+.flow-arrow{display:flex;align-items:center;color:var(--t3);font-size:16px}
+.bar-chart{display:flex;flex-direction:column;gap:8px}
+.bar-row{display:grid;grid-template-columns:90px 1fr 48px;gap:8px;align-items:center;font-size:12px}
+.bar-row .track{height:10px;background:#ebeef5;border-radius:4px;overflow:hidden}
+.bar-row .track i{display:block;height:100%;background:var(--primary);border-radius:4px}
+.subtabs{display:inline-flex;gap:0;border:1px solid var(--border-light);border-radius:4px;overflow:hidden;margin-bottom:12px}
+.subtab{padding:6px 12px;font-size:12px;cursor:pointer;color:var(--t2);background:#fff;border-right:1px solid var(--border-light)}
+.subtab:last-child{border-right:0}
+.subtab.active{background:var(--primary-light);color:var(--primary);font-weight:500}
+
+.view{display:none}.view.on{display:block}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:#f4f4f5;border-radius:10px;font-size:11px;color:var(--t2)}
+.empty{text-align:center;padding:40px;color:var(--t3);font-size:13px}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:var(--t3);margin-top:8px}
+.legend span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px;vertical-align:middle}
+
+.scheme-badge{background:linear-gradient(90deg,#7c3aed,#409eff);color:#fff;font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px}
+.cfg-block{border:1px solid var(--border-light);border-radius:4px;padding:14px;margin-bottom:12px;background:#fafafa}
+.cfg-block h4{margin:0 0 10px;font-size:13px}
+.slider-row{display:flex;align-items:center;gap:10px}
+.slider-row input[type=range]{flex:1}
+.quota-box{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.quota-item{background:#fff;border:1px solid var(--border-light);border-radius:4px;padding:12px;text-align:center}
+.quota-item .n{font-size:20px;font-weight:600}
+.account-card{border:1px solid var(--border-light);border-radius:4px;padding:12px;background:#fff;display:flex;gap:12px;align-items:center}
+.account-card .av{width:40px;height:40px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center}
+
+/* glossary visual helpers for CRM field chips */
+.glossary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:12px 0}
+.glossary-grid .g{background:#fafafa;border:1px solid var(--border-light);border-radius:4px;padding:8px 10px;font-size:11px;color:var(--t2)}
+.glossary-grid .g b{display:block;color:var(--t1);margin-bottom:2px;font-size:12px}
+
+
+
+/* === scheme switcher (global A/B nav) === */
+.scheme-switcher{position:sticky;top:0;z-index:3000;height:40px;background:#001529;border-bottom:1px solid #0a2138;display:flex;align-items:center;padding:0 16px;gap:4px;flex-shrink:0}
+.scheme-switcher .ss-brand{color:#fff;font-size:12px;font-weight:600;margin-right:14px;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.scheme-switcher .ss-brand .ss-dot{width:7px;height:7px;border-radius:50%;background:#409eff}
+.scheme-switcher a.ss-item{display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:4px;font-size:12px;color:#a6adb4;text-decoration:none;white-space:nowrap;transition:.15s}
+.scheme-switcher a.ss-item:hover{color:#fff;background:rgb(255 255 255 / 8%)}
+.scheme-switcher a.ss-item.active{color:#fff;background:#409eff;font-weight:500}
+.scheme-switcher .ss-spacer{flex:1}
+.scheme-switcher .ss-hint{font-size:11px;color:#5c6b7a;white-space:nowrap}
+body.with-ss{display:flex;flex-direction:column;height:100%;overflow:hidden}
+body.with-ss .app{flex:1;min-height:0;height:auto}
+
+</style>
+</head>
+<body class="with-ss">
+<div class="toast-wrap" id="toasts"></div>
+<div class="scheme-switcher"><div class="ss-brand"><span class="ss-dot"></span>AI外呼 × CRM</div><a class="ss-item" href="../index.html">总览</a><a class="ss-item active" href="index.html">方案A · 独立板块承接式</a><a class="ss-item" href="../scheme-b/index.html">方案B · 深度绑定嵌合式</a><div class="ss-spacer"></div><span class="ss-hint">WH_CRM_v2 · 双方案切换</span></div>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span class="dot"></span>
+      <div>
+        <div>武汉电销系统</div>
+        <div style="font-size:10px;font-weight:400;color:#5c6b7a">重洋启思电销 · WH_CRM_v2</div>
+      </div>
+    </div>
+    <div class="nav-group">客户管理</div>
+    <div class="nav-item disabled" title="现网页面，本方案不改主流程">客户池 <span class="badge reuse">复用</span></div>
+    <div class="nav-item disabled">付费线索池 <span class="badge reuse">复用</span></div>
+    <div class="nav-item disabled">线索追踪</div>
+    <div class="nav-item disabled">数据池 <span class="badge reuse">复用</span></div>
+    <div class="nav-group">AI外呼中心 <span class="scheme-badge">方案A·新增</span></div>
+    <div class="nav-item active" data-view="pool"><span>◎</span> AI专属外呼池 <span class="badge new">新增</span></div>
+    <div class="nav-item" data-view="strategy"><span>⚙</span> 外呼策略配置 <span class="badge new">新增</span></div>
+    <div class="nav-item" data-view="wework"><span>💬</span> 企微承接账号 <span class="badge new">新增</span></div>
+    <div class="nav-item" data-view="intent"><span>★</span> 意向线索池 <span class="badge new">新增</span></div>
+    <div class="nav-item" data-view="tasks"><span>▤</span> 外呼任务监控 <span class="badge new">新增</span></div>
+    <div class="nav-item" data-view="board"><span>▥</span> 外呼数据看板 <span class="badge new">新增</span></div>
+    <div class="nav-item" data-view="records"><span>☎</span> 通话明细 <span class="badge new">新增</span></div>
+    <div class="nav-item" data-view="docs"><span>?</span> 系统说明 <span class="badge new">新增</span></div>
+    <div class="nav-group">企微机器人</div>
+    <div class="nav-item disabled">AI员工 <span class="badge reuse">复用</span></div>
+    <div class="nav-item disabled">全局配置 weworkBot/globalConfig</div>
+    <div class="nav-item disabled">规则配置 / 分层配置</div>
+    <div class="nav-group">统计 / 系统</div>
+    <div class="nav-item disabled">通话记录 callRecord</div>
+    <div class="nav-item disabled">分配 distribute</div>
+    <div class="nav-item disabled">AI质检</div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="crumb">武汉电销系统 / <b id="crumbName">AI专属外呼池</b></div>
+      <span class="path" id="crumbPath">/WH_CRM_v2/aiOutbound/pool</span>
+      <div class="spacer"></div>
+      <button class="btn sm" onclick="toast('已对齐外呼数据中心口径：火山/阿里 · 有效接通≥10s','ok')">口径说明</button>
+      <div class="user"><div class="avatar">朱</div> 朱胜武 · 运营管理员</div>
+    </div>
+    <div class="content">
+      <div class="banner-note">
+        <span class="tag">方案A</span>
+        <div>独立板块承接式：在 CRM 侧栏新增「AI外呼中心」，承接 <b>销售未领取</b> 的数据池/公共线索；有意向后走企微承接加微，再在线分配入库到指定销售。不占用销售「未拨打领取额度」（对齐企微承接额度 PRD）。黄色侧栏为现网模块示意，蓝色为本次新增。</div>
+      </div>
+
+      <!-- ========== VIEW: AI专属外呼池 ========== -->
+      <div class="view on" id="view-pool">
+        <div class="kpi-row">
+          <div class="kpi"><div class="label">池内待呼线索</div><div class="val">12,480 <small>条</small></div><div class="delta up">较昨日 +6.2%</div></div>
+          <div class="kpi"><div class="label">今日 AI 已外呼</div><div class="val">3,210 <small>通</small></div><div class="delta up">接通率 28.4%</div></div>
+          <div class="kpi"><div class="label">有效接通 ≥10s</div><div class="val">612 <small>通</small></div><div class="delta">有效率 19.1%</div></div>
+          <div class="kpi"><div class="label">筛出意向待分配</div><div class="val">86 <small>条</small></div><div class="delta up">含重点意向 14</div></div>
+          <div class="kpi"><div class="label">今日加微同意</div><div class="val">41 <small>人</small></div><div class="delta">加微节点触达 73</div></div>
+          <div class="kpi"><div class="label">未拨打额度影响</div><div class="val" style="font-size:16px;padding-top:4px">不占用</div><div class="delta">对齐企微承接豁免口径</div></div>
+        </div>
+        <div class="card">
+          <div class="card-hd">AI专属外呼池 · 未领取公共线索 <span class="anno new">新增 · 源 dataPool</span>
+            <div class="spacer"></div>
+            <button class="btn sm primary" onclick="openStrategyQuick()">按策略灌入任务</button>
+            <button class="btn sm" onclick="toast('已导出当前筛选明细 CSV','ok')">导出明细</button>
+          </div>
+          <div class="card-bd">
+            <div class="filter-bar">
+              <div class="filter-item"><label>入库时间</label><select class="inp" id="f-in"><option>近 7 天</option><option>近 15 天</option><option selected>近 30 天</option><option>自定义</option></select></div>
+              <div class="filter-item"><label>私域分层</label><select class="inp" id="f-layer"><option value="">全部</option><option>C</option><option>D</option><option>B（需策略放行）</option></select></div>
+              <div class="filter-item"><label>来源</label><select class="inp"><option>全部</option><option>抖音信息流</option><option>官网留资</option><option>小程序试听</option><option>腾讯广点通</option></select></div>
+              <div class="filter-item"><label>付费分类</label><select class="inp"><option>全部</option><option>未付费</option><option>活动定金</option><option>蓄水品</option><option>体验品</option></select></div>
+              <div class="filter-item"><label>AI外呼次数</label><select class="inp"><option>0 次（未呼）</option><option>0-1</option><option>≤2</option><option>不限</option></select></div>
+              <div class="filter-item"><label>通道偏好</label><select class="inp"><option>跟随策略</option><option>火山</option><option>阿里</option></select></div>
+              <button class="btn primary" onclick="renderPool()">查询</button>
+              <button class="btn" onclick="toast('筛选已重置','ok')">重置</button>
+            </div>
+            <div class="alert info">线索状态：<b>未领取</b> → AI池锁定外呼中 → 意向待分配 / 无意向回池 / 加微成功待入库。AI 外呼期间对销售领取接口返回「AI处理中」，避免双领。</div>
+            <div class="table-wrap" style="max-height:420px">
+              <table class="data" id="poolTable">
+                <thead><tr>
+                  <th><span class="checkbox" id="chkAll" onclick="toggleAll(this)"><span class="box"></span></span></th>
+                  <th>onionId</th><th>家长/昵称</th><th>学段年级</th><th>入库时间</th><th>来源</th><th>私域分层</th><th>付费分类</th><th>AI外呼</th><th>接通</th><th>最近意向</th><th>池状态</th><th>操作</th>
+                </tr></thead>
+                <tbody id="poolBody"></tbody>
+              </table>
+            </div>
+            <div class="pager">共 <b id="poolTotal">0</b> 条 · 第 1/20 页
+              <button class="btn sm">上一页</button><button class="btn sm">下一页</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== VIEW: 策略 ========== -->
+      <div class="view" id="view-strategy">
+        <div class="card">
+          <div class="card-hd">外呼策略配置 <span class="anno new">新增 · /WH_CRM_v2/aiOutbound/strategy</span>
+            <div class="spacer"></div>
+            <button class="btn sm" onclick="toast('已恢复默认策略','ok')">恢复默认</button>
+            <button class="btn sm primary" onclick="toast('策略已保存，下一调度窗口生效','ok')">保存策略</button>
+          </div>
+          <div class="card-bd">
+            <div class="tabs" id="stratTabs">
+              <div class="tab active" data-tab="s1">基础吞吐</div>
+              <div class="tab" data-tab="s2">时段与重播</div>
+              <div class="tab" data-tab="s3">线索比例量级</div>
+              <div class="tab" data-tab="s4">通道与并发</div>
+              <div class="tab" data-tab="s5">意向与加微</div>
+              <div class="tab" data-tab="s6">红线词与合规</div>
+            </div>
+            <div id="stab-s1">
+              <div class="cfg-block">
+                <h4>日吞吐与频率</h4>
+                <div class="grid-2">
+                  <div class="form-row"><label>每日计划外呼通数上限 <span class="req">*</span></label><input class="inp" type="number" value="8000"/></div>
+                  <div class="form-row"><label>单线索每日最多外呼次数 <span class="req">*</span></label><input class="inp" type="number" value="2"/></div>
+                  <div class="form-row"><label>单线索 7 天上限</label><input class="inp" type="number" value="5"/></div>
+                  <div class="form-row"><label>最小外呼间隔（小时）</label><input class="inp" type="number" value="6"/></div>
+                </div>
+                <div class="alert warn">运营统一吞吐未领取线索；不消耗销售个人「AI 外呼名额」，也不计入「未拨打领取额度」。</div>
+              </div>
+              <div class="cfg-block">
+                <h4>准入（与融合版全局配置口径一致，运营侧）</h4>
+                <div class="pill-row" id="layerAllow">
+                  <span class="pill" data-v="A">A 类 · 默认禁止</span>
+                  <span class="pill" data-v="B">B 类 · 默认禁止</span>
+                  <span class="pill on" data-v="C">C 类 · 允许</span>
+                  <span class="pill on" data-v="D">D 类 · 允许</span>
+                </div>
+                <p class="small" style="margin-top:8px">高净值 / 已加微 / 黑名单 / 空号：强制剔除（不可关闭）</p>
+              </div>
+            </div>
+            <div id="stab-s2" class="hidden">
+              <div class="cfg-block">
+                <h4>可拨打时段（强制禁呼 22:00–08:00 不可覆盖）</h4>
+                <div class="grid-3">
+                  <div class="form-row"><label><span class="checkbox checked" onclick="this.classList.toggle('checked')"><span class="box">✓</span></span> 上午</label><input class="inp" value="09:00 – 12:00"/></div>
+                  <div class="form-row"><label><span class="checkbox checked" onclick="this.classList.toggle('checked')"><span class="box">✓</span></span> 下午</label><input class="inp" value="14:00 – 18:00"/></div>
+                  <div class="form-row"><label><span class="checkbox checked" onclick="this.classList.toggle('checked')"><span class="box">✓</span></span> 晚间</label><input class="inp" value="18:30 – 21:00"/></div>
+                </div>
+              </div>
+              <div class="cfg-block">
+                <h4>未接通重播</h4>
+                <div class="grid-2">
+                  <div class="form-row"><label>重播次数</label><input class="inp" type="number" value="2"/></div>
+                  <div class="form-row"><label>重播间隔（小时）</label><input class="inp" type="number" value="4"/></div>
+                </div>
+                <p class="small">未接通原因对齐外呼数据中心：关机 / 空号 / 拒接 / 无人接听 / 忙线 / 停机</p>
+              </div>
+            </div>
+            <div id="stab-s3" class="hidden">
+              <div class="cfg-block">
+                <h4>线索比例量级（从数据池按比例抽样入 AI 池）</h4>
+                <div class="form-row"><label>每日从数据池抽取比例</label>
+                  <div class="slider-row"><input type="range" min="5" max="100" value="35" id="ratioSlider" oninput="ratioVal.textContent=this.value+'%'"/> <b id="ratioVal">35%</b></div>
+                </div>
+                <div class="quota-box">
+                  <div class="quota-item"><div class="small">今日可抽取上限</div><div class="n">4,200</div></div>
+                  <div class="quota-item"><div class="small">已入 AI 池</div><div class="n">3,210</div></div>
+                  <div class="quota-item"><div class="small">剩余可抽</div><div class="n" style="color:var(--primary)">990</div></div>
+                </div>
+                <div class="form-row" style="margin-top:12px"><label>优先来源权重</label>
+                  <div class="pill-row">
+                    <span class="pill on">抖音信息流 ×1.5</span>
+                    <span class="pill on">官网留资 ×1.2</span>
+                    <span class="pill">小程序试听 ×1.0</span>
+                    <span class="pill">腾讯广点通 ×0.8</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="stab-s4" class="hidden">
+              <div class="table-wrap">
+                <table class="data">
+                  <thead><tr><th>启用</th><th>通道</th><th>说明</th><th>健康</th><th>并发上限</th><th>成本/分</th><th>优先级</th></tr></thead>
+                  <tbody>
+                    <tr><td><span class="switch on" onclick="this.classList.toggle('on')"></span></td><td><b>火山</b></td><td>对齐 pages.yc345.tv/waihudata 火山主体</td><td><span class="tag success">正常</span></td><td>120</td><td>¥0.12</td><td>1</td></tr>
+                    <tr><td><span class="switch on" onclick="this.classList.toggle('on')"></span></td><td><b>阿里</b></td><td>对齐外呼数据中心阿里主体</td><td><span class="tag success">正常</span></td><td>80</td><td>¥0.11</td><td>2</td></tr>
+                    <tr><td><span class="switch" onclick="this.classList.toggle('on')"></span></td><td>软电话中继</td><td>现网人工通道，AI 可选降级</td><td><span class="tag warning">观察</span></td><td>40</td><td>¥0.09</td><td>3</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="small" style="margin-top:8px">全公司 AI 并发上限 150；实际取「通道并发之和」与「公司上限」较小值。</p>
+            </div>
+            <div id="stab-s5" class="hidden">
+              <div class="cfg-block">
+                <h4>意向判定与加微</h4>
+                <div class="form-row"><label>推送加微的意向门槛</label>
+                  <select class="inp"><option>意向及以上</option><option selected>重点意向</option><option>一般及以上</option></select>
+                </div>
+                <div class="form-row"><label>加微通知承接账号</label>
+                  <select class="inp"><option>跟随「企微承接账号」轮询</option><option>指定：武汉运营-承接01</option><option>指定：武汉运营-承接02</option></select>
+                </div>
+                <div class="form-row"><label><span class="checkbox checked" onclick="this.classList.toggle('checked')"><span class="box">✓</span></span> 同意加微后自动进入「意向线索池」待分配</label></div>
+                <div class="form-row"><label><span class="checkbox checked" onclick="this.classList.toggle('checked')"><span class="box">✓</span></span> 同步 AI 通话总结到线索详情（分配入库后可见）</label></div>
+              </div>
+            </div>
+            <div id="stab-s6" class="hidden">
+              <div class="cfg-block">
+                <h4>红线词（AI 严禁说出）</h4>
+                <div class="form-row"><label>红线词列表（每行一条）</label>
+                  <textarea class="inp">保证提分
+包过
+最便宜
+绝对有效
+百分百上岸</textarea>
+                </div>
+                <div class="alert warn">命中红线词后本通立即降级兜底话术并标记高优质检；连续命中 3 次的话术版本自动下线。</div>
+              </div>
+              <div class="cfg-block">
+                <h4>合规开关</h4>
+                <div class="grid-2">
+                  <div class="form-row"><label><span class="checkbox checked" onclick="this.classList.toggle('checked')"><span class="box">✓</span></span> 开场白主动披露 AI 身份</label></div>
+                  <div class="form-row"><label><span class="checkbox checked" onclick="this.classList.toggle('checked')"><span class="box">✓</span></span> 法定节假日暂停 AI 外呼</label></div>
+                  <div class="form-row"><label>明确拒绝后免打扰（天）</label><input class="inp" type="number" value="30"/></div>
+                  <div class="form-row"><label>录音/转译保存（天）</label><input class="inp" type="number" value="90"/></div>
+                  <div class="form-row"><label><span class="checkbox checked" onclick="this.classList.toggle('checked')"><span class="box">✓</span></span> 拒绝后自动降级为 D 类</label></div>
+                  <div class="form-row"><label>强制禁呼</label><input class="inp" value="22:00 – 次日 08:00" disabled/></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== VIEW: 企微承接 ========== -->
+      <div class="view" id="view-wework">
+        <div class="card">
+          <div class="card-hd">AI外呼企微承接账号配置 <span class="anno new">新增独立页</span>
+            <span class="anno reuse">布局借鉴 weworkBot/globalConfig</span>
+            <div class="spacer"></div>
+            <button class="btn sm primary" onclick="toast('承接配置已保存','ok')">保存</button>
+          </div>
+          <div class="card-bd">
+            <div class="alert info">本页独立于销售企微机器人全局配置：专门配置 <b>AI 外呼筛出意向后</b> 发起加微通知的承接企业微信账号。加微成功入库的线索按「企微承接额度」PRD <b>不占未拨打领取额度</b>。</div>
+            <div class="tabs" id="weworkTabs">
+              <div class="tab active" data-tab="w1">承接账号</div>
+              <div class="tab" data-tab="w2">加微通知策略</div>
+              <div class="tab" data-tab="w3">额度与豁免</div>
+              <div class="tab" data-tab="w4">今日漏斗</div>
+            </div>
+            <div id="wtab-w1">
+              <div class="toolbar">
+                <button class="btn primary" onclick="toast('已打开添加承接账号弹层（示意）','ok')">＋ 添加承接账号</button>
+                <button class="btn" onclick="toast('已刷新企微活码状态','ok')">刷新活码状态</button>
+              </div>
+              <div class="grid-2" style="margin-bottom:12px">
+                <div class="account-card">
+                  <div class="av">承1</div>
+                  <div style="flex:1">
+                    <div><b>武汉运营-AI承接01</b> <span class="tag success">启用</span></div>
+                    <div class="small">企微 userid: ai_chengjie_01 · 今日已承接 18 / 上限 40</div>
+                    <div class="progress" style="margin-top:6px"><i style="width:45%"></i></div>
+                  </div>
+                  <button class="btn sm">编辑</button>
+                </div>
+                <div class="account-card">
+                  <div class="av" style="background:var(--purple)">承2</div>
+                  <div style="flex:1">
+                    <div><b>武汉运营-AI承接02</b> <span class="tag success">启用</span></div>
+                    <div class="small">企微 userid: ai_chengjie_02 · 今日已承接 12 / 上限 40</div>
+                    <div class="progress" style="margin-top:6px"><i style="width:30%"></i></div>
+                  </div>
+                  <button class="btn sm">编辑</button>
+                </div>
+                <div class="account-card">
+                  <div class="av" style="background:var(--warning)">承3</div>
+                  <div style="flex:1">
+                    <div><b>武汉运营-AI承接03</b> <span class="tag warning">额度将满</span></div>
+                    <div class="small">企微 userid: ai_chengjie_03 · 今日已承接 36 / 上限 40</div>
+                    <div class="progress" style="margin-top:6px"><i style="width:90%;background:var(--warning)"></i></div>
+                  </div>
+                  <button class="btn sm">编辑</button>
+                </div>
+                <div class="account-card">
+                  <div class="av" style="background:var(--info)">承4</div>
+                  <div style="flex:1">
+                    <div><b>备用-晚班承接</b> <span class="tag">停用</span></div>
+                    <div class="small">仅 18:30–21:00 窗口启用 · 今日 0 / 20</div>
+                    <div class="progress" style="margin-top:6px"><i style="width:0%"></i></div>
+                  </div>
+                  <button class="btn sm">启用</button>
+                </div>
+              </div>
+            </div>
+            <div id="wtab-w2" class="hidden">
+              <div class="cfg-block">
+                <h4>加微通知策略</h4>
+                <div class="grid-2">
+                  <div class="form-row"><label>分配方式</label><select class="inp"><option>轮询（推荐）</option><option>按剩余额度加权</option><option>指定账号</option></select></div>
+                  <div class="form-row"><label>活码渠道标记</label><input class="inp" value="AI外呼承接-运营池"/></div>
+                  <div class="form-row"><label>通知文案模板</label><textarea class="inp">您好，我是洋葱学园学习顾问。刚才电话沟通中您对课程表现出兴趣，这是我的企业微信，方便发资料给您～</textarea></div>
+                  <div class="form-row"><label>失败重试</label><select class="inp"><option>失败后换账号重试 1 次</option><option>失败记入待人工</option></select></div>
+                  <div class="form-row"><label>意向门槛</label><select class="inp"><option selected>重点意向</option><option>意向及以上</option></select></div>
+                  <div class="form-row"><label>静默时段不发加微</label><input class="inp" value="22:00 – 08:00"/></div>
+                </div>
+              </div>
+            </div>
+            <div id="wtab-w3" class="hidden">
+              <div class="cfg-block">
+                <h4>额度与豁免（对齐企微承接额度 PRD）</h4>
+                <div class="alert info">AI 外呼筛出意向并经承接账号加微成功入库的线索，<b>不占用</b>销售「未拨打领取额度」；与人工企微承接豁免口径一致。</div>
+                <div class="quota-box" style="margin:12px 0">
+                  <div class="quota-item"><div class="small">今日 AI 承接入库</div><div class="n">29</div></div>
+                  <div class="quota-item"><div class="small">豁免未拨打额度</div><div class="n" style="color:var(--success)">29</div></div>
+                  <div class="quota-item"><div class="small">销售名下占用</div><div class="n">0</div></div>
+                </div>
+                <div class="form-row"><label><span class="checkbox checked" onclick="this.classList.toggle('checked')"><span class="box">✓</span></span> 启用「企微承接不占未拨打领取额度」</label></div>
+                <div class="form-row"><label><span class="checkbox checked" onclick="this.classList.toggle('checked')"><span class="box">✓</span></span> 分配入库时自动打标 source=AI外呼承接</label></div>
+                <div class="form-row"><label>单账号日承接上限（默认）</label><input class="inp" type="number" value="40"/></div>
+                <div class="table-wrap" style="margin-top:12px">
+                  <table class="data">
+                    <thead><tr><th>规则</th><th>说明</th><th>状态</th></tr></thead>
+                    <tbody>
+                      <tr><td>豁免未拨打额度</td><td>加微成功 → 分配入库 → 不计入销售未拨打占用</td><td><span class="tag success">生效</span></td></tr>
+                      <tr><td>与领取额度互斥校验</td><td>同一线索不可同时占用领取额度与 AI 承接豁免</td><td><span class="tag success">生效</span></td></tr>
+                      <tr><td>账号额度耗尽</td><td>轮询跳过已满账号；全满则入「待人工承接」队列</td><td><span class="tag warning">观察</span></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div id="wtab-w4" class="hidden">
+              <div class="card-hd" style="border:0;padding:0 0 12px">今日加微漏斗（对齐外呼数据中心「加微节点 / 同意加微」）</div>
+              <div class="stat-funnel">
+                <div class="funnel-bar"><span class="name">有效接通</span><div class="bar"><i style="width:100%"></i></div><span class="n">612</span></div>
+                <div class="funnel-bar"><span class="name">触达加微节点</span><div class="bar"><i style="width:55%"></i></div><span class="n">337</span></div>
+                <div class="funnel-bar"><span class="name">发起加微通知</span><div class="bar"><i style="width:32%"></i></div><span class="n">196</span></div>
+                <div class="funnel-bar"><span class="name">同意加微</span><div class="bar"><i style="width:12%;background:var(--success)"></i></div><span class="n">73</span></div>
+              </div>
+              <div class="table-wrap" style="margin-top:14px">
+                <table class="data">
+                  <thead><tr><th>承接账号</th><th>发起</th><th>同意</th><th>通过率</th><th>入库</th></tr></thead>
+                  <tbody>
+                    <tr><td>武汉运营-AI承接01</td><td>72</td><td>28</td><td>38.9%</td><td>12</td></tr>
+                    <tr><td>武汉运营-AI承接02</td><td>58</td><td>22</td><td>37.9%</td><td>9</td></tr>
+                    <tr><td>武汉运营-AI承接03</td><td>66</td><td>23</td><td>34.8%</td><td>8</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== VIEW: 意向池 ========== -->
+      <div class="view" id="view-intent">
+        <div class="kpi-row">
+          <div class="kpi"><div class="label">待分配意向</div><div class="val">86</div></div>
+          <div class="kpi"><div class="label">重点意向</div><div class="val" style="color:var(--danger)">14</div></div>
+          <div class="kpi"><div class="label">已同意加微</div><div class="val" style="color:var(--success)">41</div></div>
+          <div class="kpi"><div class="label">今日已分配入库</div><div class="val">29</div></div>
+        </div>
+        <div class="card">
+          <div class="card-hd">意向线索池 · 在线分配入库 <span class="anno new">新增</span>
+            <div class="spacer"></div>
+            <button class="btn sm" onclick="toast('已导出意向明细（含通话总结）','ok')">导出</button>
+            <button class="btn sm primary" onclick="openAssign()">在线分配入库</button>
+          </div>
+          <div class="card-bd">
+            <div class="tabs" id="intentTabs">
+              <div class="tab active" data-tab="pending">待分配</div>
+              <div class="tab" data-tab="assigned">已分配</div>
+              <div class="tab" data-tab="wechat">加微结果</div>
+              <div class="tab" data-tab="assignDetail">分配明细</div>
+            </div>
+            <div class="filter-bar">
+              <div class="filter-item"><label>意向等级</label><select class="inp" id="fltIntent"><option>全部</option><option>重点意向</option><option>意向</option><option>一般</option></select></div>
+              <div class="filter-item"><label>加微状态</label><select class="inp" id="fltWx"><option>全部</option><option>已同意</option><option>待通过</option><option>未发起</option></select></div>
+              <div class="filter-item"><label>通道</label><select class="inp" id="fltCh"><option>全部</option><option>火山</option><option>阿里</option></select></div>
+              <button class="btn primary" onclick="renderIntent()">查询</button>
+            </div>
+            <div id="itab-pending">
+              <div class="table-wrap" style="max-height:440px">
+                <table class="data">
+                  <thead><tr>
+                    <th></th><th>onionId</th><th>昵称</th><th>分层</th><th>AI意向</th><th>通话时长</th><th>通道</th><th>加微</th><th>承接账号</th><th>通话总结摘要</th><th>操作</th>
+                  </tr></thead>
+                  <tbody id="intentBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div id="itab-assigned" class="hidden">
+              <div class="table-wrap" style="max-height:440px">
+                <table class="data">
+                  <thead><tr><th>onionId</th><th>昵称</th><th>AI意向</th><th>分配销售</th><th>入库时间</th><th>额度豁免</th><th>通话总结</th></tr></thead>
+                  <tbody id="intentAssignedBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div id="itab-wechat" class="hidden">
+              <div class="kpi-row">
+                <div class="kpi"><div class="label">发起加微</div><div class="val">196</div></div>
+                <div class="kpi"><div class="label">已同意</div><div class="val" style="color:var(--success)">73</div></div>
+                <div class="kpi"><div class="label">待通过</div><div class="val" style="color:var(--warning)">48</div></div>
+                <div class="kpi"><div class="label">失败/过期</div><div class="val" style="color:var(--danger)">12</div></div>
+              </div>
+              <div class="table-wrap" style="max-height:360px">
+                <table class="data">
+                  <thead><tr><th>onionId</th><th>昵称</th><th>承接账号</th><th>发起时间</th><th>结果</th><th>通道</th></tr></thead>
+                  <tbody id="intentWxBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div id="itab-assignDetail" class="hidden">
+              <div class="alert info">分配明细：记录运营将意向线索分配入库到销售的全程（来源=AI机器人 · 额度豁免）。</div>
+              <div class="table-wrap" style="max-height:420px">
+                <table class="data">
+                  <thead><tr><th>分配单号</th><th>onionId</th><th>意向</th><th>加微</th><th>承接账号</th><th>分配销售</th><th>分配人</th><th>入库时间</th><th>总结同步</th><th>额度豁免</th><th>操作</th></tr></thead>
+                  <tbody id="intentAssignDetailBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== VIEW: 任务 ========== -->
+      <div class="view" id="view-tasks">
+        <div class="card">
+          <div class="card-hd">外呼任务监控 <span class="anno new">新增 · 运营调度视角</span></div>
+          <div class="card-bd">
+            <div class="table-wrap">
+              <table class="data">
+                <thead><tr><th>任务ID</th><th>策略/批次</th><th>通道</th><th>计划</th><th>已呼</th><th>接通</th><th>有效≥10s</th><th>意向</th><th>进度</th><th>状态</th><th>操作</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td class="mono">A-20261022-01</td><td>早班·C/D 吞吐</td><td>火山</td><td>4000</td><td>2860</td><td>812</td><td>498</td><td>62</td>
+                    <td style="min-width:120px"><div class="progress"><i style="width:71%"></i></div><span class="small">71%</span></td>
+                    <td><span class="tag primary">进行中</span></td>
+                    <td class="ops"><button class="btn sm" onclick="toast('任务已暂停','ok')">暂停</button><button class="btn sm" onclick="openTaskDetail('A-20261022-01')">详情</button></td>
+                  </tr>
+                  <tr>
+                    <td class="mono">A-20261022-02</td><td>午后·重播未接</td><td>阿里</td><td>1500</td><td>350</td><td>88</td><td>41</td><td>9</td>
+                    <td style="min-width:120px"><div class="progress"><i style="width:23%"></i></div><span class="small">23%</span></td>
+                    <td><span class="tag primary">进行中</span></td>
+                    <td class="ops"><button class="btn sm" onclick="toast('任务已暂停','ok')">暂停</button><button class="btn sm" onclick="openTaskDetail('A-20261022-02')">详情</button></td>
+                  </tr>
+                  <tr>
+                    <td class="mono">A-20261021-08</td><td>晚班·加微追呼</td><td>火山</td><td>800</td><td>800</td><td>214</td><td>133</td><td>28</td>
+                    <td style="min-width:120px"><div class="progress"><i style="width:100%;background:var(--success)"></i></div><span class="small">100%</span></td>
+                    <td><span class="tag success">已完成</span></td>
+                    <td class="ops"><button class="btn sm" onclick="openTaskDetail('A-20261021-08')">详情</button><button class="btn sm" onclick="toast('失败 12 条已入重试队列','ok')">重试失败</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="cfg-block" style="margin-top:12px">
+              <h4>实时通话观察（示意）</h4>
+              <div class="grid-3">
+                <div class="kpi"><div class="label">当前并发</div><div class="val">86 <small>/ 150</small></div></div>
+                <div class="kpi"><div class="label">近 5 分钟接通率</div><div class="val">27.8%</div></div>
+                <div class="kpi"><div class="label">排队等待</div><div class="val">214 <small>条</small></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== VIEW: 看板 ========== -->
+      <div class="view" id="view-board">
+        <div class="toolbar">
+          <div class="pill-row">
+            <span class="pill on" onclick="selPill(this)">今日</span>
+            <span class="pill" onclick="selPill(this)">近7日</span>
+            <span class="pill" onclick="selPill(this)">近30日</span>
+          </div>
+          <div class="spacer"></div>
+          <span class="chip">口径对齐 · pages.yc345.tv/waihudata</span>
+        </div>
+        <div class="tabs" id="boardTabs">
+          <div class="tab active" data-tab="b1">总览</div>
+          <div class="tab" data-tab="b2">通道对比(火山·阿里)</div>
+          <div class="tab" data-tab="b3">意向加微</div>
+          <div class="tab" data-tab="b4">未接通分层</div>
+          <div class="tab" data-tab="b5">明细导出</div>
+        </div>
+        <div id="btab-b1">
+          <div class="kpi-row">
+            <div class="kpi"><div class="label">外呼通数</div><div class="val">3,210</div><div class="delta">火山 2,100 · 阿里 1,110</div></div>
+            <div class="kpi"><div class="label">接通率</div><div class="val">28.4%</div></div>
+            <div class="kpi"><div class="label">有效接通≥10s</div><div class="val">19.1%</div></div>
+            <div class="kpi"><div class="label">意向率（有效中）</div><div class="val">14.1%</div></div>
+            <div class="kpi"><div class="label">同意加微率</div><div class="val">11.9%</div></div>
+            <div class="kpi"><div class="label">分配入库完成</div><div class="val">29</div></div>
+          </div>
+          <div class="grid-2">
+            <div class="card"><div class="card-hd">转化漏斗</div><div class="card-bd">
+              <div class="stat-funnel">
+                <div class="funnel-bar"><span class="name">外呼通数</span><div class="bar"><i style="width:100%"></i></div><span class="n">3210</span></div>
+                <div class="funnel-bar"><span class="name">接通</span><div class="bar"><i style="width:28%"></i></div><span class="n">912</span></div>
+                <div class="funnel-bar"><span class="name">有效≥10s</span><div class="bar"><i style="width:19%"></i></div><span class="n">612</span></div>
+                <div class="funnel-bar"><span class="name">意向+</span><div class="bar"><i style="width:8%;background:var(--warning)"></i></div><span class="n">86</span></div>
+                <div class="funnel-bar"><span class="name">同意加微</span><div class="bar"><i style="width:4%;background:var(--success)"></i></div><span class="n">41</span></div>
+                <div class="funnel-bar"><span class="name">分配入库</span><div class="bar"><i style="width:3%;background:var(--purple)"></i></div><span class="n">29</span></div>
+              </div>
+            </div></div>
+            <div class="card"><div class="card-hd">时段接通率</div><div class="card-bd">
+              <div class="bar-chart">
+                <div class="bar-row"><span>09–12</span><div class="track"><i style="width:24%"></i></div><span>24%</span></div>
+                <div class="bar-row"><span>14–18</span><div class="track"><i style="width:29%"></i></div><span>29%</span></div>
+                <div class="bar-row"><span>18:30–21</span><div class="track"><i style="width:46%;background:var(--success)"></i></div><span>46%</span></div>
+              </div>
+            </div></div>
+          </div>
+        </div>
+        <div id="btab-b2" class="hidden">
+          <div class="card">
+            <div class="card-hd">通道对比 · 火山 vs 阿里</div>
+            <div class="card-bd">
+              <div class="table-wrap">
+                <table class="data">
+                  <thead><tr><th>通道</th><th>外呼通数</th><th>接通率</th><th>有效接通率</th><th>意向产出</th><th>同意加微</th><th>单通成本估</th><th>并发峰值</th></tr></thead>
+                  <tbody>
+                    <tr><td><b>火山</b></td><td>2,100</td><td>29.1%</td><td>19.8%</td><td>58</td><td>28</td><td>¥0.86</td><td>118</td></tr>
+                    <tr><td><b>阿里</b></td><td>1,110</td><td>27.0%</td><td>17.6%</td><td>28</td><td>13</td><td>¥0.79</td><td>76</td></tr>
+                    <tr><td>合计</td><td>3,210</td><td>28.4%</td><td>19.1%</td><td>86</td><td>41</td><td>¥0.84</td><td>150</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="grid-2" style="margin-top:14px">
+                <div>
+                  <div class="small" style="margin-bottom:6px">接通率对比</div>
+                  <div class="bar-chart">
+                    <div class="bar-row"><span>火山</span><div class="track"><i style="width:29%"></i></div><span>29.1%</span></div>
+                    <div class="bar-row"><span>阿里</span><div class="track"><i style="width:27%;background:var(--purple)"></i></div><span>27.0%</span></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="small" style="margin-bottom:6px">意向产出对比</div>
+                  <div class="bar-chart">
+                    <div class="bar-row"><span>火山</span><div class="track"><i style="width:67%;background:var(--warning)"></i></div><span>58</span></div>
+                    <div class="bar-row"><span>阿里</span><div class="track"><i style="width:33%;background:var(--warning)"></i></div><span>28</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="btab-b3" class="hidden">
+          <div class="kpi-row">
+            <div class="kpi"><div class="label">重点意向</div><div class="val" style="color:var(--danger)">14</div></div>
+            <div class="kpi"><div class="label">意向</div><div class="val" style="color:var(--warning)">48</div></div>
+            <div class="kpi"><div class="label">一般</div><div class="val">24</div></div>
+            <div class="kpi"><div class="label">同意加微</div><div class="val" style="color:var(--success)">41</div></div>
+          </div>
+          <div class="card">
+            <div class="card-hd">意向 × 加微交叉表</div>
+            <div class="card-bd">
+              <div class="table-wrap">
+                <table class="data">
+                  <thead><tr><th>意向等级</th><th>产出数</th><th>发起加微</th><th>同意加微</th><th>同意率</th><th>已分配入库</th></tr></thead>
+                  <tbody>
+                    <tr><td>重点意向</td><td>14</td><td>14</td><td>11</td><td>78.6%</td><td>9</td></tr>
+                    <tr><td>意向</td><td>48</td><td>42</td><td>24</td><td>57.1%</td><td>16</td></tr>
+                    <tr><td>一般</td><td>24</td><td>8</td><td>6</td><td>75.0%</td><td>4</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="btab-b4" class="hidden">
+          <div class="grid-2">
+            <div class="card"><div class="card-hd">未接通原因（对齐数据中心）</div><div class="card-bd">
+              <div class="stat-funnel">
+                <div class="funnel-bar"><span class="name">无人接听</span><div class="bar"><i style="width:38%;background:#909399"></i></div><span class="n">38%</span></div>
+                <div class="funnel-bar"><span class="name">拒接</span><div class="bar"><i style="width:22%;background:#909399"></i></div><span class="n">22%</span></div>
+                <div class="funnel-bar"><span class="name">关机</span><div class="bar"><i style="width:14%;background:#909399"></i></div><span class="n">14%</span></div>
+                <div class="funnel-bar"><span class="name">忙线</span><div class="bar"><i style="width:12%;background:#909399"></i></div><span class="n">12%</span></div>
+                <div class="funnel-bar"><span class="name">空号</span><div class="bar"><i style="width:8%;background:#f56c6c"></i></div><span class="n">8%</span></div>
+                <div class="funnel-bar"><span class="name">停机/其他</span><div class="bar"><i style="width:6%;background:#909399"></i></div><span class="n">6%</span></div>
+              </div>
+            </div></div>
+            <div class="card"><div class="card-hd">未接通 × 私域分层</div><div class="card-bd">
+              <div class="table-wrap">
+                <table class="data">
+                  <thead><tr><th>分层</th><th>未接通</th><th>无人接听</th><th>拒接</th><th>可重播</th><th>冷却回池</th></tr></thead>
+                  <tbody>
+                    <tr><td><span class="tag layer-C">C</span></td><td>1,420</td><td>540</td><td>310</td><td>980</td><td>210</td></tr>
+                    <tr><td><span class="tag layer-D">D</span></td><td>878</td><td>334</td><td>196</td><td>520</td><td>180</td></tr>
+                    <tr><td>合计</td><td>2,298</td><td>874</td><td>506</td><td>1,500</td><td>390</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div></div>
+          </div>
+
+        <div id="btab-b5" class="hidden">
+          <div class="card">
+            <div class="card-hd">明细导出 · 字段勾选 <span class="anno new">新增</span>
+              <div class="spacer"></div>
+              <button class="btn sm" onclick="document.querySelectorAll('#exportFields .checkbox').forEach(c=>{c.classList.add('checked');c.querySelector('.box').textContent='✓'})">全选</button>
+              <button class="btn sm primary" onclick="toast('已按勾选字段导出 CSV（示意）','ok')">导出 CSV</button>
+            </div>
+            <div class="card-bd">
+              <div class="alert info">导出口径对齐 pages.yc345.tv/waihudata · 主键 onionId / infoUuid 必选。</div>
+              <div class="grid-3" id="exportFields" style="gap:10px">
+                <label class="checkbox checked" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box">✓</span> onionId</label>
+                <label class="checkbox checked" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box">✓</span> infoUuid</label>
+                <label class="checkbox checked" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box">✓</span> 通道(火山/阿里)</label>
+                <label class="checkbox checked" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box">✓</span> 拨打时间</label>
+                <label class="checkbox checked" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box">✓</span> 通话时长</label>
+                <label class="checkbox checked" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box">✓</span> 是否接通</label>
+                <label class="checkbox checked" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box">✓</span> 有效接通≥10s</label>
+                <label class="checkbox checked" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box">✓</span> 意向等级</label>
+                <label class="checkbox checked" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box">✓</span> 未接通原因</label>
+                <label class="checkbox checked" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box">✓</span> 加微节点/同意</label>
+                <label class="checkbox checked" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box">✓</span> AI通话总结</label>
+                <label class="checkbox" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box"></span> 录音 URL</label>
+                <label class="checkbox" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box"></span> 转译全文</label>
+                <label class="checkbox checked" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box">✓</span> 私域分层</label>
+                <label class="checkbox checked" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box">✓</span> 承接账号</label>
+                <label class="checkbox" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box"></span> 分配销售</label>
+              </div>
+              <div class="cfg-block" style="margin-top:14px">
+                <h4>导出范围</h4>
+                <div class="pill-row">
+                  <span class="pill on" onclick="selPill(this)">今日</span>
+                  <span class="pill" onclick="selPill(this)">近7日</span>
+                  <span class="pill" onclick="selPill(this)">近30日</span>
+                  <span class="pill" onclick="selPill(this)">自定义</span>
+                </div>
+                <p class="small" style="margin-top:8px">预估行数 ≈ 3,210 · 含敏感字段时需运营管理员权限。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      
+      <!-- ========== VIEW: 记录明细（补充屏，计入≥6） ========== -->
+      <div class="view" id="view-records">
+        <div class="card">
+          <div class="card-hd">AI外呼通话明细 <span class="anno new">运营只读 · 口径同 callRecord + 外呼数据中心</span></div>
+          <div class="card-bd">
+            <div class="filter-bar">
+              <div class="filter-item"><label>通道</label><select class="inp"><option>全部</option><option>火山</option><option>阿里</option></select></div>
+              <div class="filter-item"><label>结果</label><select class="inp"><option>全部</option><option>接通</option><option>未接通</option><option>有效接通</option></select></div>
+              <div class="filter-item"><label>意向</label><select class="inp"><option>全部</option><option>重点意向</option><option>意向</option><option>一般</option><option>无</option></select></div>
+              <button class="btn primary">查询</button>
+            </div>
+            <div class="table-wrap" style="max-height:480px"><table class="data"><thead><tr>
+              <th>通话ID</th><th>onionId</th><th>通道</th><th>拨打时间</th><th>时长</th><th>接通</th><th>有效≥10s</th><th>意向</th><th>未接通原因</th><th>加微节点</th><th>总结</th>
+            </tr></thead><tbody id="recBody"></tbody></table></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== VIEW: 系统说明 ========== -->
+      <div class="view" id="view-docs">
+        <div class="card">
+          <div class="card-hd">系统说明 · 方案A 独立板块承接式</div>
+          <div class="card-bd">
+            <div class="doc-sec">
+              <h3>1. CRM 挂载位置</h3>
+              <ul>
+                <li>产品名：<b>武汉电销系统 / 重洋启思电销系统</b>，路径前缀 <span class="mono">/WH_CRM_v2/</span></li>
+                <li><span class="tag success">复用</span> 数据池 <span class="mono">dataPool</span> 作为未领取线索来源；分配 <span class="mono">distribute</span>；企微机器人 <span class="mono">weworkBot/globalConfig</span> 布局参考；通话记录字段口径</li>
+                <li><span class="tag purple">新增</span> 侧栏一级「AI外呼中心」：pool / strategy / weworkAccount / intentPool / tasks / board</li>
+                <li>明确不改：客户池一键外呼/锁定/收藏/转移；销售未拨打领取上限计算（AI 池线索豁免占用）</li>
+              </ul>
+            </div>
+            <div class="doc-sec">
+              <h3>2. 主流程</h3>
+              <div class="mermaid-box"><div class="title">运营统一吞吐未领取线索 → 意向加微 → 分配入库</div>
+                <pre class="mermaid">
+flowchart TD
+  A[数据池 dataPool 未领取线索] --> B[按策略比例灌入 AI专属外呼池]
+  B --> C{准入校验 分层/黑名单/空号}
+  C -->|剔除| Z1[回数据池或标记不可呼]
+  C -->|通过| D[调度任务 火山/阿里通道]
+  D --> E{接通?}
+  E -->|未接通| F[重播队列 次数/间隔]
+  F --> D
+  E -->|接通| G[AI 话术对话 意向识别]
+  G --> H{意向达标?}
+  H -->|否| I[回写意向/总结 释放或冷却]
+  H -->|是| J[按承接账号配置发起加微通知]
+  J --> K[意向线索池]
+  K --> L[运营在线分配入库指定销售]
+  L --> M[同步通话总结到线索详情]
+  M --> N[客户池可见 来源=AI机器人]
+  N --> O[不占未拨打领取额度]
+                </pre>
+              </div>
+            </div>
+            <div class="doc-sec">
+              <h3>3. 线索状态机</h3>
+              <div class="mermaid-box"><div class="title">AI 池内状态</div>
+                <pre class="mermaid">
+stateDiagram-v2
+  [*] --> 未领取公共
+  未领取公共 --> AI池待呼: 策略抽取
+  AI池待呼 --> 外呼中: 任务拨打
+  外呼中 --> 未接通待重播: 未接通
+  未接通待重播 --> 外呼中: 重播
+  未接通待重播 --> 冷却回池: 重播耗尽
+  外呼中 --> 已接通识别中: 接通
+  已接通识别中 --> 无意向冷却: 低意向
+  已接通识别中 --> 意向待加微: 意向达标
+  意向待加微 --> 加微待通过: 发起通知
+  加微待通过 --> 意向待分配: 同意加微
+  加微待通过 --> 意向待分配: 超时仍可人工分配
+  意向待分配 --> 已入库销售名下: distribute 分配
+  已入库销售名下 --> [*]
+  冷却回池 --> 未领取公共
+  无意向冷却 --> AI池待呼: 间隔满足可再呼
+                </pre>
+              </div>
+            </div>
+            <div class="doc-sec">
+              <h3>4. 与领取额度 / 分配的关系</h3>
+              <ul>
+                <li>AI 专属池内线索对销售领取接口不可领（状态 AI处理中），避免与人工抢同一条。</li>
+                <li>分配入库后：来源覆盖为「AI机器人」（对齐《CRM线索池私域筛选》PRD）；首次承接销售名下若经 AI 加微活码进线，<b>不计入未拨打领取额度</b>（对齐《企微承接额度》PRD）。</li>
+                <li>转交/回收后再分配给其他销售：恢复占用未拨打额度（同现网规则）。</li>
+              </ul>
+            </div>
+            <div class="doc-sec">
+              <h3>5. 字段与指标字典（现网对齐）</h3>
+              <ul>
+                <li>私域分层 A/B/C/D；意向度：未跟进/未拨/未接/拒接/不需要/待跟进/一般/意向/重点意向/正常成单/未沟通成单</li>
+                <li>外呼状态按时长分档；付费分类：未付费/活动定金/蓄水品/高净值/零售商品/体验品</li>
+                <li>看板：外呼通数、接通率、有效接通≥10s、意向等级、加微节点/同意加微、未接通原因、通话总结、导出明细</li>
+                <li>主键示意：onionId / infoUuid</li>
+              </ul>
+            </div>
+            
+            <div class="doc-sec">
+              <h3>6. 现网页面复用 vs 新增对照表</h3>
+              <div class="table-wrap"><table class="data">
+                <thead><tr><th>模块</th><th>现网路径</th><th>本方案动作</th><th>说明</th></tr></thead>
+                <tbody>
+                  <tr><td>客户池</td><td class="mono">customer/ongoing</td><td><span class="tag success">复用</span></td><td>分配入库后线索出现在销售客户池；不改一键外呼</td></tr>
+                  <tr><td>付费线索池</td><td class="mono">customer/payClue</td><td><span class="tag success">复用</span></td><td>分层 A/B/C/D 口径一致</td></tr>
+                  <tr><td>数据池</td><td class="mono">dataPool</td><td><span class="tag warning">复用+抽取</span></td><td>未领取线索来源；AI 抽取后锁定</td></tr>
+                  <tr><td>分配</td><td class="mono">distribute</td><td><span class="tag warning">复用+调用</span></td><td>意向池「在线分配入库」走现网分配能力</td></tr>
+                  <tr><td>企微全局配置</td><td class="mono">weworkBot/globalConfig</td><td><span class="tag success">复用布局</span></td><td>承接账号页视觉对齐；配置数据独立</td></tr>
+                  <tr><td>通话记录</td><td class="mono">callRecord</td><td><span class="tag success">复用字段</span></td><td>AI 通话写入统一记录，主体标记 AI</td></tr>
+                  <tr><td>AI专属外呼池</td><td class="mono">aiOutbound/pool</td><td><span class="tag purple">新增</span></td><td>运营主工作台</td></tr>
+                  <tr><td>外呼策略</td><td class="mono">aiOutbound/strategy</td><td><span class="tag purple">新增</span></td><td>频率/时段/比例/重播/通道</td></tr>
+                  <tr><td>企微承接账号</td><td class="mono">aiOutbound/weworkAccount</td><td><span class="tag purple">新增</span></td><td>独立页，非销售个人配置</td></tr>
+                  <tr><td>意向线索池</td><td class="mono">aiOutbound/intentPool</td><td><span class="tag purple">新增</span></td><td>导出 / 在线分配 / 总结同步</td></tr>
+                  <tr><td>任务监控/看板/明细</td><td class="mono">aiOutbound/*</td><td><span class="tag purple">新增</span></td><td>对齐外呼数据中心指标</td></tr>
+                </tbody>
+              </table></div>
+            </div>
+            <div class="doc-sec">
+              <h3>7. 与方案B的边界</h3>
+              <ul>
+                <li>方案A 面向<strong>运营</strong>：吞吐未领取公共线索，销售被动接收分配结果。</li>
+                <li>方案B 面向<strong>销售</strong>：在客户池对自己名下线索发起 AI 批量外呼（见 scheme-b）。</li>
+                <li>可并列落地：A 清公共池库存，B 清销售私海未接通；共享通道、话术、意向字典与加微能力。</li>
+              </ul>
+            </div>
+            <div class="doc-sec">
+              <h3>8. 验收要点（摘）</h3>
+              <ul>
+                <li>从 dataPool 按比例抽取后，销售领取接口对该线索返回 AI处理中。</li>
+                <li>策略页修改重播次数/时段后，下一调度窗口生效；强制禁呼不可覆盖。</li>
+                <li>意向达标触发加微通知，承接账号按轮询/额度；同意后进入意向池。</li>
+                <li>分配入库后来源=AI机器人，通话总结在线索详情可见；不占未拨打领取额度。</li>
+                <li>看板接通率/有效接通≥10s/加微与 pages.yc345.tv/waihudata 同口径可对账。</li>
+              </ul>
+            </div>
+
+            <div class="doc-sec">
+              <h3>9. 接口与数据落点（实现备注）</h3>
+              <div class="table-wrap"><table class="data">
+                <thead><tr><th>能力</th><th>建议服务</th><th>读写</th><th>备注</th></tr></thead>
+                <tbody>
+                  <tr><td>未领取线索抽取</td><td>dataPool + aiOutbound.pool</td><td>读池/写锁定</td><td>抽取事务内加锁，防领取竞态</td></tr>
+                  <tr><td>外呼任务调度</td><td>aiOutbound.task</td><td>写</td><td>通道适配火山/阿里；并发令牌桶</td></tr>
+                  <tr><td>通话结果回写</td><td>callRecord + clue</td><td>写</td><td>意向、时长、录音URL、转译、总结</td></tr>
+                  <tr><td>加微通知</td><td>weworkBot 能力复用</td><td>写</td><td>承接账号独立配置表</td></tr>
+                  <tr><td>分配入库</td><td>distribute</td><td>写</td><td>来源=AI机器人；额度豁免标记</td></tr>
+                  <tr><td>看板指标</td><td>aiOutbound.metrics</td><td>读</td><td>与 waihudata 对账字段清单</td></tr>
+                </tbody>
+              </table></div>
+            </div>
+            <div class="doc-sec">
+              <h3>10. 风险与合规</h3>
+              <ul>
+                <li>开场白必须披露机构身份；客户明确拒绝 → 立即挂断 + 30 天免打扰（人工与 AI 均不可呼）。</li>
+                <li>录音与转译保存 90 天，仅授权人员可访问；红线词命中降级并质检。</li>
+                <li>法定禁呼时段 22:00–08:00 与节假日策略不可被任务级覆盖。</li>
+                <li>A/B 高价值分层默认禁止进入 AI 专属池，除非主管在策略中显式放行并记审计日志。</li>
+                <li>空号检测结果回写，避免重复消耗通道成本。</li>
+              </ul>
+            </div>
+            <div class="doc-sec">
+              <h3>11. 演示路径（给评审）</h3>
+              <ol style="font-size:13px;line-height:1.8;color:var(--t2)">
+                <li>打开「AI专属外呼池」→ 看 KPI 与未领取列表 → 勾选若干 →「按策略灌入任务」。</li>
+                <li>「外呼策略配置」→ 调比例滑杆与重播次数 → 保存。</li>
+                <li>「企微承接账号」→ 查看额度进度与加微漏斗。</li>
+                <li>「意向线索池」→ 勾选重点意向 →「在线分配入库」选销售 → 确认。</li>
+                <li>「外呼数据看板」→ 核对火山/阿里与有效接通≥10s。</li>
+                <li>「系统说明」→ 查看 mermaid 主流程与状态机。</li>
+              </ol>
+            </div>
+
+            <div class="doc-sec">
+              <h3>12. 客户池字段对齐清单（分配入库后销售可见）</h3>
+              <div class="table-wrap"><table class="data">
+                <thead><tr><th>字段</th><th>现网来源</th><th>AI回写</th><th>说明</th></tr></thead>
+                <tbody>
+                  <tr><td>入库时间</td><td>customer/ongoing</td><td>分配时刻刷新</td><td>销售视角的入库=分配入库时间</td></tr>
+                  <tr><td>外呼/接通次数</td><td>callRecord 聚合</td><td>累加 AI 次</td><td>列表可区分 AI/人工列（建议）</td></tr>
+                  <tr><td>外呼状态</td><td>按时长分档</td><td>最近一通 AI</td><td>通话=0 / &lt;10s / 10s–3min / …</td></tr>
+                  <tr><td>意向度</td><td>11 档字典</td><td>AI判定可人工改</td><td>与融合版一致</td></tr>
+                  <tr><td>私域分层</td><td>付费线索池 A/B/C/D</td><td>拒绝可降 D</td><td>策略默认仅 C/D 入池</td></tr>
+                  <tr><td>来源</td><td>多选表头</td><td>覆盖为 AI机器人</td><td>私域筛选 PRD</td></tr>
+                  <tr><td>付费分类</td><td>6 类</td><td>不改</td><td>高净值禁止入 AI 池</td></tr>
+                  <tr><td>学情报告打开次数</td><td>现网</td><td>不改</td><td>可用于策略加权</td></tr>
+                  <tr><td>onionId / infoUuid</td><td>主键</td><td>贯穿</td><td>明细导出必备</td></tr>
+                  <tr><td>是否成功加微</td><td>企微关系</td><td>承接成功置是</td><td>绑定承接账号</td></tr>
+                  <tr><td>AI通话总结</td><td>—</td><td>新增详情区</td><td>分配时同步</td></tr>
+                </tbody>
+              </table></div>
+            </div>
+            <div class="doc-sec">
+              <h3>13. 外呼数据中心对账字段</h3>
+              <p>看板与导出需能与 <span class="mono">https://pages.yc345.tv/waihudata/</span> 的火山/阿里主体对齐：</p>
+              <ul>
+                <li>外呼通数、接通通数、接通率</li>
+                <li>有效接通（通话时长 ≥10s）、有效接通率</li>
+                <li>意向等级分布、加微节点触达、同意加微</li>
+                <li>未接通原因分布、通话总结文本、明细导出</li>
+                <li>主体维度：销售人工 / 火山 AI / 阿里 AI（方案A仅后两者为主，分配后销售跟进计入人工）</li>
+              </ul>
+            </div>
+            <div class="doc-sec">
+              <h3>14. 角色权限矩阵</h3>
+              <div class="table-wrap"><table class="data">
+                <thead><tr><th>角色</th><th>策略配置</th><th>承接账号</th><th>灌池/任务</th><th>意向分配</th><th>看板</th></tr></thead>
+                <tbody>
+                  <tr><td>运营管理员</td><td>读写</td><td>读写</td><td>读写</td><td>读写</td><td>全部</td></tr>
+                  <tr><td>运营专员</td><td>只读</td><td>只读</td><td>执行</td><td>执行</td><td>全部</td></tr>
+                  <tr><td>销售主管</td><td>只读</td><td>无</td><td>无</td><td>本组分配</td><td>本组</td></tr>
+                  <tr><td>销售</td><td>无</td><td>无</td><td>无</td><td>无（收分配）</td><td>个人跟进结果</td></tr>
+                </tbody>
+              </table></div>
+            </div>
+
+            <div class="doc-sec">
+              <h3>术语速查（现网字典）</h3>
+              <div class="glossary-grid">
+                <div class="g"><b>私域分层</b>A高意向 B中意向 C低/潜在 D无意向</div>
+                <div class="g"><b>意向度</b>未跟进/未拨/未接/拒接/不需要/待跟进/一般/意向/重点意向/正常成单/未沟通成单</div>
+                <div class="g"><b>外呼状态</b>通话=0；0&lt;通话&lt;10s；10s–3min；3–10min；≥10min</div>
+                <div class="g"><b>付费分类</b>未付费/活动定金/蓄水品/高净值/零售商品/体验品</div>
+                <div class="g"><b>未拨打领取额度</b>销售名下未拨打线索占用上限；企微/AI承接可豁免</div>
+                <div class="g"><b>有效接通</b>通话时长≥10s（外呼数据中心口径）</div>
+                <div class="g"><b>onionId</b>用户洋葱 ID</div>
+                <div class="g"><b>infoUuid</b>线索档案唯一键</div>
+                <div class="g"><b>dataPool</b>未领取公共线索数据池</div>
+                <div class="g"><b>distribute</b>系统分配模块</div>
+                <div class="g"><b>weworkBot</b>企微机器人子系统</div>
+                <div class="g"><b>callRecord</b>通话记录日常模块</div>
+              </div>
+            </div>
+<div class="alert ok">完整 Markdown 文档见仓库 <span class="mono">docs/scheme-a-system.md</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+<div class="card" style="margin:12px 16px">
+  <div class="card-hd">附录 · 节点话术样例（评审可读，非线上配置）</div>
+  <div class="card-bd">
+    <div class="grid-2">
+      <div class="cfg-block" style="border:1px solid var(--border-light);padding:12px;border-radius:4px;background:#fff">
+        <h4 style="margin:0 0 8px;font-size:13px">开场节点</h4>
+        <p class="small" style="line-height:1.7">「您好，我是洋葱学园的学习顾问助理，今天打电话是想了解一下孩子最近的学习情况。请问方便说两分钟吗？」<br/>分支：方便→学情询问；不方便→预约改时；拒绝→免打扰。</p>
+      </div>
+      <div class="cfg-block" style="border:1px solid var(--border-light);padding:12px;border-radius:4px;background:#fff">
+        <h4 style="margin:0 0 8px;font-size:13px">加微节点</h4>
+        <p class="small" style="line-height:1.7">「我把适合孩子年级的学情报告和试听安排发您微信，您看方便加一下我的企业微信吗？」<br/>分支：同意→触发加微；犹豫→发短信链；拒绝→记录原因结束。</p>
+      </div>
+      <div class="cfg-block" style="border:1px solid var(--border-light);padding:12px;border-radius:4px;background:#fff">
+        <h4 style="margin:0 0 8px;font-size:13px">价格节点</h4>
+        <p class="small" style="line-height:1.7">缓存话术：说明有同步课与专题课不同套餐，具体方案加微后按年级发送，不在电话口播精确价以免违规承诺。</p>
+      </div>
+      <div class="cfg-block" style="border:1px solid var(--border-light);padding:12px;border-radius:4px;background:#fff">
+        <h4 style="margin:0 0 8px;font-size:13px">拒绝红线</h4>
+        <p class="small" style="line-height:1.7">命中「不要再打 / 投诉 / 报警」等：立即挂断，写入免打扰 30 天，分层可降 D，任务记拒绝终止。</p>
+      </div>
+    </div>
+    <h4 style="font-size:13px;margin:16px 0 8px">武汉电销日常协同说明</h4>
+    <p class="small" style="line-height:1.8;color:var(--t2)">AI 外呼不是替换销售，而是把「未接通与低意向过滤」前置。方案A由运营统一清洗数据池；方案B由销售清洗私海。两者共享通道健康度、话术版本、意向字典与企微加微能力。质检走现网 AI质检模块抽检录音；投诉工单仍走原客服流程。上线建议：先 B 灰度一组销售（沿用融合 PRD），再开 A 的运营池小流量，最后并列全量并做 waihudata 对账。</p>
+    <div class="table-wrap" style="margin-top:12px"><table class="data">
+      <thead><tr><th>周次</th><th>里程碑</th><th>负责人角色</th><th>退出标准</th></tr></thead>
+      <tbody>
+        <tr><td>W1</td><td>通道联调 + 字典对齐</td><td>研发/运营</td><td>火山&阿里试呼成功率&gt;95%</td></tr>
+        <tr><td>W2</td><td>方案B 单组灰度</td><td>销售主管</td><td>高意向回写准确率人工抽检≥80%</td></tr>
+        <tr><td>W3</td><td>方案A 小流量抽池</td><td>运营</td><td>无双领事故；额度豁免正确</td></tr>
+        <tr><td>W4</td><td>加微承接并联</td><td>运营+企微</td><td>同意加微链路端到端跑通</td></tr>
+        <tr><td>W5</td><td>看板对账</td><td>数据</td><td>与 waihudata 误差&lt;2%</td></tr>
+        <tr><td>W6</td><td>并列全量</td><td>产品</td><td>投诉率不高于基线</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</div>
+
+<div class="mask hidden" id="detailMask">
+  <div class="dialog lg">
+    <div class="dialog-hd">线索详情 · infoUuid 示意 <span class="close" onclick="detailMask.classList.add('hidden')">×</span></div>
+    <div class="dialog-bd">
+      <div class="grid-2">
+        <div>
+          <div class="form-row"><label>onionId</label><input class="inp" value="ON88291033" readonly/></div>
+          <div class="form-row"><label>infoUuid</label><input class="inp" value="iu-6f3a-91bc-20261022" readonly/></div>
+          <div class="form-row"><label>私域分层 / 付费分类</label><input class="inp" value="C · 未付费" readonly/></div>
+          <div class="form-row"><label>来源（入库时）</label><input class="inp" value="抖音信息流" readonly/></div>
+          <div class="form-row"><label>学情报告打开次数</label><input class="inp" value="3" readonly/></div>
+        </div>
+        <div>
+          <div class="form-row"><label>AI 外呼次数 / 接通次数</label><input class="inp" value="2 / 1" readonly/></div>
+          <div class="form-row"><label>最近意向</label><input class="inp" value="意向" readonly/></div>
+          <div class="form-row"><label>加微状态</label><input class="inp" value="已同意 · 承接01" readonly/></div>
+          <div class="form-row"><label>池状态</label><input class="inp" value="意向待分配" readonly/></div>
+          <div class="form-row"><label>额度占用</label><input class="inp" value="否（AI承接豁免）" readonly/></div>
+        </div>
+      </div>
+      <div class="cfg-block">
+        <h4>AI 通话总结</h4>
+        <p class="small" style="line-height:1.7;color:var(--t2)">开场披露机构身份后，家长表示孩子初二数学薄弱，近期考试下滑。对「同步课+学情报告」有兴趣，询问周末是否可试听。价格方面希望先看方案再决定。已在加微节点引导，家长口头同意。建议销售今日内跟进并发送试听安排。</p>
+        <div class="pill-row" style="margin-top:8px">
+          <span class="chip">标签: 初二数学</span><span class="chip">标签: 要试听</span><span class="chip">标签: 价格敏感</span>
+        </div>
+      </div>
+      <div class="cfg-block">
+        <h4>外呼轨迹</h4>
+        <div class="table-wrap"><table class="data"><thead><tr><th>时间</th><th>通道</th><th>结果</th><th>时长</th><th>备注</th></tr></thead>
+        <tbody>
+          <tr><td>10-22 10:12</td><td>火山</td><td>未接通</td><td>0s</td><td>无人接听 · 入重播</td></tr>
+          <tr><td>10-22 15:40</td><td>火山</td><td>有效接通</td><td>96s</td><td>意向 · 已加微</td></tr>
+        </tbody></table></div>
+      </div>
+    </div>
+    <div class="dialog-ft"><button class="btn" onclick="detailMask.classList.add('hidden')">关闭</button><button class="btn primary" onclick="detailMask.classList.add('hidden');openAssign()">去分配</button></div>
+  </div>
+</div>
+
+
+      <div class="view" id="view-appendix" style="display:none"></div>
+      <div class="card" id="crmBindingCard" style="margin-top:12px">
+        <div class="card-hd">附录 · WH_CRM_v2 信息架构对照（方案A交付附件）</div>
+        <div class="card-bd">
+          <p class="small">以下侧栏结构来自现网历史路由 <span class="mono">shadow.yangcong345.com/WH_CRM_v2/</span>，用于评审时核对挂载点，避免做成通用 SaaS 皮肤。</p>
+          <div class="grid-2">
+            <div>
+              <h4 style="font-size:13px;margin:0 0 8px">现网模块（复用/只读示意）</h4>
+              <ul class="small" style="line-height:1.9;color:var(--t2)">
+                <li>客户池 customer/ongoing — 销售主工作台</li>
+                <li>付费线索池 customer/payClue — 分层口径</li>
+                <li>线索追踪 customer/clueTrace</li>
+                <li>已完成 / 超期 done/beyond</li>
+                <li>转介绍 / 跟进线索</li>
+                <li>数据池 dataPool — <b>本方案线索水源</b></li>
+                <li>企微机器人 weworkBot/aiEmployee</li>
+                <li>weworkBot/globalConfig · ruleConfig</li>
+                <li>aiScriptTemplate · sessionAttr · layerConfig</li>
+                <li>transferReason · promptConfig · bulkAudit</li>
+                <li>统计 matchOutbound · matchConversion · wechatData · cluePushAgent</li>
+                <li>系统 distribute · poolShield · orientation</li>
+                <li>日常 callRecord</li>
+                <li>AI质检 aiQualityInspection/*</li>
+              </ul>
+            </div>
+            <div>
+              <h4 style="font-size:13px;margin:0 0 8px">本方案新增（AI外呼中心）</h4>
+              <ul class="small" style="line-height:1.9;color:var(--t2)">
+                <li>aiOutbound/pool — AI专属外呼池</li>
+                <li>aiOutbound/strategy — 频率/时段/比例/重播/通道</li>
+                <li>aiOutbound/weworkAccount — 企微承接账号独立页</li>
+                <li>aiOutbound/intentPool — 意向导出与在线分配</li>
+                <li>aiOutbound/tasks — 运营任务监控</li>
+                <li>aiOutbound/board — 对账看板</li>
+                <li>aiOutbound/records — 通话明细</li>
+                <li>aiOutbound/docs — 系统说明（含状态机）</li>
+              </ul>
+              <div class="alert warn" style="margin-top:12px">产品铬（chrome）名称固定为「武汉电销系统 / 重洋启思电销系统」，勿写成通用 CRM。</div>
+            </div>
+          </div>
+          <h4 style="font-size:13px;margin:16px 0 8px">加微通知时序（实现备注）</h4>
+          <div class="table-wrap"><table class="data">
+            <thead><tr><th>步骤</th><th>系统</th><th>输入</th><th>输出</th></tr></thead>
+            <tbody>
+              <tr><td>1 意向达标</td><td>AI对话引擎</td><td>通话转译、节点路径</td><td>意向等级、总结、加微意愿</td></tr>
+              <tr><td>2 选承接账号</td><td>aiOutbound.weworkAccount</td><td>轮询/额度策略</td><td>userid、活码</td></tr>
+              <tr><td>3 发加微通知</td><td>企微能力复用</td><td>文案模板、客户手机号映射</td><td>通知回执</td></tr>
+              <tr><td>4 同意回调</td><td>企微回调</td><td>好友事件</td><td>意向池状态=已同意</td></tr>
+              <tr><td>5 分配入库</td><td>distribute</td><td>销售ID、infoUuid</td><td>客户池可见、来源AI机器人、额度豁免标记</td></tr>
+            </tbody>
+          </table></div>
+          <h4 style="font-size:13px;margin:16px 0 8px">示例：策略 JSON（示意）</h4>
+          <pre class="mono" style="background:#0b1220;color:#d1e0ff;padding:12px;border-radius:6px;overflow:auto;font-size:11px;line-height:1.5">{
+  "strategyId": "ops-default-cd",
+  "dailyCap": 8000,
+  "perClueDaily": 2,
+  "retry": {"times": 2, "intervalHours": 4},
+  "windows": ["09:00-12:00","14:00-18:00","18:30-21:00"],
+  "forbid": ["22:00-08:00"],
+  "layersAllow": ["C","D"],
+  "sampleRatioFromDataPool": 0.35,
+  "channels": [
+    {"id":"volc","priority":1,"concurrency":120},
+    {"id":"ali","priority":2,"concurrency":80}
+  ],
+  "intentForWecom": ["意向","重点意向"],
+  "quotaExemptOnAssign": true
+}</pre>
+        </div>
+      </div>
+
+<!-- Assign dialog -->
+
+<!-- Task detail drawer -->
+<div class="mask hidden" id="taskDetailMask">
+  <div class="dialog lg">
+    <div class="dialog-hd">任务详情 · <span id="taskDetailId">A-20261022-01</span> <span class="close" onclick="taskDetailMask.classList.add('hidden')">×</span></div>
+    <div class="dialog-bd">
+      <div class="tabs" id="taskDetailTabs">
+        <div class="tab active" data-tab="ov">概览</div>
+        <div class="tab" data-tab="dial">拨打明细</div>
+        <div class="tab" data-tab="retry">失败重试</div>
+        <div class="tab" data-tab="live">实时通话</div>
+        <div class="tab" data-tab="log">操作日志</div>
+      </div>
+      <div id="tdtab-ov">
+        <div class="kpi-row">
+          <div class="kpi"><div class="label">计划</div><div class="val">4,000</div></div>
+          <div class="kpi"><div class="label">已呼</div><div class="val">2,860</div></div>
+          <div class="kpi"><div class="label">接通</div><div class="val">812</div></div>
+          <div class="kpi"><div class="label">有效≥10s</div><div class="val">498</div></div>
+          <div class="kpi"><div class="label">意向</div><div class="val">62</div></div>
+          <div class="kpi"><div class="label">进度</div><div class="val">71%</div></div>
+        </div>
+        <div class="grid-2">
+          <div class="form-row"><label>策略/批次</label><input class="inp" value="早班·C/D 吞吐" readonly/></div>
+          <div class="form-row"><label>通道</label><input class="inp" value="火山" readonly/></div>
+          <div class="form-row"><label>状态</label><input class="inp" value="进行中" readonly/></div>
+          <div class="form-row"><label>创建人</label><input class="inp" value="运营·朱胜武" readonly/></div>
+        </div>
+        <div class="progress" style="margin-top:8px"><i style="width:71%"></i></div>
+      </div>
+      <div id="tdtab-dial" class="hidden">
+        <div class="table-wrap" style="max-height:360px"><table class="data">
+          <thead><tr><th>时间</th><th>onionId</th><th>结果</th><th>时长</th><th>有效</th><th>意向</th><th>未接通原因</th></tr></thead>
+          <tbody>
+            <tr><td>10-22 09:12</td><td class="mono">ON10086011</td><td><span class="tag success">接通</span></td><td>86s</td><td>是</td><td>意向</td><td>—</td></tr>
+            <tr><td>10-22 09:13</td><td class="mono">ON10086012</td><td><span class="tag">未接通</span></td><td>0s</td><td>否</td><td>—</td><td>无人接听</td></tr>
+            <tr><td>10-22 09:14</td><td class="mono">ON10086013</td><td><span class="tag success">接通</span></td><td>22s</td><td>是</td><td>一般</td><td>—</td></tr>
+            <tr><td>10-22 09:15</td><td class="mono">ON10086014</td><td><span class="tag">未接通</span></td><td>0s</td><td>否</td><td>—</td><td>拒接</td></tr>
+            <tr><td>10-22 09:16</td><td class="mono">ON10086015</td><td><span class="tag success">接通</span></td><td>112s</td><td>是</td><td>重点意向</td><td>—</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+      <div id="tdtab-retry" class="hidden">
+        <div class="toolbar"><span class="chip">失败待重试 12</span><button class="btn sm primary" onclick="toast('已全部入重试队列','ok')">全部重试</button></div>
+        <div class="table-wrap"><table class="data">
+          <thead><tr><th>onionId</th><th>失败原因</th><th>已重试</th><th>下次计划</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">ON10086101</td><td>无人接听</td><td>1/3</td><td>10-22 16:30</td><td><button class="btn sm" onclick="toast('已单条重试','ok')">重试</button></td></tr>
+            <tr><td class="mono">ON10086102</td><td>忙线</td><td>0/3</td><td>10-22 15:00</td><td><button class="btn sm" onclick="toast('已单条重试','ok')">重试</button></td></tr>
+            <tr><td class="mono">ON10086103</td><td>拒接</td><td>2/3</td><td>10-22 18:40</td><td><button class="btn sm" onclick="toast('已单条重试','ok')">重试</button></td></tr>
+          </tbody>
+        </table></div>
+      </div>
+      <div id="tdtab-live" class="hidden">
+        <div class="grid-3">
+          <div class="kpi"><div class="label">当前并发</div><div class="val">86 <small>/ 150</small></div></div>
+          <div class="kpi"><div class="label">近 5 分钟接通率</div><div class="val">27.8%</div></div>
+          <div class="kpi"><div class="label">排队等待</div><div class="val">214</div></div>
+        </div>
+        <div class="table-wrap" style="margin-top:12px"><table class="data">
+          <thead><tr><th>会话</th><th>onionId</th><th>通道</th><th>已通话</th><th>节点</th><th>状态</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">S-9912</td><td class="mono">ON10086201</td><td>火山</td><td>00:42</td><td>学情询问</td><td><span class="tag primary">通话中</span></td></tr>
+            <tr><td class="mono">S-9913</td><td class="mono">ON10086202</td><td>火山</td><td>01:08</td><td>加微节点</td><td><span class="tag primary">通话中</span></td></tr>
+            <tr><td class="mono">S-9914</td><td class="mono">ON10086203</td><td>火山</td><td>00:15</td><td>开场</td><td><span class="tag primary">通话中</span></td></tr>
+          </tbody>
+        </table></div>
+      </div>
+      <div id="tdtab-log" class="hidden">
+        <div class="table-wrap"><table class="data">
+          <thead><tr><th>时间</th><th>操作人</th><th>动作</th><th>备注</th></tr></thead>
+          <tbody>
+            <tr><td>10-22 08:55</td><td>朱胜武</td><td>创建任务</td><td>策略早班·C/D · 计划 4000</td></tr>
+            <tr><td>10-22 09:00</td><td>系统</td><td>开始调度</td><td>通道火山 · 并发 120</td></tr>
+            <tr><td>10-22 11:20</td><td>朱胜武</td><td>调高并发</td><td>120 → 150</td></tr>
+            <tr><td>10-22 14:02</td><td>系统</td><td>入重试队列</td><td>失败 12 条</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+    <div class="dialog-ft"><button class="btn" onclick="taskDetailMask.classList.add('hidden')">关闭</button><button class="btn primary" onclick="taskDetailMask.classList.add('hidden');toast('已刷新任务快照','ok')">刷新</button></div>
+  </div>
+</div>
+
+<!-- Call detail (转译/总结/录音/回写) -->
+<div class="mask hidden" id="callDetailMask">
+  <div class="dialog lg">
+    <div class="dialog-hd">通话明细 · <span id="callDetailOid">ON10086003</span> <span class="close" onclick="callDetailMask.classList.add('hidden')">×</span></div>
+    <div class="dialog-bd">
+      <div class="tabs" id="callDetailTabs">
+        <div class="tab active" data-tab="tr">转译</div>
+        <div class="tab" data-tab="sum">AI通话总结</div>
+        <div class="tab" data-tab="rec">录音信息</div>
+        <div class="tab" data-tab="crm">回写字段</div>
+      </div>
+      <div id="cdtab-tr">
+        <div class="cfg-block">
+          <div class="small">▶ ──●──────── 01:12 / 01:36 · 通道火山 · 任务 A-20261022-01</div>
+          <p style="font-size:12px;line-height:1.8;color:var(--t2);margin-top:10px"><b>AI：</b>您好，我是洋葱学园学习顾问助理，今天想了解一下孩子最近的学习情况…<br/><b>客户：</b>你们是做什么的？<br/><b>AI：</b>我们提供初高中同步课与学情报告…<br/><b>客户：</b>初二数学有点跟不上，多少钱？先发我看看吧。<br/><b>AI：</b>可以先发免费资料，这是我的企微…</p>
+        </div>
+      </div>
+      <div id="cdtab-sum" class="hidden">
+        <div class="form-row"><label>一句话总结</label><textarea class="inp" readonly>开场披露机构身份后，家长表示孩子初二数学薄弱。对同步课+学情报告有兴趣，询问周末是否可试听。价格敏感，已引导加微。</textarea></div>
+        <div class="grid-2">
+          <div class="form-row"><label>AI意向</label><input class="inp" value="意向" readonly/></div>
+          <div class="form-row"><label>关键诉求</label><input class="inp" value="试听 / 资料" readonly/></div>
+          <div class="form-row"><label>异议点</label><input class="inp" value="价格对比" readonly/></div>
+          <div class="form-row"><label>加微动作</label><input class="inp" value="已同意 · 承接01" readonly/></div>
+        </div>
+        <div class="pill-row"><span class="chip">标签: 初二数学</span><span class="chip">标签: 要试听</span><span class="chip">标签: 价格敏感</span></div>
+      </div>
+      <div id="cdtab-rec" class="hidden">
+        <div class="grid-2">
+          <div class="form-row"><label>录音 ID</label><input class="inp" value="REC-A-1022-8861" readonly/></div>
+          <div class="form-row"><label>格式 / 码率</label><input class="inp" value="mp3 · 32kbps" readonly/></div>
+          <div class="form-row"><label>时长</label><input class="inp" value="96s" readonly/></div>
+          <div class="form-row"><label>存储</label><input class="inp" value="oss://ai-call/2026/10/22/…" readonly/></div>
+          <div class="form-row"><label>保留至</label><input class="inp" value="2027-01-20（90天）" readonly/></div>
+          <div class="form-row"><label>权限</label><input class="inp" value="运营管理员 / 分配销售" readonly/></div>
+        </div>
+        <button class="btn sm" onclick="toast('开始播放录音（示意）','ok')">▶ 播放录音</button>
+        <button class="btn sm" onclick="toast('已复制录音链接','ok')">复制链接</button>
+      </div>
+      <div id="cdtab-crm" class="hidden">
+        <div class="alert info">以下字段在分配入库或意向回写时写入线索详情（customer/ongoing）。</div>
+        <div class="table-wrap"><table class="data">
+          <thead><tr><th>CRM 字段</th><th>回写值</th><th>状态</th></tr></thead>
+          <tbody>
+            <tr><td>意向度</td><td>意向</td><td><span class="tag success">已回写</span></td></tr>
+            <tr><td>外呼/接通次数</td><td>+1 / +1（AI）</td><td><span class="tag success">已回写</span></td></tr>
+            <tr><td>外呼状态</td><td>10s–3min</td><td><span class="tag success">已回写</span></td></tr>
+            <tr><td>来源</td><td>AI机器人</td><td><span class="tag warning">待分配后覆盖</span></td></tr>
+            <tr><td>是否成功加微</td><td>是</td><td><span class="tag success">已回写</span></td></tr>
+            <tr><td>AI通话总结</td><td>（见总结 Tab）</td><td><span class="tag success">已回写</span></td></tr>
+            <tr><td>onionId / infoUuid</td><td>贯穿</td><td><span class="tag primary">主键</span></td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+    <div class="dialog-ft"><button class="btn" onclick="callDetailMask.classList.add('hidden')">关闭</button><button class="btn primary" onclick="callDetailMask.classList.add('hidden');openAssign()">去分配</button></div>
+  </div>
+</div>
+
+<div class="mask hidden" id="assignMask">
+  <div class="dialog">
+    <div class="dialog-hd">在线分配入库到指定销售 <span class="anno new">走 distribute 能力</span><span class="close" onclick="closeAssign()">×</span></div>
+    <div class="dialog-bd">
+      <div class="alert info">将同步 AI 外呼总结、意向等级、录音链接到线索详情；来源记为「AI机器人」。</div>
+      <div class="form-row"><label>已选意向线索</label><input class="inp" id="assignCount" value="3 条（含重点意向 1）" readonly/></div>
+      <div class="form-row"><label>目标销售 <span class="req">*</span></label>
+        <select class="inp"><option>王敏 · 武汉一组（剩余未拨打额度 12）</option><option>李强 · 武汉二组（剩余 8）</option><option>周杰 · 武汉三组（剩余 15）</option></select>
+      </div>
+      <div class="form-row"><label>入库后锁定</label><select class="inp"><option>锁定 2 小时（推荐）</option><option>不锁定</option><option>锁定至首次跟进</option></select></div>
+      <div class="form-row"><label><span class="checkbox checked" onclick="this.classList.toggle('checked')"><span class="box">✓</span></span> 写入站内待跟进提醒</label></div>
+    </div>
+    <div class="dialog-ft">
+      <button class="btn" onclick="closeAssign()">取消</button>
+      <button class="btn primary" onclick="closeAssign();toast('已分配入库，总结已同步','ok')">确认分配</button>
+    </div>
+  </div>
+</div>
+
+<script>
+mermaid.initialize({startOnLoad:false, theme:'neutral', securityLevel:'loose'});
+
+const PATHS = {
+  pool:['AI专属外呼池','/WH_CRM_v2/aiOutbound/pool'],
+  strategy:['外呼策略配置','/WH_CRM_v2/aiOutbound/strategy'],
+  wework:['企微承接账号','/WH_CRM_v2/aiOutbound/weworkAccount'],
+  intent:['意向线索池','/WH_CRM_v2/aiOutbound/intentPool'],
+  tasks:['外呼任务监控','/WH_CRM_v2/aiOutbound/tasks'],
+  board:['外呼数据看板','/WH_CRM_v2/aiOutbound/board'],
+  docs:['系统说明','/WH_CRM_v2/aiOutbound/docs'],
+  records:['通话明细','/WH_CRM_v2/aiOutbound/records']
+};
+
+const NAMES=['赵敏','钱丽','孙强','李娜','周伟','吴芳','郑磊','王芳','冯军','陈静','褚勇','卫红'];
+const GRADES=['初一','初二','初三','高一','高二','高三'];
+const SOURCES=['抖音信息流','官网留资','小程序试听','腾讯广点通','转介绍'];
+const PAYS=['未付费','活动定金','蓄水品','体验品'];
+const LAYERS=['C','D','C','D','C','B'];
+const STATES=['待呼','外呼中','未接通待重播','冷却'];
+const INTENTS=['—','未接','一般','意向','重点意向'];
+
+function rid(){return 'ON'+Math.floor(10000000+Math.random()*89999999)}
+function toast(text,type){
+  const w=document.getElementById('toasts');
+  const d=document.createElement('div');
+  d.className='toast '+(type||'ok');
+  d.textContent=text;
+  w.appendChild(d);
+  setTimeout(()=>d.remove(),2800);
+}
+
+function navigate(view){
+  document.querySelectorAll('.nav-item[data-view]').forEach(n=>n.classList.toggle('active',n.dataset.view===view));
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.getElementById('view-'+view).classList.add('on');
+  const [name,path]=PATHS[view];
+  crumbName.textContent=name; crumbPath.textContent=path;
+  if(view==='docs'){ setTimeout(()=>{ document.querySelectorAll('#view-docs .mermaid').forEach((el,i)=>{ if(!el.dataset.done){ el.dataset.done=1; mermaid.run({nodes:[el]}); } }); },50); }
+}
+document.querySelectorAll('.nav-item[data-view]').forEach(n=>n.addEventListener('click',()=>navigate(n.dataset.view)));
+
+function bindTabs(tabRootSelector, getPaneId){
+  const root=document.querySelector(tabRootSelector);
+  if(!root) return;
+  root.querySelectorAll('.tab').forEach(t=>{
+    t.addEventListener('click',()=>{
+      root.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      const panes=[];
+      root.querySelectorAll('.tab').forEach(x=>{
+        const id=getPaneId(x);
+        const el=document.getElementById(id);
+        if(el) panes.push({id,el,on:x===t});
+      });
+      panes.forEach(p=>p.el.classList.toggle('hidden', !p.on));
+    });
+  });
+}
+bindTabs('#stratTabs', t=>'stab-'+t.dataset.tab);
+bindTabs('#weworkTabs', t=>'wtab-'+t.dataset.tab);
+bindTabs('#boardTabs', t=>'btab-'+t.dataset.tab);
+bindTabs('#intentTabs', t=>'itab-'+t.dataset.tab);
+
+bindTabs('#taskDetailTabs', t=>'tdtab-'+t.dataset.tab);
+bindTabs('#callDetailTabs', t=>'cdtab-'+t.dataset.tab);
+function openTaskDetail(id){
+  const el=document.getElementById('taskDetailId');
+  if(el&&id) el.textContent=id;
+  // reset tabs to 概览
+  const root=document.querySelector('#taskDetailTabs');
+  if(root){
+    root.querySelectorAll('.tab').forEach((x,i)=>x.classList.toggle('active',i===0));
+    ['ov','dial','retry','live','log'].forEach((k,i)=>{
+      const p=document.getElementById('tdtab-'+k);
+      if(p) p.classList.toggle('hidden', i!==0);
+    });
+  }
+  taskDetailMask.classList.remove('hidden');
+}
+function openCallDetail(oid){
+  const el=document.getElementById('callDetailOid');
+  if(el&&oid) el.textContent=oid;
+  const root=document.querySelector('#callDetailTabs');
+  if(root){
+    root.querySelectorAll('.tab').forEach((x,i)=>x.classList.toggle('active',i===0));
+    ['tr','sum','rec','crm'].forEach((k,i)=>{
+      const p=document.getElementById('cdtab-'+k);
+      if(p) p.classList.toggle('hidden', i!==0);
+    });
+  }
+  callDetailMask.classList.remove('hidden');
+}
+function renderRecords(){
+  const tb=document.getElementById('recBody');
+  if(!tb) return;
+  tb.innerHTML='';
+  const reasons=['—','无人接听','拒接','忙线','关机','—','—'];
+  for(let i=0;i<14;i++){
+    const ok=i%3!==1;
+    const eff=ok&&(20+i*7)>=10;
+    const intent=ok?(i%5===0?'重点意向':i%2?'意向':'一般'):'—';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td class="mono">C-A-${1000+i}</td><td class="mono">${rid()}</td><td>${i%2?'火山':'阿里'}</td>
+      <td>10-22 ${9+i%8}:${String(i*3%60).padStart(2,'0')}</td><td>${ok?(20+i*7)+'s':'0s'}</td>
+      <td>${ok?'是':'否'}</td><td>${eff?'是':'否'}</td>
+      <td>${intent==='—'?'—':`<span class="tag ${intent==='重点意向'?'danger':intent==='意向'?'warning':'primary'}">${intent}</span>`}</td>
+      <td>${ok?'—':reasons[i%reasons.length]}</td>
+      <td>${ok&&i%4===0?'已同意':ok?'触达':'—'}</td>
+      <td><button class="btn sm" onclick="openCallDetail('${rid()}')">总结</button></td>`;
+    tb.appendChild(tr);
+  }
+}
+function renderAssignDetail(){
+  const tb=document.getElementById('intentAssignDetailBody');
+  if(!tb) return;
+  tb.innerHTML='';
+  const rows=[['重点意向','已同意','武汉运营-AI承接01','王芳','朱胜武','2026-10-22 11:20'],
+    ['意向','已同意','武汉运营-AI承接02','李娜','朱胜武','2026-10-22 10:05'],
+    ['意向','待通过','武汉运营-AI承接01','周伟','运营专员','2026-10-21 16:40'],
+    ['一般','已同意','武汉运营-AI承接03','陈静','朱胜武','2026-10-21 15:12']];
+  rows.forEach((r,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td class="mono">AS-A-${220+i}</td><td class="mono">${rid()}</td>
+      <td><span class="tag ${r[0]==='重点意向'?'danger':'warning'}">${r[0]}</span></td>
+      <td><span class="tag ${r[1]==='已同意'?'success':'warning'}">${r[1]}</span></td>
+      <td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td>
+      <td><span class="tag success">是</span></td><td><span class="tag success">是</span></td>
+      <td><button class="btn sm" onclick="openCallDetail()">总结</button>
+      <button class="btn sm" onclick="detailMask.classList.remove('hidden')">详情</button></td>`;
+    tb.appendChild(tr);
+  });
+}
+
+document.querySelectorAll('#layerAllow .pill').forEach(p=>{
+  p.addEventListener('click',()=>{
+    if(p.dataset.v==='A'||p.dataset.v==='B'){ toast(p.dataset.v+' 类默认禁止 AI 直呼，需主管放行','err'); return; }
+    p.classList.toggle('on');
+  });
+});
+
+function renderPool(){
+  const tb=document.getElementById('poolBody');
+  tb.innerHTML='';
+  for(let i=0;i<18;i++){
+    const layer=LAYERS[i%LAYERS.length];
+    const st=STATES[i%STATES.length];
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><span class="checkbox" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box"></span></span></td>
+      <td class="mono">${rid()}</td><td>${NAMES[i%NAMES.length]}家长</td><td>${GRADES[i%6]}</td>
+      <td>2026-10-${String(20-(i%10)).padStart(2,'0')} 1${i%9}:2${i%6}</td>
+      <td>${SOURCES[i%SOURCES.length]}</td>
+      <td><span class="tag layer-${layer}">${layer}</span></td>
+      <td>${PAYS[i%PAYS.length]}</td>
+      <td>${i%4}</td><td>${i%3}</td>
+      <td>${INTENTS[i%INTENTS.length]}</td>
+      <td><span class="tag ${st==='外呼中'?'primary':st==='待呼'?'':'warning'}">${st}</span></td>
+      <td class="ops"><button class="btn sm" onclick="toast('已加入下一调度批次','ok')">入队</button>
+      <button class="btn sm" onclick="toast('infoUuid 详情抽屉（示意）','ok')">详情</button></td>`;
+    tb.appendChild(tr);
+  }
+  poolTotal.textContent='12480';
+}
+const INTENT_ROWS=[
+  {intent:'重点意向',wx:'已同意',ch:'火山',acc:'武汉运营-AI承接01',sum:'家长确认周末可试听，关注初二数学同步，已发加微',tab:'pending'},
+  {intent:'意向',wx:'待通过',ch:'阿里',acc:'武汉运营-AI承接02',sum:'对价格敏感，要对比竞品，同意先看资料',tab:'pending'},
+  {intent:'重点意向',wx:'已同意',ch:'火山',acc:'武汉运营-AI承接01',sum:'孩子开学成绩下滑，希望安排顾问回电',tab:'pending'},
+  {intent:'一般',wx:'未发起',ch:'火山',acc:'—',sum:'通话较短，提到「再考虑」，系统标一般',tab:'pending'},
+  {intent:'意向',wx:'已同意',ch:'阿里',acc:'武汉运营-AI承接03',sum:'询问能否分期，已引导加微发方案',tab:'pending'},
+  {intent:'意向',wx:'待通过',ch:'火山',acc:'武汉运营-AI承接02',sum:'加微卡片已发，等待通过',tab:'pending'},
+  {intent:'重点意向',wx:'已同意',ch:'火山',acc:'武汉运营-AI承接01',sum:'明确说「想买」，需销售当天跟进',tab:'pending'},
+  {intent:'一般',wx:'未发起',ch:'阿里',acc:'—',sum:'有效接通但拒绝加微，进入冷却',tab:'pending'}
+];
+function renderIntent(){
+  const tb=document.getElementById('intentBody');
+  if(!tb) return;
+  tb.innerHTML='';
+  const fi=(document.getElementById('fltIntent')||{}).value||'全部';
+  const fw=(document.getElementById('fltWx')||{}).value||'全部';
+  const fc=(document.getElementById('fltCh')||{}).value||'全部';
+  INTENT_ROWS.filter(r=>{
+    if(fi!=='全部'&&r.intent!==fi) return false;
+    if(fw!=='全部'&&r.wx!==fw) return false;
+    if(fc!=='全部'&&r.ch!==fc) return false;
+    return true;
+  }).forEach((r,i)=>{
+    const tr=document.createElement('tr');
+    const itTag=r.intent==='重点意向'?'danger':r.intent==='意向'?'warning':'primary';
+    const wxTag=r.wx==='已同意'?'success':r.wx==='待通过'?'warning':'';
+    tr.innerHTML=`<td><span class="checkbox" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box"></span></span></td>
+      <td class="mono">${rid()}</td><td>${NAMES[i%NAMES.length]}家长</td><td><span class="tag layer-C">C</span></td>
+      <td><span class="tag ${itTag}">${r.intent}</span></td><td>${45+i*13}s</td><td>${r.ch}</td>
+      <td><span class="tag ${wxTag}">${r.wx}</span></td><td>${r.acc}</td>
+      <td style="max-width:240px;white-space:normal;font-size:11px;color:var(--t2)">${r.sum}</td>
+      <td class="ops"><button class="btn sm primary" onclick="openAssign()">分配</button>
+      <button class="btn sm" onclick="openCallDetail()">总结</button>
+      <button class="btn sm" onclick="detailMask.classList.remove('hidden')">详情</button></td>`;
+    tb.appendChild(tr);
+  });
+  const ab=document.getElementById('intentAssignedBody');
+  if(ab){
+    ab.innerHTML='';
+    [['重点意向','王芳','2026-10-22 11:20','是'],['意向','李娜','2026-10-22 10:05','是'],['意向','周伟','2026-10-21 16:40','是'],['一般','陈静','2026-10-21 15:12','是']].forEach((r,i)=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td class="mono">${rid()}</td><td>${NAMES[i]}家长</td><td><span class="tag ${r[0]==='重点意向'?'danger':'warning'}">${r[0]}</span></td>
+        <td>${r[1]}</td><td>${r[2]}</td><td><span class="tag success">${r[3]}</span></td>
+        <td><button class="btn sm" onclick="openCallDetail()">总结</button>
+        <button class="btn sm" onclick="detailMask.classList.remove('hidden')">详情</button></td>`;
+      ab.appendChild(tr);
+    });
+  }
+  const wb=document.getElementById('intentWxBody');
+  if(wb){
+    wb.innerHTML='';
+    [['已同意','武汉运营-AI承接01','10-22 09:18','火山'],['待通过','武汉运营-AI承接02','10-22 10:02','阿里'],['已同意','武汉运营-AI承接01','10-22 11:40','火山'],['失败','武汉运营-AI承接03','10-22 12:15','阿里'],['待通过','武汉运营-AI承接02','10-22 14:08','火山']].forEach((r,i)=>{
+      const tr=document.createElement('tr');
+      const tg=r[0]==='已同意'?'success':r[0]==='待通过'?'warning':'danger';
+      tr.innerHTML=`<td class="mono">${rid()}</td><td>${NAMES[i]}家长</td><td>${r[1]}</td><td>${r[2]}</td>
+        <td><span class="tag ${tg}">${r[0]}</span></td><td>${r[3]}</td>`;
+      wb.appendChild(tr);
+    });
+  }
+}
+function toggleAll(el){
+  el.classList.toggle('checked');
+  el.querySelector('.box').textContent=el.classList.contains('checked')?'✓':'';
+  document.querySelectorAll('#poolBody .checkbox').forEach(c=>{
+    c.classList.toggle('checked', el.classList.contains('checked'));
+    c.querySelector('.box').textContent=el.classList.contains('checked')?'✓':'';
+  });
+}
+function openAssign(){ assignMask.classList.remove('hidden'); }
+function closeAssign(){ assignMask.classList.add('hidden'); }
+function openStrategyQuick(){ navigate('strategy'); toast('已跳转策略配置，可调整比例后灌入','ok'); }
+function selPill(el){ el.parentElement.querySelectorAll('.pill').forEach(p=>p.classList.remove('on')); el.classList.add('on'); }
+
+renderPool(); renderIntent(); renderRecords(); renderAssignDetail();
+</script>
+
+<div class="hidden" id="seedDataA" aria-hidden="true">
+<!-- MOCK_SEED: AI专属池抽样数据备份，供评审对照字段 -->
+<pre style="font-size:10px">
+onionId,infoUuid,layer,source,pay,aiCalls,connects,intent,poolState,quotaExempt
+ON10086001,iu-a001,C,抖音信息流,未付费,0,0,—,待呼,Y
+ON10086002,iu-a002,D,官网留资,活动定金,1,0,未接,未接通待重播,Y
+ON10086003,iu-a003,C,小程序试听,未付费,2,1,意向,意向待分配,Y
+ON10086004,iu-a004,C,腾讯广点通,蓄水品,1,1,重点意向,加微待通过,Y
+ON10086005,iu-a005,D,抖音信息流,未付费,3,0,—,冷却回池,Y
+ON10086006,iu-a006,B,转介绍,体验品,0,0,—,策略未放行,Y
+ON10086007,iu-a007,C,官网留资,未付费,1,1,一般,无意向冷却,Y
+ON10086008,iu-a008,C,抖音信息流,未付费,2,1,意向,已入库销售名下,Y
+</pre>
+</div>
+
+</body>
+</html>
