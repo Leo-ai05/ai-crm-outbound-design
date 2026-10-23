@@ -253,6 +253,15 @@ body.with-ss .app{flex:1;min-height:0;height:auto}
 .filter-tabs .ft .n{font-size:11px;color:var(--t3);margin-left:4px}
 .readonly-pill{display:inline-flex;align-items:center;height:32px;padding:0 12px;border:1px solid var(--border);border-radius:4px;background:#f5f7fa;color:var(--t1);font-size:13px}
 
+
+.layer-ratio-grid{display:flex;flex-direction:column;gap:10px;margin:8px 0 12px}
+.layer-ratio-item{display:grid;grid-template-columns:28px 1fr 56px 18px;gap:10px;align-items:center}
+.layer-ratio-item .lab{font-weight:600;font-size:14px;color:var(--t1)}
+.layer-ratio-item .track{height:8px;background:#ebeef5;border-radius:4px;overflow:hidden}
+.layer-ratio-item .track>i{display:block;height:100%;background:var(--primary);border-radius:4px}
+.layer-ratio-item input[type=number]{width:56px;height:32px;padding:0 6px;border:1px solid var(--border);border-radius:4px;font-size:13px;text-align:center}
+.layer-ratio-actions{display:flex;align-items:center;gap:8px;margin-top:8px}
+
 </style>
 </head>
 <body class="with-ss">
@@ -299,7 +308,7 @@ body.with-ss .app{flex:1;min-height:0;height:auto}
     <div class="content">
       <div class="banner-note">
         <span class="tag">方案A</span>
-        <div>独立板块承接式：侧栏「AI外呼中心」以 <b>AI任务</b> 为入口创建每日外呼任务（含线索分配比例 / 并发 / 禁拨时段），<b>任务明细</b> 合并客户列表与意向待分配并支持批量指定承接人；企微承接账号按渠道活码成员样式配置。不占用销售「未拨打领取额度」。</div>
+        <div>独立板块承接式：侧栏「AI外呼中心」以 <b>AI任务</b> 为入口创建每日外呼任务（含公海池线索分层比例 / 并发 / 禁拨时段），<b>任务明细</b> 合并客户列表与意向待分配并支持批量指定承接人；企微承接账号按渠道活码成员样式配置。不占用销售「未拨打领取额度」。</div>
       </div>
 
       <!-- ========== VIEW: AI任务 ========== -->
@@ -319,7 +328,7 @@ body.with-ss .app{flex:1;min-height:0;height:auto}
             <button class="btn sm primary" onclick="openCreateTask()">＋ 新建AI外呼任务</button>
           </div>
           <div class="card-bd">
-            <div class="alert info">按「外呼策略默认值」创建任务：线索分配比例、准入分层、通道与意向门槛沿用策略；任务级可改计划量、并发、任务时间与禁拨时段。任务状态含进度，不再单独设「外呼任务监控」页。</div>
+            <div class="alert info">按「外呼策略默认值」创建任务：线索分配比例对齐公海池分层（A/B/C/D/E 合计100%），通道与意向门槛沿用策略；任务级可改计划量、并发、任务时间与禁拨时段。任务状态含进度，不再单独设「外呼任务监控」页。</div>
             <div class="table-wrap">
               <table class="data">
                 <thead><tr>
@@ -643,10 +652,10 @@ body.with-ss .app{flex:1;min-height:0;height:auto}
                 <pre class="mermaid">
 flowchart TD
   A[数据池 dataPool 未领取线索] --> B[新建AI外呼任务]
-  B --> B1[线索分配比例 来源%合计100]
+  B --> B1[线索分配比例 公海池分层A-E合计100]
   B1 --> B2[并发独占 / 任务时间 / 禁拨时段]
-  B2 --> C{准入校验 分层C/D}
-  C -->|剔除| Z1[回数据池或标记不可呼]
+  B2 --> C{按分层比例抽取 A-E}
+  C -->|占比0或强制剔除| Z1[回数据池或标记不可呼]
   C -->|通过| D[任务明细客户列表]
   D --> E[调度拨打 火山/阿里]
   E --> F{接通?}
@@ -683,7 +692,7 @@ stateDiagram-v2
             <div class="doc-sec">
               <h3>4. 配置要点</h3>
               <ul>
-                <li><b>线索分配比例：</b>按来源（抖音/官网/小程序/广点通等）设置 %，合计必须 = 100%；计划外呼量与比例分离</li>
+                <li><b>线索分配比例：</b>对齐公海池分层 A/B/C/D/E %（默认 5/15/5/5/70），合计必须 = 100%；与准入合并，按分层占比从数据池抽取；计划外呼量与比例分离</li>
                 <li><b>时间：</b>任务时间区间 + 禁拨时段；政策 21:00–次日 09:00 不可外呼</li>
                 <li><b>并发：</b>可分配机器人并发/总并发，独占模式，任务并发 1–可分配上限</li>
                 <li><b>加微：</b>初始化仅轮询；配置加微昵称、邀请通知模版、通过欢迎语、失败重试</li>
@@ -693,7 +702,7 @@ stateDiagram-v2
             <div class="doc-sec">
               <h3>5. 验收要点</h3>
               <ul>
-                <li>创建任务时线索分配比例 ≠100% 不可提交</li>
+                <li>创建任务时公海池分层比例（A–E）合计 ≠100% 不可提交</li>
                 <li>任务明细可按任务切换，意向与池内客户同表，支持批量指定承接人</li>
                 <li>企微承接可走组织架构添加成员；加微策略分配方式固定轮询</li>
                 <li>分配入库后来源=AI机器人，额度豁免正确</li>
@@ -742,20 +751,12 @@ stateDiagram-v2
       <div class="task-form-sec">
         <h4>基本信息</h4>
         <div class="grid-2">
-          <div class="form-row"><label>任务名称 <span class="req">*</span></label><input class="inp" id="taskName" value="早班·C/D 吞吐-1023" placeholder="请输入任务名称"/></div>
+          <div class="form-row"><label>任务名称 <span class="req">*</span></label><input class="inp" id="taskName" value="早班·公海分层吞吐-1023" placeholder="请输入任务名称"/></div>
           <div class="form-row"><label>通道 <span class="req">*</span></label>
             <select class="inp" id="taskChannel"><option>火山</option><option>阿里</option></select>
           </div>
           <div class="form-row"><label>计划外呼量 <span class="req">*</span></label><input class="inp" type="number" id="taskPlan" value="4000"/></div>
           <div class="form-row"><label>意向门槛</label><select class="inp"><option selected>重点意向</option><option>意向及以上</option></select></div>
-        </div>
-        <div class="form-row"><label>准入分层</label>
-          <div class="pill-row" id="layerAllow">
-            <span class="pill" data-v="A">A 类 · 默认禁止</span>
-            <span class="pill" data-v="B">B 类 · 默认禁止</span>
-            <span class="pill on" data-v="C">C 类 · 允许</span>
-            <span class="pill on" data-v="D">D 类 · 允许</span>
-          </div>
         </div>
       </div>
 
@@ -807,20 +808,19 @@ stateDiagram-v2
       </div>
 
       <div class="task-form-sec">
-        <h4>线索分配比例 <span class="anno mod">按来源占比，合计须=100%</span></h4>
-        <p class="small" style="margin:0 0 10px">从数据池按来源比例抽取进入本任务明细；与「计划外呼量」分离配置。</p>
-        <div id="ratioRows">
-          <div class="ratio-row" data-src="抖音信息流"><span>抖音信息流</span><input type="range" min="0" max="100" value="40" oninput="syncRatio(this)"/><input type="number" min="0" max="100" value="40" oninput="syncRatioNum(this)"/></div>
-          <div class="ratio-row" data-src="官网留资"><span>官网留资</span><input type="range" min="0" max="100" value="25" oninput="syncRatio(this)"/><input type="number" min="0" max="100" value="25" oninput="syncRatioNum(this)"/></div>
-          <div class="ratio-row" data-src="小程序试听"><span>小程序试听</span><input type="range" min="0" max="100" value="20" oninput="syncRatio(this)"/><input type="number" min="0" max="100" value="20" oninput="syncRatioNum(this)"/></div>
-          <div class="ratio-row" data-src="腾讯广点通"><span>腾讯广点通</span><input type="range" min="0" max="100" value="15" oninput="syncRatio(this)"/><input type="number" min="0" max="100" value="15" oninput="syncRatioNum(this)"/></div>
+        <h4>线索分配比例设置 <span class="anno reuse">对齐公海池 · 线索分配设置</span></h4>
+        <div class="alert info" style="margin-bottom:10px">使用公海池线索<strong>分层比例</strong>（A/B/C/D/E），合计须 = 100%。AI 任务按分层占比从数据池抽取；准入与占比合并为本项，不再单独配置准入分层 / 来源占比。</div>
+        <div class="layer-ratio-grid" id="ratioRows">
+          <div class="layer-ratio-item" data-layer="A"><span class="lab">A</span><div class="track"><i style="width:5%"></i></div><input type="number" min="0" max="100" value="5" oninput="syncLayerRatio(this)"/><span class="small">%</span></div>
+          <div class="layer-ratio-item" data-layer="B"><span class="lab">B</span><div class="track"><i style="width:15%"></i></div><input type="number" min="0" max="100" value="15" oninput="syncLayerRatio(this)"/><span class="small">%</span></div>
+          <div class="layer-ratio-item" data-layer="C"><span class="lab">C</span><div class="track"><i style="width:5%"></i></div><input type="number" min="0" max="100" value="5" oninput="syncLayerRatio(this)"/><span class="small">%</span></div>
+          <div class="layer-ratio-item" data-layer="D"><span class="lab">D</span><div class="track"><i style="width:5%"></i></div><input type="number" min="0" max="100" value="5" oninput="syncLayerRatio(this)"/><span class="small">%</span></div>
+          <div class="layer-ratio-item" data-layer="E"><span class="lab">E</span><div class="track"><i style="width:70%"></i></div><input type="number" min="0" max="100" value="70" oninput="syncLayerRatio(this)"/><span class="small">%</span></div>
         </div>
         <div class="ratio-total ok" id="ratioTotal">合计 <b>100%</b> · 可提交</div>
-        <div class="form-row" style="margin-top:12px;margin-bottom:0"><label>私域分层权重（可选）</label>
-          <div class="pill-row">
-            <span class="pill on">C ×1.2</span>
-            <span class="pill on">D ×1.0</span>
-          </div>
+        <div class="layer-ratio-actions">
+          <button type="button" class="btn sm" onclick="resetLayerRatio()">重置</button>
+          <span class="small">默认对齐 CRM 公海池线索分配设置（A5 / B15 / C5 / D5 / E70）</span>
         </div>
       </div>
     </div>
@@ -913,7 +913,7 @@ stateDiagram-v2
         <div class="grid-2">
           <div class="form-row"><label>任务时间</label><input class="inp" value="2026-10-23 09:00 – 21:00" readonly/></div>
           <div class="form-row"><label>通道 / 并发</label><input class="inp" value="火山 · 独占 8" readonly/></div>
-          <div class="form-row"><label>线索分配比例</label><input class="inp" value="抖音40% · 官网25% · 小程序20% · 广点通15%" readonly/></div>
+          <div class="form-row"><label>线索分配比例（公海池分层）</label><input class="inp" value="A 5% · B 15% · C 5% · D 5% · E 70%" readonly/></div>
           <div class="form-row"><label>状态</label><input class="inp" value="进行中" readonly/></div>
         </div>
       </div>
@@ -1019,7 +1019,7 @@ const WX=['未发起','未发起','待通过','已同意','已同意','未发起
 const ACC=['—','—','张晓雯','李明辉','王芳','—','—','张晓雯'];
 
 const TASKS=[
-  {id:'A-20261023-01',name:'早班·C/D 吞吐',time:'10-23 09:00–21:00',ch:'火山',plan:4000,called:2860,conn:812,intent:62,pct:71,st:'进行中',stTag:'primary'},
+  {id:'A-20261023-01',name:'早班·公海分层吞吐',time:'10-23 09:00–21:00',ch:'火山',plan:4000,called:2860,conn:812,intent:62,pct:71,st:'进行中',stTag:'primary'},
   {id:'A-20261023-02',name:'午后·重播未接',time:'10-23 14:00–21:00',ch:'阿里',plan:1500,called:350,conn:88,intent:9,pct:23,st:'进行中',stTag:'primary'},
   {id:'A-20261022-08',name:'晚班·加微追呼',time:'10-22 18:30–21:00',ch:'火山',plan:800,called:800,conn:214,intent:28,pct:100,st:'已完成',stTag:'success'},
   {id:'A-20261024-01',name:'明日·官网加权',time:'10-24 09:00–21:00',ch:'火山',plan:2000,called:0,conn:0,intent:0,pct:0,st:'待开始',stTag:''}
@@ -1242,21 +1242,29 @@ function addForbidRow(){
     <button class="btn sm" onclick="this.closest('.forbid-row').remove()">🗑</button>`;
   list.appendChild(d);
 }
-function syncRatio(range){
-  const row=range.closest('.ratio-row');
-  row.querySelector('input[type=number]').value=range.value;
+const LAYER_RATIO_DEFAULT={A:5,B:15,C:5,D:5,E:70};
+function syncLayerRatio(num){
+  let v=Math.max(0,Math.min(100,parseInt(num.value||'0',10)));
+  if(isNaN(v)) v=0;
+  num.value=v;
+  const item=num.closest('.layer-ratio-item');
+  if(item){ const bar=item.querySelector('.track>i'); if(bar) bar.style.width=v+'%'; }
   updateRatioTotal();
 }
-function syncRatioNum(num){
-  const row=num.closest('.ratio-row');
-  let v=Math.max(0,Math.min(100,parseInt(num.value||'0',10)));
-  num.value=v;
-  row.querySelector('input[type=range]').value=v;
+function resetLayerRatio(){
+  document.querySelectorAll('#ratioRows .layer-ratio-item').forEach(item=>{
+    const layer=item.dataset.layer;
+    const num=item.querySelector('input[type=number]');
+    const v=LAYER_RATIO_DEFAULT[layer]||0;
+    if(num){ num.value=v; }
+    const bar=item.querySelector('.track>i'); if(bar) bar.style.width=v+'%';
+  });
   updateRatioTotal();
+  toast('已重置为公海池默认分层比例','ok');
 }
 function updateRatioTotal(){
   let sum=0;
-  document.querySelectorAll('#ratioRows .ratio-row input[type=number]').forEach(i=>sum+=parseInt(i.value||'0',10));
+  document.querySelectorAll('#ratioRows .layer-ratio-item input[type=number]').forEach(i=>sum+=parseInt(i.value||'0',10));
   const el=document.getElementById('ratioTotal');
   if(!el) return;
   const ok=sum===100;
@@ -1265,7 +1273,7 @@ function updateRatioTotal(){
   return ok;
 }
 function submitCreateTask(){
-  if(!updateRatioTotal()){ toast('线索分配比例合计须为 100%','err'); return; }
+  if(!updateRatioTotal()){ toast('线索分配比例（分层 A–E）合计须为 100%','err'); return; }
   const name=(document.getElementById('taskName')||{}).value||'新任务';
   const conc=parseInt((document.getElementById('taskConc')||{}).value||'0',10);
   if(conc<1||conc>12){ toast('任务并发请输入 1–12 的整数','err'); return; }
@@ -1340,12 +1348,6 @@ function filterOrgTree(){
 }
 function toggleDept(el){ /* visual only */ }
 
-document.querySelectorAll('#layerAllow .pill').forEach(p=>{
-  p.addEventListener('click',()=>{
-    if(p.dataset.v==='A'||p.dataset.v==='B'){ toast(p.dataset.v+' 类默认禁止 AI 直呼，需主管放行','err'); return; }
-    p.classList.toggle('on');
-  });
-});
 function selPill(el){ el.parentElement.querySelectorAll('.pill').forEach(p=>p.classList.remove('on')); el.classList.add('on'); }
 
 renderTasks(); renderPool(); renderRecords();
