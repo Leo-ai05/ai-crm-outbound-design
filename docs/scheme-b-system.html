@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>方案B · 系统说明 · 人工优先 · AI超时兜底</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js" async onload="window.__mermaidReady&&window.__mermaidReady()"></script>
+<style>
+:root{--primary:#409eff;--bg:#f0f2f5;--card:#fff;--t1:#303133;--t2:#606266;--t3:#909399;--border:#ebeef5;--sidebar:#001529;--ok:#67c23a}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--t1);font-size:14px;line-height:1.65}
+.scheme-switcher{position:sticky;top:0;z-index:3000;height:40px;background:#001529;border-bottom:1px solid #0a2138;display:flex;align-items:center;padding:0 16px;gap:4px}
+.scheme-switcher .ss-brand{color:#fff;font-size:12px;font-weight:600;margin-right:14px;display:flex;align-items:center;gap:6px}
+.scheme-switcher .ss-brand .ss-dot{width:7px;height:7px;border-radius:50%;background:#409eff}
+.scheme-switcher a.ss-item{display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:4px;font-size:12px;color:#a6adb4;text-decoration:none}
+.scheme-switcher a.ss-item:hover{color:#fff;background:rgb(255 255 255 / 8%)}
+.scheme-switcher a.ss-item.active{color:#fff;background:#409eff;font-weight:500}
+.scheme-switcher .ss-spacer{flex:1}
+.scheme-switcher .ss-hint{font-size:11px;color:#5c6b7a}
+.top{background:var(--sidebar);color:#fff;padding:14px 24px;display:flex;align-items:center;gap:12px}
+.top .dot{width:10px;height:10px;border-radius:50%;background:#67c23a}
+.wrap{max-width:1080px;margin:0 auto;padding:24px}
+h1{font-size:22px;margin:0 0 6px}
+.sub{color:var(--t3);margin:0 0 18px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;box-shadow:0 2px 12px rgb(0 0 0 / 6%);margin-bottom:16px}
+.card h2{margin:0 0 12px;font-size:16px}
+.note{background:#f0f9eb;border:1px solid #c2e7b0;color:#67c23a;padding:10px 14px;border-radius:4px;font-size:13px;margin-bottom:16px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{border:1px solid var(--border);padding:9px 11px;text-align:left;vertical-align:top}
+th{background:#f5f7fa;color:var(--t2);font-weight:600}
+.mono{font-family:ui-monospace,Menlo,monospace;font-size:11px}
+ul,ol{margin:8px 0;padding-left:20px;color:var(--t2)}
+li{margin:4px 0}
+.mermaid-box{background:#fafbfc;border:1px solid var(--border);border-radius:6px;padding:16px;overflow:auto;margin:10px 0}
+.mermaid-box .title{font-weight:600;margin-bottom:10px;font-size:13px;color:var(--t2)}
+.links a{display:inline-flex;margin:4px 8px 4px 0;padding:8px 14px;background:var(--primary);color:#fff;border-radius:4px;text-decoration:none;font-size:13px}
+.links a.ghost{background:#fff;color:var(--primary);border:1px solid var(--primary)}
+.toc a{color:var(--primary);margin-right:10px;font-size:12px}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;background:#f0f9eb;color:var(--ok)}
+.footer{color:var(--t3);font-size:12px;text-align:center;padding:8px 0 24px}
+</style>
+</head>
+<body>
+<div class="scheme-switcher">
+  <div class="ss-brand"><span class="ss-dot"></span>AI外呼 × CRM</div>
+  <a class="ss-item" href="../index.html">总览</a>
+  <a class="ss-item" href="../scheme-a/index.html">方案A · 独立板块承接式</a>
+  <a class="ss-item" href="../scheme-b/index.html">方案B · 深度绑定嵌合式</a>
+  <a class="ss-item" href="comparison.html">方案对比</a>
+  <div class="ss-spacer"></div>
+  <span class="ss-hint">方案B 系统说明</span>
+</div>
+<div class="top"><span class="dot"></span><div><b>方案B · 深度绑定嵌合式 · 系统说明</b><div style="font-size:12px;opacity:.75"><span class="tag">人工优先 · AI超时兜底</span> · 销售清洗名下库存</div></div></div>
+<div class="wrap">
+  <h1>方案B · 人工优先 · AI超时兜底 · 系统说明</h1>
+  <p class="sub">原型：<span class="mono">scheme-b/index.html</span> · 基线：融合版 PRD（2026-08）+ 超时兜底增量</p>
+  <div class="note">日常以「一键外呼」优先；销售可主动 AI 批量外呼；超时未跟 / 多次未接通走兜底。已加微则名下直接可见入库。</div>
+  <p class="toc">
+    <a href="#s1">1 目标</a><a href="#s2">2 挂载</a><a href="#s3">3 总览流</a><a href="#s4">4 向导流</a>
+    <a href="#s5">5 超时兜底</a><a href="#s6">6 状态机</a><a href="#s7">7 配置</a><a href="#s8">8 向导摘要</a>
+    <a href="#s9">9 边界</a><a href="#s10">10 NON-GOAL</a><a href="#s11">11 额度</a><a href="#s12">12 指标</a><a href="#s13">13 验收</a>
+  </p>
+
+  <div class="card" id="s1">
+    <h2>1. 问题与目标</h2>
+    <p style="color:var(--t2);margin:0 0 8px">销售名下积压大量未跟进、多次未接通线索，人均日触达有限。方案B在现有客户池嵌入：</p>
+    <ol>
+      <li><b>人工优先</b>：保留并强调「一键外呼」；</li>
+      <li><b>主动 AI</b>：销售可圈选发起「AI批量外呼」四步向导；</li>
+      <li><b>超时兜底</b>：未跟进 ≥ X 小时或未接通 ≥ N 次时，系统标记/自动建名下 AI 任务（可选需销售确认）。</li>
+    </ol>
+    <p style="color:var(--t2);margin:8px 0 0">结果回写意向与总结；<b>已加微则直接在名下可见入库</b>，不单独做承接池叙事。</p>
+  </div>
+
+  <div class="card" id="s2">
+    <h2>2. CRM 挂载（改造 / 新增 / 复用）</h2>
+    <table>
+      <thead><tr><th>模块</th><th>路径</th><th>动作</th></tr></thead>
+      <tbody>
+        <tr><td>客户池</td><td><span class="mono">customer/ongoing</span></td><td><b>改造</b>：+AI批量外呼；+跟进状态；+确认入AI队列；原一键外呼等不变</td></tr>
+        <tr><td>个人信息</td><td>顶栏头像</td><td><b>改造</b>：+我的AI音色</td></tr>
+        <tr><td>外呼任务管理</td><td><span class="mono">aiOutbound/tasks</span></td><td><b>新增</b>（创建方式：销售手动 / 系统超时兜底）</td></tr>
+        <tr><td>AI外呼记录</td><td><span class="mono">aiOutbound/records</span></td><td><b>新增</b></td></tr>
+        <tr><td>全局配置</td><td><span class="mono">aiOutbound/globalConfig</span></td><td><b>新增</b>（含超时兜底页签）</td></tr>
+        <tr><td>数据看板</td><td><span class="mono">aiOutbound/board</span></td><td><b>新增</b></td></tr>
+        <tr><td>通话记录</td><td><span class="mono">callRecord</span></td><td>复用写入</td></tr>
+        <tr><td>字典</td><td>意向/外呼状态/分层/付费</td><td>复用</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card" id="s3">
+    <h2>3. 总览流程（人工优先 + 双入队）</h2>
+    <div class="mermaid-box">
+      <div class="title">人拨优先 · 主动 AI · 超时兜底 · 回写名下</div>
+      <pre class="mermaid">
+flowchart TD
+  P[客户池名下线索] --> H[销售一键外呼 人工优先]
+  P --> M[销售点 AI批量外呼]
+  P --> S[系统扫描超时规则]
+  H --> RW0[通话结果回写名下]
+  M --> W[四步向导]
+  W --> T1[名下AI任务 创建方式=销售手动]
+  S --> Q{满足未跟进≥Xh 或 未接通≥N次?}
+  Q -->|否| IDLE[保持人工跟进中]
+  Q -->|是| CONF{需销售确认?}
+  CONF -->|是| TAG[标记 已超时待AI]
+  TAG --> OK[销售点 确认入AI队列]
+  CONF -->|否| AUTO[自动入队]
+  OK --> T2[名下AI任务 创建方式=系统超时兜底]
+  AUTO --> T2
+  T1 --> DIAL[AI队列拨打]
+  T2 --> DIAL
+  DIAL --> RW[意向/总结回写名下]
+  RW --> WE{已加微?}
+  WE -->|是| IN[客户池直接可见入库]
+  WE -->|否| FOLLOW[高意向待跟 / 更新次数]
+      </pre>
+    </div>
+  </div>
+
+  <div class="card" id="s4">
+    <h2>4. 销售主动发起主流程</h2>
+    <div class="mermaid-box">
+      <div class="title">客户池 → 四步向导 → 名下任务 → 回写</div>
+      <pre class="mermaid">
+flowchart TD
+  A[客户池点击 AI批量外呼] --> B[第一步 筛选或勾选名下线索]
+  B --> C{全局准入校验}
+  C -->|可外呼=0| X[阻断]
+  C -->|可外呼>0| D[第二步 话术与音色]
+  D --> E[第三步 通道并发时段重拨]
+  E --> F[第四步 合规确认与名额]
+  F --> G[创建名下AI任务·销售手动]
+  G --> H[队列拨打]
+  H --> I[意向与总结回写]
+  I --> J{高意向?}
+  J -->|是| K[推送待跟进 可选加微]
+  J -->|否| L[仅更新次数与意向]
+      </pre>
+    </div>
+  </div>
+
+  <div class="card" id="s5">
+    <h2>5. 超时兜底流程</h2>
+    <div class="mermaid-box">
+      <div class="title">规则扫描 → 确认/自动 → 兜底任务 → 回写</div>
+      <pre class="mermaid">
+flowchart TD
+  A[定时/事件扫描名下线索] --> B{未跟进≥Xh 或 未接通≥N}
+  B -->|否| Z[结束]
+  B -->|是| C{准入校验}
+  C -->|不通过| Z
+  C -->|通过| D{需销售确认}
+  D -->|开| E[标记 已超时待AI]
+  E --> F[销售确认入AI队列]
+  D -->|关| G[系统直接建任务]
+  F --> H[名下AI任务·系统超时兜底]
+  G --> H
+  H --> I[遵守禁拨与并发]
+  I --> J[拨打并回写]
+  J --> K{加微成功?}
+  K -->|是| L[名下直接可见入库]
+  K -->|否| M[更新跟进状态]
+      </pre>
+    </div>
+  </div>
+
+  <div class="card" id="s6">
+    <h2>6. 单通执行状态机</h2>
+    <div class="mermaid-box">
+      <div class="title">排队 → 拨号 → 结束</div>
+      <pre class="mermaid">
+stateDiagram-v2
+  [*] --> 排队
+  排队 --> 跳过: 超频/禁呼/当日人工已呼
+  排队 --> 拨号中
+  拨号中 --> 未接通
+  未接通 --> 重拨排队: 未超重拨
+  未接通 --> 结束未接通: 重拨耗尽
+  拨号中 --> 对话中: 接通
+  对话中 --> 结束有意向
+  对话中 --> 结束无意向
+  对话中 --> 结束拒绝
+  结束有意向 --> [*]
+  结束无意向 --> [*]
+  结束拒绝 --> [*]
+  结束未接通 --> [*]
+  跳过 --> [*]
+      </pre>
+    </div>
+  </div>
+
+  <div class="card" id="s7">
+    <h2>7. 超时兜底配置项（全局，销售弹窗不可绕过）</h2>
+    <table>
+      <thead><tr><th>项</th><th>说明</th><th>默认示意</th></tr></thead>
+      <tbody>
+        <tr><td>启用超时兜底</td><td>总开关</td><td>开</td></tr>
+        <tr><td>未跟进超时时长</td><td>小时</td><td>24</td></tr>
+        <tr><td>未接通次数阈值</td><td>次</td><td>3</td></tr>
+        <tr><td>需销售确认后才外呼</td><td>开=只标记，确认后入队；关=自动建任务</td><td>开</td></tr>
+        <tr><td>禁拨时段</td><td>与合规页一致</td><td>22:00–08:00</td></tr>
+        <tr><td>兜底默认话术/通道</td><td>自动任务用</td><td>未接通回拨 / 火山</td></tr>
+        <tr><td>单次兜底任务上限</td><td>条</td><td>40</td></tr>
+      </tbody>
+    </table>
+    <p style="margin:10px 0 0;color:var(--t2);font-size:13px">强制排除：已加微、锁定、免打扰、空号、A/B 禁止分层（可配置）、当日名额不足。</p>
+  </div>
+
+  <div class="card" id="s8">
+    <h2>8. 四步向导摘要（PRD 7.2–7.5）</h2>
+    <ol>
+      <li><b>筛选：</b>入库、外呼/接通/AI次数、外呼状态、意向度、分层、来源、学情报告、加微、付费分类等；试算「命中−剔除=可外呼」；全局剔除不可关闭。</li>
+      <li><b>话术音色：</b>已发布话术；个人复刻/公共/预置音色。</li>
+      <li><b>策略：</b>火山/阿里通道、并发、时段收窄、重拨、立即/预约。</li>
+      <li><b>确认：</b>效果成本预估、三项合规、名额顺延/拒绝。</li>
+    </ol>
+    <p style="color:var(--t2);font-size:13px;margin:8px 0 0">快捷预设：新入库未接通、沉默15天·D类、接通未加微、学情活跃未跟进、权益即将到期。</p>
+  </div>
+
+  <div class="card" id="s9">
+    <h2>9. 全局配置边界（原有）</h2>
+    <ul>
+      <li>A/B 类默认禁止 AI 直呼。</li>
+      <li>免打扰/空号等强制项不可关。</li>
+      <li>单销售每日名额 + 公司总量/并发；分组角色可覆盖。</li>
+      <li>红线词命中降级并质检，连续命中下线话术版本。</li>
+    </ul>
+  </div>
+
+  <div class="card" id="s10">
+    <h2>10. NON-GOAL</h2>
+    <ul>
+      <li>通话中转人工；自建线路；改人工外呼主流程</li>
+      <li>跨销售公共池调度（归方案A）</li>
+      <li>话术自动生成优化</li>
+      <li>单独「承接池」页面（已加微直接入库可见）</li>
+    </ul>
+  </div>
+
+  <div class="card" id="s11">
+    <h2>11. 与额度 / 方案A</h2>
+    <ul>
+      <li>只操作本人名下（配置可开放组长跨组）。</li>
+      <li>消耗「AI外呼名额」，与未拨打领取额度独立。</li>
+      <li>加微成功后在名下直接可见；若走承接活码豁免，规则同企微承接额度 PRD。</li>
+      <li>与方案A并列时：同一 <span class="mono">infoUuid</span> AI 状态互斥；通道并发共享。</li>
+    </ul>
+  </div>
+
+  <div class="card" id="s12">
+    <h2>12. 指标</h2>
+    <p style="color:var(--t2);margin:0">个人漏斗 + AI vs 人工同口径；任务维度区分手动/超时兜底；对齐 waihudata：通数、接通率、有效≥10s、意向、加微、未接通原因、总结导出。列表基础字段：<b>通话ID · 洋葱ID · 外呼手机号</b>。</p>
+  </div>
+
+  <div class="card" id="s13">
+    <h2>13. 验收</h2>
+    <p style="color:var(--t2);margin:0 0 12px">向导三段数字实时变化；全局禁止项不可关；名额策略提示正确；任务可暂停继续终止重试；记录可转译与修正意向回写；音色授权复刻；配置保存后再次发起立即生效；超时规则开关/确认模式行为正确；任务列表可区分创建方式。</p>
+    <div class="links">
+      <a href="../scheme-b/index.html">打开方案B原型</a>
+      <a class="ghost" href="comparison.html">方案对比</a>
+      <a class="ghost" href="scheme-a-system.html">方案A系统说明</a>
+      <a class="ghost" href="../index.html">返回总览</a>
+    </div>
+  </div>
+</div>
+<p class="footer">源稿保留 docs/scheme-b-system.md · 本页为可渲染版本</p>
+<script>
+window.__mermaidReady=function(){
+  try{
+    if(window.mermaid){
+      mermaid.initialize({startOnLoad:false,theme:'neutral',securityLevel:'loose'});
+      mermaid.run({nodes:document.querySelectorAll('.mermaid')});
+    }
+  }catch(e){}
+};
+if(window.mermaid)window.__mermaidReady();
+</script>
+</body>
+</html>

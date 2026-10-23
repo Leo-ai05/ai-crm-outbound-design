@@ -178,10 +178,6 @@ table.data .ops{display:flex;gap:6px}
 .talk-row{display:flex;gap:8px;margin-bottom:8px;font-size:12px}
 .talk-who{flex:0 0 36px;color:var(--t3)}
 .talk-body{flex:1;background:#fafafa;border:1px solid var(--border-light);border-radius:4px;padding:8px 10px}
-.script-side-nav{flex:0 0 160px;border:1px solid var(--border-light);border-radius:4px;overflow:hidden}
-.script-side-nav .ni{padding:8px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid var(--border-lighter,#f2f6fc);color:var(--t2);display:flex;justify-content:space-between}
-.script-side-nav .ni.on{color:var(--primary);background:var(--primary-light);font-weight:500}
-.script-side-nav .ni:hover{color:var(--primary)}
 
 .view{display:none}.view.on{display:block}
 .chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:#f4f4f5;border-radius:10px;font-size:11px;color:var(--t2)}
@@ -268,7 +264,6 @@ body.with-ss .app{flex:1;min-height:0;height:auto}
     <div class="nav-item" data-view="records"><span>☎</span> AI外呼记录 <span class="badge new">新增</span></div>
     <div class="nav-item" data-view="config"><span>⚙</span> AI外呼全局配置 <span class="badge new">新增</span></div>
     <div class="nav-item" data-view="board"><span>▥</span> AI外呼数据看板 <span class="badge new">新增</span></div>
-    <div class="nav-item" data-view="script"><span>✎</span> 智能查询·AI外呼 <span class="badge" style="background:#e6a23c">改造</span></div>
     <div class="nav-item" data-view="docs"><span>?</span> 系统说明 <span class="badge new">新增</span></div>
     <div class="nav-group">企微 / 统计 / 系统</div>
     <div class="nav-item disabled">企微机器人 weworkBot/*</div>
@@ -663,176 +658,6 @@ body.with-ss .app{flex:1;min-height:0;height:auto}
         </div>
       </div>
 
-<!-- SCRIPT -->
-      <div class="view" id="view-script">
-        <div class="card">
-          <div class="card-hd">智能查询 · AI外呼页签 <span class="anno mod">改造 · 原话术查询后新增</span>
-            <div class="spacer"></div>
-            <span class="small">权限码 telesale_ai_script_manage</span>
-          </div>
-          <div class="card-bd">
-            <div class="tabs" id="scriptMainTabs">
-              <div class="tab" data-tab="sq">话术查询</div>
-              <div class="tab" data-tab="sm">话术管理</div>
-              <div class="tab active" data-tab="ai">AI外呼</div>
-            </div>
-            <div id="smtab-sq" class="hidden">
-              <div class="alert info">现网「话术查询」能力保留示意：按关键词检索销售话术库，本原型不展开。</div>
-              <div class="filter-bar">
-                <div class="filter-item"><label>关键词</label><input class="inp" placeholder="价格 / 试听 / 加微"/></div>
-                <div class="filter-item"><label>学段</label><select class="inp"><option>全部</option><option>初中</option><option>高中</option></select></div>
-                <button class="btn primary" onclick="toast('已查询现网话术库（示意）','ok')">查询</button>
-              </div>
-              <div class="table-wrap"><table class="data">
-                <thead><tr><th>话术标题</th><th>场景</th><th>适用年级</th><th>更新人</th><th>操作</th></tr></thead>
-                <tbody>
-                  <tr><td>试听课邀约开场</td><td>首触</td><td>初二</td><td>张敏</td><td><button class="btn sm">查看</button></td></tr>
-                  <tr><td>价格异议应对</td><td>异议</td><td>全年级</td><td>周琳</td><td><button class="btn sm">查看</button></td></tr>
-                </tbody>
-              </table></div>
-            </div>
-            <div id="smtab-sm" class="hidden">
-              <div class="alert info">现网「话术管理」能力保留示意：话术 CRUD / 审核，本原型不展开。</div>
-              <div class="toolbar">
-                <button class="btn primary" onclick="toast('新增话术（现网能力）','ok')">＋ 新增话术</button>
-                <button class="btn">导入</button>
-              </div>
-              <div class="table-wrap"><table class="data">
-                <thead><tr><th>标题</th><th>状态</th><th>版本</th><th>操作</th></tr></thead>
-                <tbody>
-                  <tr><td>销冠蒸馏·试听邀约</td><td><span class="tag success">已发布</span></td><td>v12</td><td><button class="btn sm">编辑</button></td></tr>
-                  <tr><td>加微引导标准稿</td><td><span class="tag warning">审核中</span></td><td>v3</td><td><button class="btn sm">编辑</button></td></tr>
-                </tbody>
-              </table></div>
-            </div>
-            <div id="smtab-ai">
-              <div class="tabs" id="scriptSubTabs" style="border:0;margin-bottom:8px">
-                <div class="tab active" data-tab="cache">AI缓存话术</div>
-                <div class="tab" data-tab="flow">AI节点流程</div>
-                <div class="tab" data-tab="pub">发布与灰度</div>
-              </div>
-              <div id="ssub-cache">
-                <div class="grid-2">
-                  <div>
-                    <div class="form-row"><label>匹配测试器 · 输入客户可能说的话</label>
-                      <input class="inp" id="matchIn" placeholder="例如：多少钱？ / 不要再打了" value="你们这个收费吗？"/>
-                    </div>
-                    <button class="btn primary" onclick="doMatch()">测试匹配</button>
-                    <div id="matchOut" class="alert info" style="margin-top:12px">等待测试…</div>
-                    <div class="alert warn" style="margin-top:8px">匹配顺序：触发词双向包含 → 场景关键词 → 模糊比对（阈值 72%）→ 回落 LLM。</div>
-                  </div>
-                  <div>
-                    <div class="toolbar" style="margin-bottom:8px">
-                      <button class="btn sm" onclick="toast('已从 SOP 导入骨架','ok')">从 SOP 导入</button>
-                      <button class="btn sm" onclick="toast('已从优秀话术库导入 12 条','ok')">从优秀话术库导入</button>
-                      <button class="btn sm primary" onclick="toast('新增话术弹窗（示意）','ok')">＋ 新增</button>
-                      <span class="tag warning">有 3 项未发布改动</span>
-                    </div>
-                    <div style="display:flex;gap:12px;align-items:flex-start">
-                      <div class="script-side-nav">
-                        <div class="ni on" onclick="selScriptCat(this)"><span>全部场景</span><span class="small">12</span></div>
-                        <div class="ni" onclick="selScriptCat(this)"><span>开场与身份</span><span class="small">2</span></div>
-                        <div class="ni" onclick="selScriptCat(this)"><span>价格异议</span><span class="small">3</span></div>
-                        <div class="ni" onclick="selScriptCat(this)"><span>加微引导</span><span class="small">2</span></div>
-                        <div class="ni" onclick="selScriptCat(this)"><span>拒绝与挂断</span><span class="small">3</span></div>
-                        <div class="ni" onclick="selScriptCat(this)"><span>要求人工</span><span class="small">2</span></div>
-                      </div>
-                      <div style="flex:1;min-width:0">
-                        <div class="script-card on"><b>价格询问</b><div class="small">触发：多少钱|费用|价格 · 动作：继续对话 · 7日命中 328 · 优先级 80</div></div>
-                        <div class="script-card"><b>明确拒绝</b><div class="small">触发：不要打了|拉黑|投诉 · 动作：挂断+免打扰+降D · 7日命中 96</div></div>
-                        <div class="script-card"><b>同意加微</b><div class="small">触发：好的|加吧|发我 · 动作：触发加微并结束 · 7日命中 141</div></div>
-                        <div class="script-card"><b>要求人工</b><div class="small">触发：转人工|找顾问 · 动作：标记高优推送 · 7日命中 54</div></div>
-                        <div class="script-card"><b>机主的电话助理</b><div class="small">触发：助理|秘书代接 · 动作：立即挂断不计接通 · 4h 后重拨</div></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div id="ssub-flow" class="hidden">
-                <div class="toolbar">
-                  <span class="tag warning">草稿 v4（线上运行 v3）</span>
-                  <span class="small">试听课邀约 · 销冠张敏版</span>
-                  <div class="spacer"></div>
-                  <button class="btn sm" onclick="toast('红线词校验通过','ok')">红线词校验</button>
-                  <button class="btn sm" onclick="toast('已生成 3 通模拟对话','ok')">流程试跑</button>
-                  <button class="btn sm primary" onclick="toast('已发布 v4，灰度：武汉一组','ok')">发布 / 灰度</button>
-                </div>
-                <div class="alert info">一个节点 = AI 说一句话 → 听客户怎么答 → 按不同答法走去不同节点。连线条件括号内为近 7 天分支占比。</div>
-                <div class="flow-mini">
-                  <div class="flow-node start"><b>#1 开场披露</b>您好，我是洋葱学园学习顾问助理…<div class="small">2 出口 · 7日 612</div></div>
-                  <div class="flow-arrow">→</div>
-                  <div class="flow-node branch"><b>#2 需求探询</b>孩子目前几年级？最想提升哪科？<div class="small">3 出口 · 7日 498</div></div>
-                  <div class="flow-arrow">→</div>
-                  <div class="flow-node reply"><b>#3 价值陈述</b>同步课+学情报告，先发您试听…<div class="small">2 出口 · 7日 360</div></div>
-                  <div class="flow-arrow">→</div>
-                  <div class="flow-node branch"><b>#4 价格异议</b>先说免费资料，再谈课程<div class="small">3 出口 · 7日 210</div></div>
-                  <div class="flow-arrow">→</div>
-                  <div class="flow-node end"><b>#5 加微结束</b>触发加微通知并挂断<div class="small">终止 · 7日 141</div></div>
-                </div>
-                <div class="grid-2" style="margin-top:12px">
-                  <div class="cfg-block" style="border:1px solid var(--border-light);padding:12px;border-radius:4px">
-                    <h4 style="margin:0 0 8px;font-size:13px">选中节点 · #4 价格异议</h4>
-                    <div class="table-wrap"><table class="data">
-                      <thead><tr><th>客户反应</th><th>跳转</th><th>占比</th></tr></thead>
-                      <tbody>
-                        <tr><td>接受价格 / 要资料</td><td>#5 加微结束</td><td>48%</td></tr>
-                        <tr><td>再便宜点 / 对比竞品</td><td>#4b 优惠说明</td><td>31%</td></tr>
-                        <tr><td>明确拒绝</td><td>#6 礼貌挂断</td><td>21%</td></tr>
-                      </tbody>
-                    </table></div>
-                    <div class="form-row" style="margin-top:8px"><label>节点话术</label><textarea class="inp">理解您的顾虑。我们可以先发一份免费学情报告和试听课，您看完再决定是否报名～</textarea></div>
-                    <button class="btn primary sm" onclick="toast('节点已保存到草稿 v4','ok')">保存到草稿</button>
-                  </div>
-                  <div class="cfg-block" style="border:1px solid var(--border-light);padding:12px;border-radius:4px">
-                    <h4 style="margin:0 0 8px;font-size:13px">路径预演</h4>
-                    <div class="pill-row" style="margin-bottom:8px">
-                      <span class="pill on" onclick="selPill(this);showPath('agree')">同意加微 48%</span>
-                      <span class="pill" onclick="selPill(this);showPath('price')">价格异议 31%</span>
-                      <span class="pill" onclick="selPill(this);showPath('refuse')">明确拒绝 21%</span>
-                    </div>
-                    <div id="pathTalk">
-                      <div class="talk-row"><div class="talk-who">AI</div><div class="talk-body">您好，我是洋葱学园学习顾问助理…</div></div>
-                      <div class="talk-row"><div class="talk-who">客户</div><div class="talk-body">多少钱？先发我看看吧。</div></div>
-                      <div class="talk-row"><div class="talk-who">AI</div><div class="talk-body">可以先发免费资料，这是我的企微…</div></div>
-                      <div class="talk-row"><div class="talk-who">系统</div><div class="talk-body"><span class="tag success">触发加微 · 结束通话</span></div></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div id="ssub-pub" class="hidden">
-                <div class="cfg-block" style="border:1px solid var(--border-light);padding:12px;border-radius:4px;margin-bottom:12px">
-                  <h4 style="margin:0 0 10px;font-size:13px">灰度范围</h4>
-                  <div>
-                    <div class="radio-card" onclick="selRadio(this)">仅自己（试用）</div>
-                    <div class="radio-card on" onclick="selRadio(this)">按团队灰度</div>
-                    <div class="radio-card" onclick="selRadio(this)">按线索比例灰度</div>
-                    <div class="radio-card" onclick="selRadio(this)">全量</div>
-                  </div>
-                  <div class="grid-2" style="margin-top:8px">
-                    <div class="form-row"><label>灰度团队</label><select class="inp"><option>武汉一组</option><option>武汉二组</option><option>武汉基地全员</option></select></div>
-                    <div class="form-row"><label>线索比例 %</label><input class="inp" type="number" value="30"/></div>
-                  </div>
-                  <button class="btn primary" onclick="toast('灰度配置已保存','ok')">保存灰度配置</button>
-                  <div class="alert warn" style="margin-top:12px">话术改动直接作用于真实客户。发布前须通过红线词校验；发布后 30 分钟内若异常挂断率 &gt; 12%，自动回滚并告警。</div>
-                </div>
-                <div class="card" style="box-shadow:none;border:1px solid var(--border-light)">
-                  <div class="card-hd">版本历史</div>
-                  <div class="card-bd" style="padding-top:0">
-                    <div class="table-wrap"><table class="data">
-                      <thead><tr><th>版本</th><th>状态</th><th>变更说明</th><th>操作人</th><th>时间</th><th>操作</th></tr></thead>
-                      <tbody>
-                        <tr><td class="mono">v4</td><td><span class="tag warning">草稿</span></td><td>补充「要求转人工」场景，调整加微引导时机</td><td>朱胜武</td><td>2026-10-20 13:40</td><td><button class="btn sm" onclick="toast('版本对比（示意）','ok')">对比</button> <button class="btn sm" onclick="toast('已回滚','ok')">回滚</button></td></tr>
-                        <tr><td class="mono">v3</td><td><span class="tag success">线上运行</span></td><td>价格异议话术改为先说免费再谈课程</td><td>朱胜武</td><td>2026-10-14 10:22</td><td><button class="btn sm">对比</button> <button class="btn sm">回滚</button></td></tr>
-                        <tr><td class="mono">v2</td><td><span class="tag">已下线</span></td><td>首版销冠蒸馏话术</td><td>张敏</td><td>2026-10-08 17:05</td><td><button class="btn sm">对比</button> <button class="btn sm">回滚</button></td></tr>
-                      </tbody>
-                    </table></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <!-- DOCS -->
       <div class="view" id="view-docs">
@@ -845,7 +670,7 @@ body.with-ss .app{flex:1;min-height:0;height:auto}
                 <li>产品定位：<b>人工优先，AI 超时兜底</b>；嵌合客户池，不做公共池调度（那是方案A）</li>
                 <li>基线文档：<span class="mono">PRD-AI外呼机器人-CRM融合版.md</span>（2026-08）+ fusion 原型 + 本设计包超时兜底增量</li>
                 <li><span class="tag warning">改造</span> 客户池 <span class="mono">customer/ongoing</span>：保留「一键外呼」；新增「AI批量外呼」四步向导 + 跟进状态标签（人工跟进中 / 已超时待AI / AI外呼中）+「确认入 AI 队列」</li>
-                <li><span class="tag warning">改造</span> 智能查询：新增 AI外呼页签；个人信息：我的AI音色</li>
+                <li><span class="tag warning">改造</span> 个人信息：我的AI音色</li>
                 <li><span class="tag purple">新增</span> 任务管理（区分销售手动 / 系统超时兜底）/ AI外呼记录 / 全局配置（含超时兜底页签）/ 数据看板</li>
                 <li><span class="tag success">复用</span> 意向度、外呼状态、私域分层、付费分类、onionId/infoUuid 字典；已加微直接可见入库</li>
               </ul>
@@ -959,7 +784,6 @@ stateDiagram-v2
                 <thead><tr><th>页面</th><th>路径</th><th>动作</th></tr></thead>
                 <tbody>
                   <tr><td>客户池</td><td class="mono">customer/ongoing</td><td>改造：+AI批量外呼</td></tr>
-                  <tr><td>智能查询</td><td class="mono">（现网话术模块）</td><td>改造：+AI外呼页签</td></tr>
                   <tr><td>个人信息</td><td class="mono">顶栏头像</td><td>改造：+我的AI音色</td></tr>
                   <tr><td>外呼任务管理</td><td class="mono">aiOutbound/tasks</td><td>新增</td></tr>
                   <tr><td>AI外呼记录</td><td class="mono">aiOutbound/records</td><td>新增</td></tr>
@@ -1033,7 +857,7 @@ stateDiagram-v2
                 <div class="g"><b>callRecord</b>通话记录日常模块</div>
               </div>
             </div>
-<div class="alert ok">完整文档 <span class="mono">docs/scheme-b-system.md</span> · 需求基线融合版 PRD</div>
+<div class="alert ok">完整文档 <span class="mono">docs/scheme-b-system.html</span> · 需求基线融合版 PRD</div>
           </div>
         </div>
       
@@ -1051,7 +875,6 @@ stateDiagram-v2
               <tr><td>7.5 确认提交</td><td>向导步骤4 合规+名额</td><td>可点</td></tr>
               <tr><td>7.6 全局配置</td><td>AI外呼全局配置四页签</td><td>可点</td></tr>
               <tr><td>7.7 音色复刻</td><td>顶栏「我的AI音色」</td><td>可点示意</td></tr>
-              <tr><td>7.8 智能查询AI外呼</td><td>智能查询页签+匹配测试器</td><td>可点</td></tr>
               <tr><td>任务/记录/看板</td><td>侧栏对应三项</td><td>可点</td></tr>
             </tbody>
           </table></div>
@@ -1205,7 +1028,7 @@ stateDiagram-v2
     </table></div>
     <h4 style="font-size:13px;margin:16px 0 8px">并列落地时与方案A的接口约定</h4>
     <p class="small" style="line-height:1.8;color:var(--t2)">同一 infoUuid 不可同时处于方案A「AI池外呼中」与方案B「名下任务排队」。以状态机互斥为准：A 池锁定期间客户池不展示或展示「运营AI处理中」且禁用 AI批量外呼勾选；分配入库完成后再允许销售侧 B 任务。通道并发令牌全公司共享。话术与红线词配置一套源，两边引用相同 versionId。</p>
-    <div class="alert ok">打开本页即可评审；静态文件无构建。配套文档见 docs/scheme-b-system.md 与 docs/comparison.md。</div>
+    <div class="alert ok">打开本页即可评审；静态文件无构建。配套文档见 docs/scheme-b-system.html 与 docs/comparison.html。</div>
   </div>
 </div>
 <div class="card" style="margin-top:12px">
@@ -1253,7 +1076,7 @@ stateDiagram-v2
 <div class="card" style="margin:0 0 16px">
   <div class="card-hd">变更相对融合原型</div>
   <div class="card-bd small" style="line-height:1.8;color:var(--t2)">
-    本文件为单页静态重制，保留融合版交互主干（客户池入口、四步向导、任务/记录/配置/看板、音色、匹配测试器），并显式标注 WH_CRM_v2 路径与「复用/改造/新增」徽章；通道选项对齐外呼数据中心火山/阿里主体；补充与方案A互斥约定及企微承接额度边界。Vue 多文件原型仍可在 crm-refs/fusion-proto 查阅细字段实现。评审请同时打开 docs/scheme-b-system.md。
+    本文件为单页静态重制，保留融合版交互主干（客户池入口、四步向导、任务/记录/配置/看板、音色、匹配测试器），并显式标注 WH_CRM_v2 路径与「复用/改造/新增」徽章；通道选项对齐外呼数据中心火山/阿里主体；补充与方案A互斥约定及企微承接额度边界。Vue 多文件原型仍可在 crm-refs/fusion-proto 查阅细字段实现。评审请同时打开 docs/scheme-b-system.html。
   </div>
 </div>
 </div>
@@ -1568,7 +1391,6 @@ const PATHS={
   records:['AI外呼记录','/WH_CRM_v2/aiOutbound/records'],
   config:['AI外呼全局配置','/WH_CRM_v2/aiOutbound/globalConfig'],
   board:['AI外呼数据看板','/WH_CRM_v2/aiOutbound/board'],
-  script:['智能查询·AI外呼','/WH_CRM_v2/smartQuery/aiOutbound'],
   docs:['系统说明','/WH_CRM_v2/aiOutbound/docs']
 };
 const NAMES=['赵敏','钱丽','孙强','李娜','周伟','吴芳','郑磊','王芳','冯军','陈静'];
@@ -1664,13 +1486,6 @@ function openTaskDetail(id){
   }
   taskDetailMask.classList.remove('hidden');
 }
-function doMatch(){
-  const v=matchIn.value||'多少钱';
-  if(/不要|拒绝|拉黑/.test(v)) matchOut.innerHTML='命中 <b>明确拒绝</b> · 动作：挂断并加入免打扰并降级 D';
-  else if(/钱|价格|费用/.test(v)) matchOut.innerHTML='命中 <b>价格询问</b> 匹配度 96% · 将播报标准话术并继续对话';
-  else if(/加|微信|发我/.test(v)) matchOut.innerHTML='命中 <b>同意加微</b> · 触发加微并结束通话';
-  else matchOut.innerHTML='未命中缓存 · 将由大模型实时生成并记入未覆盖场景';
-}
 function bindTabs(tabRootSelector, getPaneId){
   const root=document.querySelector(tabRootSelector);
   if(!root) return;
@@ -1687,30 +1502,11 @@ function bindTabs(tabRootSelector, getPaneId){
   });
 }
 bindTabs('#cfgTabs', t=>'ct-'+t.dataset.t);
-bindTabs('#scriptMainTabs', t=>'smtab-'+t.dataset.tab);
-bindTabs('#scriptSubTabs', t=>'ssub-'+t.dataset.tab);
 bindTabs('#recTabs', t=>'rtab-'+t.dataset.tab);
 bindTabs('#personTabs', t=>'ptab-'+t.dataset.tab);
 bindTabs('#boardTabsB', t=>'bbtab-'+t.dataset.tab);
 bindTabs('#taskDetailTabs', t=>'tdtab-'+t.dataset.tab);
-function selScriptCat(el){ el.parentElement.querySelectorAll('.ni').forEach(x=>x.classList.remove('on')); el.classList.add('on'); }
 function selRadio(el){ el.parentElement.querySelectorAll('.radio-card').forEach(x=>x.classList.remove('on')); el.classList.add('on'); }
-function showPath(k){
-  const map={
-    agree:`<div class="talk-row"><div class="talk-who">AI</div><div class="talk-body">您好，我是洋葱学园学习顾问助理…</div></div>
-      <div class="talk-row"><div class="talk-who">客户</div><div class="talk-body">多少钱？先发我看看吧。</div></div>
-      <div class="talk-row"><div class="talk-who">AI</div><div class="talk-body">可以先发免费资料，这是我的企微…</div></div>
-      <div class="talk-row"><div class="talk-who">系统</div><div class="talk-body"><span class="tag success">触发加微 · 结束通话</span></div></div>`,
-    price:`<div class="talk-row"><div class="talk-who">AI</div><div class="talk-body">同步课可以先试听再决定…</div></div>
-      <div class="talk-row"><div class="talk-who">客户</div><div class="talk-body">别家更便宜，你们有优惠吗？</div></div>
-      <div class="talk-row"><div class="talk-who">AI</div><div class="talk-body">理解，我们先发免费学情报告对比一下效果…</div></div>
-      <div class="talk-row"><div class="talk-who">系统</div><div class="talk-body"><span class="tag warning">进入优惠说明节点</span></div></div>`,
-    refuse:`<div class="talk-row"><div class="talk-who">AI</div><div class="talk-body">方便占用您两分钟介绍一下…</div></div>
-      <div class="talk-row"><div class="talk-who">客户</div><div class="talk-body">不要再打了，拉黑你。</div></div>
-      <div class="talk-row"><div class="talk-who">系统</div><div class="talk-body"><span class="tag danger">挂断 · 免打扰 30 天 · 降级 D</span></div></div>`
-  };
-  pathTalk.innerHTML=map[k]||map.agree;
-}
 renderPool(); renderRecords();
 </script>
 

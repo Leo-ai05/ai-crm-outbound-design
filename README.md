@@ -21,7 +21,8 @@ python3 -m http.server 8765
 - Hub：`index.html` — A/B 对比入口、CRM 绑定要点、顶栏方案切换  
 - 方案A：`scheme-a/index.html` — 独立板块 · AI外呼中心  
 - 方案B：`scheme-b/index.html` — 客户池嵌合 · **人工优先 + AI超时兜底**  
-- 文档：`docs/scheme-a-system.md` · `docs/scheme-b-system.md` · `docs/comparison.md`  
+- 文档（HTML 可渲染）：[`docs/comparison.html`](https://leo-ai05.github.io/ai-crm-outbound-design/docs/comparison.html) · [`scheme-a-system.html`](https://leo-ai05.github.io/ai-crm-outbound-design/docs/scheme-a-system.html) · [`scheme-b-system.html`](https://leo-ai05.github.io/ai-crm-outbound-design/docs/scheme-b-system.html)
+- 源稿 Markdown：`docs/*.md`（Pages 上请用 .html，勿直接打开 .md）  
 
 ## 在线地址（部署后）
 
@@ -53,9 +54,12 @@ ai-crm-outbound-design/
 ├── scheme-a/index.html
 ├── scheme-b/index.html
 ├── docs/
+│   ├── comparison.html          # 方案对比（可渲染）
+│   ├── scheme-a-system.html
+│   ├── scheme-b-system.html
+│   ├── comparison.md            # 源稿
 │   ├── scheme-a-system.md
-│   ├── scheme-b-system.md
-│   └── comparison.md
+│   └── scheme-b-system.md
 └── assets/          # 参考样式备份等
 ```
 

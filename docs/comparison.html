@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>方案对比 · A 独立板块 vs B 深度嵌合</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js" async onload="window.__mermaidReady&&window.__mermaidReady()"></script>
+<style>
+:root{--primary:#409eff;--bg:#f0f2f5;--card:#fff;--t1:#303133;--t2:#606266;--t3:#909399;--border:#ebeef5;--sidebar:#001529;--ok:#67c23a;--warn:#e6a23c}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--t1);font-size:14px;line-height:1.65}
+.scheme-switcher{position:sticky;top:0;z-index:3000;height:40px;background:#001529;border-bottom:1px solid #0a2138;display:flex;align-items:center;padding:0 16px;gap:4px}
+.scheme-switcher .ss-brand{color:#fff;font-size:12px;font-weight:600;margin-right:14px;display:flex;align-items:center;gap:6px}
+.scheme-switcher .ss-brand .ss-dot{width:7px;height:7px;border-radius:50%;background:#409eff}
+.scheme-switcher a.ss-item{display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:4px;font-size:12px;color:#a6adb4;text-decoration:none}
+.scheme-switcher a.ss-item:hover{color:#fff;background:rgb(255 255 255 / 8%)}
+.scheme-switcher a.ss-item.active{color:#fff;background:#409eff;font-weight:500}
+.scheme-switcher .ss-spacer{flex:1}
+.scheme-switcher .ss-hint{font-size:11px;color:#5c6b7a}
+.top{background:var(--sidebar);color:#fff;padding:14px 24px;display:flex;align-items:center;gap:12px;border-top:1px solid #0a2138}
+.top .dot{width:10px;height:10px;border-radius:50%;background:var(--primary);flex-shrink:0}
+.wrap{max-width:1080px;margin:0 auto;padding:24px}
+h1{font-size:22px;margin:0 0 6px}
+.sub{color:var(--t3);margin:0 0 18px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;box-shadow:0 2px 12px rgb(0 0 0 / 6%);margin-bottom:16px}
+.card h2{margin:0 0 12px;font-size:16px;display:flex;align-items:center;gap:8px}
+.card h2 .num{display:inline-flex;width:22px;height:22px;border-radius:50%;background:#ecf5ff;color:var(--primary);font-size:12px;align-items:center;justify-content:center;font-weight:600}
+.note{background:#ecf5ff;border:1px solid #b3d8ff;color:#409eff;padding:10px 14px;border-radius:4px;font-size:13px;margin-bottom:16px}
+.note.warn{background:#fdf6ec;border-color:#f5dab1;color:#b88230}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{border:1px solid var(--border);padding:10px 12px;text-align:left;vertical-align:top}
+th{background:#f5f7fa;color:var(--t2);font-weight:600}
+td strong{color:var(--t1)}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;background:#ecf5ff;color:var(--primary);margin-right:4px}
+.tag.b{background:#f0f9eb;color:var(--ok)}
+.mono{font-family:ui-monospace,Menlo,monospace;font-size:11px}
+ul{margin:8px 0;padding-left:20px;color:var(--t2)}
+li{margin:4px 0}
+.mermaid-box{background:#fafbfc;border:1px solid var(--border);border-radius:6px;padding:16px;overflow:auto;margin-top:8px}
+.mermaid-box .title{font-weight:600;margin-bottom:10px;font-size:13px;color:var(--t2)}
+.links{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.links a{display:inline-flex;padding:8px 14px;background:var(--primary);color:#fff;border-radius:4px;text-decoration:none;font-size:13px}
+.links a.ghost{background:#fff;color:var(--primary);border:1px solid var(--primary)}
+ol{margin:8px 0;padding-left:22px;color:var(--t2)}
+.footer{color:var(--t3);font-size:12px;text-align:center;padding:8px 0 24px}
+</style>
+</head>
+<body>
+<div class="scheme-switcher">
+  <div class="ss-brand"><span class="ss-dot"></span>AI外呼 × CRM</div>
+  <a class="ss-item" href="../index.html">总览</a>
+  <a class="ss-item" href="../scheme-a/index.html">方案A · 独立板块承接式</a>
+  <a class="ss-item" href="../scheme-b/index.html">方案B · 深度绑定嵌合式</a>
+  <a class="ss-item active" href="comparison.html">方案对比</a>
+  <div class="ss-spacer"></div>
+  <span class="ss-hint">WH_CRM_v2 · 双方案对比</span>
+</div>
+<div class="top"><span class="dot"></span><div><b>方案对比 · A 独立板块 vs B 深度嵌合</b><div style="font-size:12px;opacity:.75">人工优先 + AI超时兜底（方案B）· 无方案C</div></div></div>
+<div class="wrap">
+  <h1>方案对比 · A 独立板块 vs B 深度嵌合</h1>
+  <p class="sub">一页看清两套方案差异、适用场景与落地顺序。表格与流程图可直接评审（非 raw Markdown）。</p>
+  <div class="note">方案A = 运营统一吞吐「销售未领取」公共线索；方案B = <b>人工优先 + AI 超时兜底</b>，销售清洗「名下」库存。可并列落地，共享通道与话术。</div>
+
+  <div class="card">
+    <h2><span class="num">1</span> 一句话对照</h2>
+    <table>
+      <thead><tr><th style="width:18%"></th><th><span class="tag">方案A</span> 独立板块承接式</th><th><span class="tag b">方案B</span> 深度绑定嵌合式</th></tr></thead>
+      <tbody>
+        <tr><td><strong>谁用</strong></td><td>运营为主</td><td>销售为主</td></tr>
+        <tr><td><strong>线索从哪来</strong></td><td><span class="mono">dataPool</span> <b>未领取</b>公共线索</td><td>客户池 <b>名下</b>线索</td></tr>
+        <tr><td><strong>CRM 怎么长</strong></td><td>侧栏<strong>新增</strong>「AI外呼中心」</td><td><strong>改造</strong>客户池 + 新增任务/记录/配置/看板</td></tr>
+        <tr><td><strong>AI 角色</strong></td><td>运营统一吞吐</td><td><b>人工优先</b>；销售可主动 AI；<b>超时未跟/多次未接通兜底</b></td></tr>
+        <tr><td><strong>价值</strong></td><td>统一吞吐公共池，提升整体触达</td><td>清私海库存，不抢销售日常人拨</td></tr>
+        <tr><td><strong>加微后</strong></td><td>意向池再分配</td><td><b>名下直接可见入库</b>（无单独承接池叙事）</td></tr>
+        <tr><td><strong>基线文档</strong></td><td>本设计包方案A说明</td><td>融合版 PRD + 超时兜底增量</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">2</span> 适用场景</h2>
+    <ul>
+      <li><b>选 A：</b>公共池积压严重、领取积极性不足、需要运营统一控频控时段控通道，并集中做企微承接再分配。</li>
+      <li><b>选 B：</b>销售名下已有大量未接通/低意向，要保人拨主权，同时用 AI 清超时库存；结果直接回写自己的客户池。</li>
+      <li><b>并列：</b>A 清公共池，B 清私海；共享话术、红线词、通道并发、意向字典；线索 AI 状态互斥。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">3</span> CRM 触点对照</h2>
+    <table>
+      <thead><tr><th>触点</th><th>A</th><th>B</th></tr></thead>
+      <tbody>
+        <tr><td><span class="mono">customer/ongoing</span></td><td>分配后落点（不改操作区）</td><td><b>入口+向导+跟进状态+超时确认</b></td></tr>
+        <tr><td><span class="mono">dataPool</span></td><td><b>水源</b></td><td>不直接用</td></tr>
+        <tr><td><span class="mono">distribute</span></td><td>意向池分配</td><td>一般不走（已在名下；已加微直接可见）</td></tr>
+        <tr><td><span class="mono">weworkBot/globalConfig</span></td><td>布局参考；承接账号<strong>独立页</strong></td><td>加微可复用能力</td></tr>
+        <tr><td><span class="mono">callRecord</span></td><td>写入</td><td>写入</td></tr>
+        <tr><td>未拨打领取额度</td><td>AI池锁定不领；承接豁免</td><td>基本不变；加微入库可豁免</td></tr>
+        <tr><td>来源「AI机器人」</td><td>分配入库时覆盖</td><td>筛选可用；转入时按私域 PRD</td></tr>
+        <tr><td>火山/阿里看板</td><td>运营总览</td><td>个人+对比；区分手动/兜底</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">4</span> 流程差异</h2>
+    <div class="mermaid-box">
+      <div class="title">A 清公海 · B 清私海（人拨优先 + 主动AI + 超时兜底）</div>
+      <pre class="mermaid">
+flowchart LR
+  subgraph A方案
+    DP[dataPool未领取] --> AIP[AI专属池/任务]
+    AIP --> INT[任务明细意向]
+    INT --> DIST[指定承接人分配]
+    DIST --> POOL1[销售客户池]
+  end
+  subgraph B方案
+    POOL2[销售客户池] --> MAN[一键外呼人工优先]
+    POOL2 --> WIZ[四步向导手动AI]
+    POOL2 --> TO[超时规则兜底AI]
+    MAN --> POOL2
+    WIZ --> TASK[名下AI任务]
+    TO --> TASK
+    TASK --> RW[回写意向总结]
+    RW --> POOL2
+  end
+      </pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">5</span> 落地建议</h2>
+    <ol>
+      <li><b>先 B 灰度</b>（融合 PRD + 超时确认模式）：单组销售验证回写、投诉率与确认入队体验。</li>
+      <li><b>再 A 小流量</b>：验证抽取锁、额度豁免、承接账号。</li>
+      <li><b>后并联全量</b>：统一对账 waihudata；质检抽检两边录音。</li>
+      <li>产品叙事：同一套 WH_CRM_v2 上的两种 AI 产能入口——A 清公海，B 清私海（人优先+超时兜底）。</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">6</span> 明确非目标（两边共同）</h2>
+    <ul>
+      <li>通话中转人工</li>
+      <li>自建线路采购</li>
+      <li>替换人工一键外呼</li>
+      <li>话术全自动生成</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">7</span> 文档与原型</h2>
+    <div class="links">
+      <a href="../scheme-a/index.html">打开方案A原型</a>
+      <a href="../scheme-b/index.html">打开方案B原型</a>
+      <a class="ghost" href="scheme-a-system.html">方案A系统说明</a>
+      <a class="ghost" href="scheme-b-system.html">方案B系统说明</a>
+      <a class="ghost" href="../index.html">返回总览</a>
+    </div>
+    <p style="margin-top:14px;font-size:12px;color:var(--t3)">在线：<span class="mono">https://leo-ai05.github.io/ai-crm-outbound-design/docs/comparison.html</span> · 源稿仍保留 <span class="mono">comparison.md</span></p>
+  </div>
+</div>
+<p class="footer">AI外呼 × CRM · WH_CRM_v2 · 方案对比页</p>
+<script>
+window.__mermaidReady=function(){
+  try{
+    if(window.mermaid){
+      mermaid.initialize({startOnLoad:false,theme:'neutral',securityLevel:'loose'});
+      mermaid.run({nodes:document.querySelectorAll('.mermaid')});
+    }
+  }catch(e){}
+};
+if(window.mermaid)window.__mermaidReady();
+</script>
+</body>
+</html>

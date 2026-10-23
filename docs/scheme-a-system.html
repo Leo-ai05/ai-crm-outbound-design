@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>方案A · 系统说明 · 独立板块承接式</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js" async onload="window.__mermaidReady&&window.__mermaidReady()"></script>
+<style>
+:root{--primary:#409eff;--bg:#f0f2f5;--card:#fff;--t1:#303133;--t2:#606266;--t3:#909399;--border:#ebeef5;--sidebar:#001529}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--t1);font-size:14px;line-height:1.65}
+.scheme-switcher{position:sticky;top:0;z-index:3000;height:40px;background:#001529;border-bottom:1px solid #0a2138;display:flex;align-items:center;padding:0 16px;gap:4px}
+.scheme-switcher .ss-brand{color:#fff;font-size:12px;font-weight:600;margin-right:14px;display:flex;align-items:center;gap:6px}
+.scheme-switcher .ss-brand .ss-dot{width:7px;height:7px;border-radius:50%;background:#409eff}
+.scheme-switcher a.ss-item{display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:4px;font-size:12px;color:#a6adb4;text-decoration:none}
+.scheme-switcher a.ss-item:hover{color:#fff;background:rgb(255 255 255 / 8%)}
+.scheme-switcher a.ss-item.active{color:#fff;background:#409eff;font-weight:500}
+.scheme-switcher .ss-spacer{flex:1}
+.scheme-switcher .ss-hint{font-size:11px;color:#5c6b7a}
+.top{background:var(--sidebar);color:#fff;padding:14px 24px;display:flex;align-items:center;gap:12px}
+.top .dot{width:10px;height:10px;border-radius:50%;background:var(--primary)}
+.wrap{max-width:1080px;margin:0 auto;padding:24px}
+h1{font-size:22px;margin:0 0 6px}
+.sub{color:var(--t3);margin:0 0 18px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;box-shadow:0 2px 12px rgb(0 0 0 / 6%);margin-bottom:16px}
+.card h2{margin:0 0 12px;font-size:16px}
+.note{background:#ecf5ff;border:1px solid #b3d8ff;color:#409eff;padding:10px 14px;border-radius:4px;font-size:13px;margin-bottom:16px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{border:1px solid var(--border);padding:9px 11px;text-align:left;vertical-align:top}
+th{background:#f5f7fa;color:var(--t2);font-weight:600}
+.mono{font-family:ui-monospace,Menlo,monospace;font-size:11px}
+ul,ol{margin:8px 0;padding-left:20px;color:var(--t2)}
+li{margin:4px 0}
+.mermaid-box{background:#fafbfc;border:1px solid var(--border);border-radius:6px;padding:16px;overflow:auto;margin:10px 0}
+.mermaid-box .title{font-weight:600;margin-bottom:10px;font-size:13px;color:var(--t2)}
+.links a{display:inline-flex;margin:4px 8px 4px 0;padding:8px 14px;background:var(--primary);color:#fff;border-radius:4px;text-decoration:none;font-size:13px}
+.links a.ghost{background:#fff;color:var(--primary);border:1px solid var(--primary)}
+.toc a{color:var(--primary);margin-right:12px;font-size:13px}
+.footer{color:var(--t3);font-size:12px;text-align:center;padding:8px 0 24px}
+</style>
+</head>
+<body>
+<div class="scheme-switcher">
+  <div class="ss-brand"><span class="ss-dot"></span>AI外呼 × CRM</div>
+  <a class="ss-item" href="../index.html">总览</a>
+  <a class="ss-item" href="../scheme-a/index.html">方案A · 独立板块承接式</a>
+  <a class="ss-item" href="../scheme-b/index.html">方案B · 深度绑定嵌合式</a>
+  <a class="ss-item" href="comparison.html">方案对比</a>
+  <div class="ss-spacer"></div>
+  <span class="ss-hint">方案A 系统说明</span>
+</div>
+<div class="top"><span class="dot"></span><div><b>方案A · 独立板块承接式 · 系统说明</b><div style="font-size:12px;opacity:.75">运营统一吞吐销售未领取公共线索 · /WH_CRM_v2/</div></div></div>
+<div class="wrap">
+  <h1>方案A · 独立板块承接式 · 系统说明</h1>
+  <p class="sub">原型：<span class="mono">scheme-a/index.html</span> · 角色重心：<b>运营</b></p>
+  <div class="note">产品：武汉电销系统 / 重洋启思电销系统（<span class="mono">/WH_CRM_v2/</span>）。侧栏新增「AI外呼中心」，以 AI任务 + 任务明细 + 企微承接账号为主链路。</div>
+  <p class="toc"><a href="#s1">1 目标</a><a href="#s2">2 挂载</a><a href="#s3">3 主流程</a><a href="#s4">4 状态机</a><a href="#s5">5 额度</a><a href="#s6">6 任务配置</a><a href="#s7">7 企微承接</a><a href="#s8">8 指标</a><a href="#s9">9 验收</a><a href="#s10">10 屏幕</a></p>
+
+  <div class="card" id="s1">
+    <h2>1. 问题与目标</h2>
+    <p style="color:var(--t2);margin:0">数据池（<span class="mono">dataPool</span>）中大量未领取线索靠销售主动领取效率不足；人工外呼成本高、未接通占比大。方案A在 CRM 侧栏新增一级「AI外呼中心」，以 <b>AI任务</b> 创建每日外呼任务（含公海池线索分层比例、并发、禁拨时段），在 <b>任务明细</b> 查看客户并批量指定承接人分配入库；企微承接账号按渠道活码成员样式配置。</p>
+  </div>
+
+  <div class="card" id="s2">
+    <h2>2. CRM 挂载（复用 vs 新增）</h2>
+    <table>
+      <thead><tr><th>模块</th><th>现网路径</th><th>动作</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>数据池</td><td><span class="mono">dataPool</span></td><td>复用+抽取</td><td>未领取线索水源；按任务比例抽取后锁定防双领</td></tr>
+        <tr><td>客户池</td><td><span class="mono">customer/ongoing</span></td><td>复用</td><td>分配入库后出现在销售名下</td></tr>
+        <tr><td>付费线索池</td><td><span class="mono">customer/payClue</span></td><td>复用</td><td>分层 A/B/C/D 口径</td></tr>
+        <tr><td>分配</td><td><span class="mono">distribute</span></td><td>复用+调用</td><td>任务明细「批量/单条指定承接人」</td></tr>
+        <tr><td>渠道活码成员</td><td>组织架构弹窗</td><td>复用交互</td><td>承接账号添加成员；弹窗展示云设备状态，离线不可选</td></tr>
+        <tr><td>企微全局配置</td><td><span class="mono">weworkBot/globalConfig</span></td><td>复用布局参考</td><td>承接账号页数据独立</td></tr>
+        <tr><td>通话记录</td><td><span class="mono">callRecord</span></td><td>复用字段</td><td>AI 通话写入，主体标记</td></tr>
+        <tr><td>AI任务</td><td><span class="mono">aiOutbound/tasks</span></td><td><b>新增</b></td><td>创建/管理每日任务；合并原策略+池入口</td></tr>
+        <tr><td>任务明细</td><td><span class="mono">aiOutbound/taskDetail</span></td><td><b>新增</b></td><td>任务下客户列表；合并原意向池</td></tr>
+        <tr><td>企微承接账号</td><td><span class="mono">aiOutbound/weworkAccount</span></td><td><b>新增独立页</b></td><td>列表+组织架构筛选+云设备在线（离线默认不承接）+加微轮询</td></tr>
+        <tr><td>看板/明细/说明</td><td><span class="mono">aiOutbound/*</span></td><td><b>新增</b></td><td>对齐 waihudata</td></tr>
+      </tbody>
+    </table>
+    <p style="margin:12px 0 0;color:var(--t2);font-size:13px"><b>已合并下线（独立菜单）：</b>AI专属外呼池、外呼策略配置、意向线索池、外呼任务监控。<br/>
+    <b>实时观察：</b>原「外呼任务监控」折叠为 AI任务页顶部板块。<br/>
+    <b>不改：</b>客户池一键外呼/锁定/收藏/转移；销售未拨打领取上限公式。</p>
+  </div>
+
+  <div class="card" id="s3">
+    <h2>3. 主流程</h2>
+    <div class="mermaid-box">
+      <div class="title">创建AI任务 → 按线索分配比例抽池 → 外呼 → 加微 → 任务明细批量分配</div>
+      <pre class="mermaid">
+flowchart TD
+  A[数据池 dataPool 未领取线索] --> B[新建AI外呼任务]
+  B --> B1[线索分配比例 公海池分层A-E合计100]
+  B1 --> B2[并发独占 / 任务时间 / 禁拨时段]
+  B2 --> C{按分层比例抽取 A-E}
+  C -->|占比0或强制剔除| Z1[回数据池或标记不可呼]
+  C -->|通过| D[任务明细客户列表]
+  D --> E[调度拨打 火山/阿里]
+  E --> F{接通?}
+  F -->|未接通| G[未接再呼]
+  G --> E
+  F -->|接通| H[AI意向识别]
+  H --> I{意向达标?}
+  I -->|否| J[回写总结 冷却]
+  I -->|是| K[承接账号轮询加微]
+  K --> L[任务明细 · 意向待分配]
+  L --> M[批量/单条指定承接人分配]
+  M --> N[客户池 来源=AI机器人]
+  N --> O[不占未拨打领取额度]
+      </pre>
+    </div>
+  </div>
+
+  <div class="card" id="s4">
+    <h2>4. 线索状态机</h2>
+    <div class="mermaid-box">
+      <div class="title">任务明细内状态</div>
+      <pre class="mermaid">
+stateDiagram-v2
+  [*] --> 未领取公共
+  未领取公共 --> 待呼: 任务按比例抽取
+  待呼 --> 外呼中: 任务拨打
+  外呼中 --> 未接通待重播: 未接通
+  未接通待重播 --> 外呼中: 再呼
+  外呼中 --> 意向待分配: 意向达标
+  意向待分配 --> 已加微: 加微同意
+  已加微 --> 已分配: 指定承接人入库
+  已分配 --> [*]
+      </pre>
+    </div>
+  </div>
+
+  <div class="card" id="s5">
+    <h2>5. 与领取额度 / 分配的关系</h2>
+    <ol>
+      <li>任务抽取锁定期间，销售领取接口对该线索返回「AI处理中」，不可领。</li>
+      <li>经 AI 加微活码进线并首次自动承接的销售，<b>不计入未拨打领取额度</b>。</li>
+      <li>转交/回收后再分配给其他销售：恢复占用额度。</li>
+      <li>来源覆盖为「AI机器人」。</li>
+    </ol>
+  </div>
+
+  <div class="card" id="s6">
+    <h2>6. AI任务配置要点</h2>
+    <ul>
+      <li><b>线索分配比例：</b>对齐公海池分层 A/B/C/D/E %（默认 5/15/5/5/70），合计必须 = 100%；与准入合并，按分层占比从数据池抽取</li>
+      <li><b>并发：</b>可分配机器人并发/总并发；独占模式；任务并发 1–可分配上限</li>
+      <li><b>时间：</b>任务时间区间；禁拨时段可多条；政策 <b>21:00–次日 09:00</b> 不可外呼；未接再呼开关+次数/间隔</li>
+      <li><b>分层抽取：</b>A–E 占比即准入与分配；占比为 0 的分层不抽取；高净值/已加微/黑名单/空号仍强制剔除</li>
+      <li><b>通道：</b>火山 / 阿里</li>
+    </ul>
+  </div>
+
+  <div class="card" id="s7">
+    <h2>7. 企微承接账号独立页</h2>
+    <ul>
+      <li>成员列表对齐<b>渠道活码</b>展示（头像/姓名/userid/部门/今日承接/上限）</li>
+      <li><b>添加成员</b>打开组织架构筛选弹窗；仅<b>云设备在线</b>可添加并开启承接，离线默认不承接</li>
+      <li>Tab：承接账号 / 加微通知策略 / 额度与豁免（不加独立漏斗 Tab）</li>
+      <li>加微通知策略：初始化<b>仅轮询</b>；配置加微昵称、邀请模版、欢迎语、失败重试</li>
+      <li>布局借鉴 <span class="mono">weworkBot/globalConfig</span>，配置数据与销售企微机器人全局配置分离</li>
+    </ul>
+  </div>
+
+  <div class="card" id="s8">
+    <h2>8. 指标口径</h2>
+    <p style="color:var(--t2);margin:0">与 <span class="mono">pages.yc345.tv/waihudata</span> 对齐：外呼通数、接通率、有效接通≥10s、意向等级、加微节点/同意加微、未接通原因、通话总结、导出明细；主体维度火山/阿里。<br/><br/>
+    看板 / 通话明细等列表<b>基础字段统一</b>为：通话ID · 洋葱ID · 外呼手机号。企微承接页不含独立「今日漏斗」Tab。</p>
+  </div>
+
+  <div class="card" id="s9">
+    <h2>9. 验收要点</h2>
+    <ol>
+      <li>创建任务时公海池分层比例（A–E）合计 ≠100% 不可提交；禁呼时段不可破。</li>
+      <li>任务明细可切换任务；意向与池内客户同表；支持批量指定承接人。</li>
+      <li>企微承接可走组织架构添加成员；加微策略分配方式固定轮询。</li>
+      <li>分配入库后客户池可见总结；来源=AI机器人；额度豁免正确。</li>
+      <li>看板可与 waihudata 对账（误差目标 &lt;2%）。</li>
+    </ol>
+  </div>
+
+  <div class="card" id="s10">
+    <h2>10. 原型屏幕清单</h2>
+    <p style="color:var(--t2);margin:0 0 12px">AI任务 · 任务明细 · 企微承接账号 · 外呼数据看板 · 通话明细 · 系统说明（含 mermaid）</p>
+    <div class="links">
+      <a href="../scheme-a/index.html">打开方案A原型</a>
+      <a class="ghost" href="comparison.html">方案对比</a>
+      <a class="ghost" href="scheme-b-system.html">方案B系统说明</a>
+      <a class="ghost" href="../index.html">返回总览</a>
+    </div>
+  </div>
+</div>
+<p class="footer">源稿保留 docs/scheme-a-system.md · 本页为可渲染版本</p>
+<script>
+window.__mermaidReady=function(){
+  try{
+    if(window.mermaid){
+      mermaid.initialize({startOnLoad:false,theme:'neutral',securityLevel:'loose'});
+      mermaid.run({nodes:document.querySelectorAll('.mermaid')});
+    }
+  }catch(e){}
+};
+if(window.mermaid)window.__mermaidReady();
+</script>
+</body>
+</html>

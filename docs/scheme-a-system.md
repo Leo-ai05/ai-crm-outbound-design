@@ -1,5 +1,8 @@
 # 方案A · 独立板块承接式 · 系统说明
 
+> **浏览器请打开可渲染页：** [scheme-a-system.html](./scheme-a-system.html)（GitHub Pages 对 `.md` 会当纯文本，表格/流程图不会渲染）
+
+
 > 产品：武汉电销系统 / 重洋启思电销系统（`/WH_CRM_v2/`）  
 > 原型：`scheme-a/index.html`  
 > 角色重心：**运营**统一吞吐销售未领取的公共线索
