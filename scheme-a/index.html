@@ -295,6 +295,20 @@ table.data tr.col-filtered-out{display:none!important}
 tr.device-offline td{background:#fafafa}
 .accept-tip{font-size:11px;color:var(--t3);margin-top:2px}
 
+
+/* board layout polish */
+#view-board .board-toolbar{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:12px 14px;background:#fff;border:1px solid var(--border-light);border-radius:6px}
+#view-board .board-section{margin-bottom:14px}
+#view-board .board-section > .card{margin:0}
+#view-board .kpi-row{gap:12px;margin-bottom:14px}
+#view-board .kpi{border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.03);padding:16px 18px}
+#view-board .kpi .val{font-size:24px;letter-spacing:.2px}
+#view-board .board-charts{display:grid;grid-template-columns:1.2fr 1fr;gap:12px;margin-bottom:14px}
+#view-board .board-charts .card-hd{font-weight:600}
+#view-board .board-table-card .card-hd{display:flex;align-items:center;gap:8px}
+#view-board .base-fields-tip{font-size:12px;color:var(--t3);font-weight:400}
+#view-board .tabs{margin-bottom:14px}
+@media(max-width:1100px){#view-board .board-charts{grid-template-columns:1fr}}
 </style>
 </head>
 <body class="with-ss">
@@ -431,7 +445,7 @@ tr.device-offline td{background:#fafafa}
               <table class="data" id="poolTable">
                 <thead><tr>
                   <th class="th-check"><span class="checkbox" id="chkAll" onclick="toggleAll(this)"><span class="box"></span></span></th>
-                  <th class="th-filter"><span class="th-lab">onionId</span><select class="col-filter" data-col="oid" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+                  <th class="th-filter"><span class="th-lab">洋葱ID</span><select class="col-filter" data-col="oid" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
                   <th class="th-filter"><span class="th-lab">昵称</span><select class="col-filter" data-col="nick" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
                   <th class="th-filter"><span class="th-lab">学段</span><select class="col-filter" data-col="grade" onchange="applyTableFilters(this)"><option value="">全部</option><option value="初一">初一</option><option value="初二">初二</option><option value="初三">初三</option><option value="高一">高一</option><option value="高二">高二</option><option value="高三">高三</option></select></th>
                   <th class="th-filter"><span class="th-lab">来源</span><select class="col-filter" data-col="src" onchange="applyTableFilters(this)"><option value="">全部</option><option value="抖音信息流">抖音信息流</option><option value="官网留资">官网留资</option><option value="小程序试听">小程序试听</option><option value="腾讯广点通">腾讯广点通</option></select></th>
@@ -468,7 +482,6 @@ tr.device-offline td{background:#fafafa}
               <div class="tab active" data-tab="w1">承接账号</div>
               <div class="tab" data-tab="w2">加微通知策略</div>
               <div class="tab" data-tab="w3">额度与豁免</div>
-              <div class="tab" data-tab="w4">今日漏斗</div>
             </div>
             <div id="wtab-w1">
               <div class="alert info" style="margin-bottom:12px">列表模式管理承接成员；支持<strong>组织架构快速筛选</strong>。仅<strong>云设备在线</strong>的账号可添加为承接成员并开启承接；离线账号默认不承接且不可开启。</div>
@@ -580,22 +593,13 @@ tr.device-offline td{background:#fafafa}
                 <div class="form-row"><label>单账号日承接上限（默认）</label><input class="inp" type="number" value="40"/></div>
               </div>
             </div>
-            <div id="wtab-w4" class="hidden">
-              <div class="card-hd" style="border:0;padding:0 0 12px">今日加微漏斗</div>
-              <div class="stat-funnel">
-                <div class="funnel-bar"><span class="name">有效接通</span><div class="bar"><i style="width:100%"></i></div><span class="n">612</span></div>
-                <div class="funnel-bar"><span class="name">触达加微节点</span><div class="bar"><i style="width:55%"></i></div><span class="n">337</span></div>
-                <div class="funnel-bar"><span class="name">发起加微通知</span><div class="bar"><i style="width:32%"></i></div><span class="n">196</span></div>
-                <div class="funnel-bar"><span class="name">同意加微</span><div class="bar"><i style="width:12%;background:var(--success)"></i></div><span class="n">73</span></div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
 
       <!-- ========== VIEW: 看板 ========== -->
       <div class="view" id="view-board">
-        <div class="toolbar">
+        <div class="board-toolbar">
           <div class="pill-row">
             <span class="pill on" onclick="selPill(this)">今日</span>
             <span class="pill" onclick="selPill(this)">近7日</span>
@@ -603,24 +607,27 @@ tr.device-offline td{background:#fafafa}
           </div>
           <div class="spacer"></div>
           <span class="chip">口径对齐 · pages.yc345.tv/waihudata</span>
+          <button class="btn sm" onclick="toast('已刷新看板数据（示意）','ok')">刷新</button>
         </div>
         <div class="tabs" id="boardTabs">
           <div class="tab active" data-tab="b1">总览</div>
           <div class="tab" data-tab="b2">通道对比(火山·阿里)</div>
           <div class="tab" data-tab="b3">意向加微</div>
           <div class="tab" data-tab="b4">未接通分层</div>
-          <div class="tab" data-tab="b5">明细导出</div>
+          <div class="tab" data-tab="b5">明细列表</div>
         </div>
         <div id="btab-b1">
-          <div class="kpi-row">
-            <div class="kpi"><div class="label">外呼通数</div><div class="val">3,210</div><div class="delta">火山 2,100 · 阿里 1,110</div></div>
-            <div class="kpi"><div class="label">接通率</div><div class="val">28.4%</div></div>
-            <div class="kpi"><div class="label">有效接通≥10s</div><div class="val">19.1%</div></div>
-            <div class="kpi"><div class="label">意向率（有效中）</div><div class="val">14.1%</div></div>
-            <div class="kpi"><div class="label">同意加微率</div><div class="val">11.9%</div></div>
-            <div class="kpi"><div class="label">分配入库完成</div><div class="val">29</div></div>
+          <div class="board-section">
+            <div class="kpi-row">
+              <div class="kpi"><div class="label">外呼通数</div><div class="val">3,210</div><div class="delta">火山 2,100 · 阿里 1,110</div></div>
+              <div class="kpi"><div class="label">接通率</div><div class="val">28.4%</div><div class="delta up">较昨日 +1.2pp</div></div>
+              <div class="kpi"><div class="label">有效接通≥10s</div><div class="val">19.1%</div><div class="delta">612 通</div></div>
+              <div class="kpi"><div class="label">意向率（有效中）</div><div class="val">14.1%</div><div class="delta up">86 条</div></div>
+              <div class="kpi"><div class="label">同意加微率</div><div class="val">11.9%</div><div class="delta">41 人</div></div>
+              <div class="kpi"><div class="label">分配入库完成</div><div class="val">29</div><div class="delta up">豁免未拨打额度</div></div>
+            </div>
           </div>
-          <div class="grid-2">
+          <div class="board-charts">
             <div class="card"><div class="card-hd">转化漏斗</div><div class="card-bd">
               <div class="stat-funnel">
                 <div class="funnel-bar"><span class="name">外呼通数</span><div class="bar"><i style="width:100%"></i></div><span class="n">3210</span></div>
@@ -639,9 +646,28 @@ tr.device-offline td{background:#fafafa}
               </div>
             </div></div>
           </div>
+          <div class="card board-table-card board-section">
+            <div class="card-hd">近期通话抽样 <span class="base-fields-tip">基础字段：通话ID · 洋葱ID · 外呼手机号</span>
+              <div class="spacer"></div>
+              <button class="btn sm" onclick="document.querySelector('#boardTabs .tab[data-tab=b5]').click()">查看全部明细</button>
+            </div>
+            <div class="card-bd">
+              <div class="table-wrap"><table class="data" id="boardSampleTable">
+                <thead><tr>
+                  <th class="th-filter"><span class="th-lab">通话ID</span><select class="col-filter" data-col="cid" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+                  <th class="th-filter"><span class="th-lab">洋葱ID</span><select class="col-filter" data-col="oid" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+                  <th class="th-filter"><span class="th-lab">外呼手机号</span><select class="col-filter" data-col="phone" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+                  <th class="th-filter"><span class="th-lab">通道</span><select class="col-filter" data-col="ch" onchange="applyTableFilters(this)"><option value="">全部</option><option value="火山">火山</option><option value="阿里">阿里</option></select></th>
+                  <th class="th-filter"><span class="th-lab">接通</span><select class="col-filter" data-col="ok" onchange="applyTableFilters(this)"><option value="">全部</option><option value="是">是</option><option value="否">否</option></select></th>
+                  <th class="th-filter"><span class="th-lab">意向</span><select class="col-filter" data-col="intent" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+                </tr></thead>
+                <tbody id="boardSampleBody"></tbody>
+              </table></div>
+            </div>
+          </div>
         </div>
         <div id="btab-b2" class="hidden">
-          <div class="card"><div class="card-hd">通道对比 · 火山 vs 阿里</div><div class="card-bd">
+          <div class="card board-table-card"><div class="card-hd">通道对比 · 火山 vs 阿里</div><div class="card-bd">
             <div class="table-wrap"><table class="data" id="boardChTable">
               <thead><tr>
                 <th class="th-filter"><span class="th-lab">通道</span><select class="col-filter" data-col="ch" onchange="applyTableFilters(this)"><option value="">全部</option><option value="火山">火山</option><option value="阿里">阿里</option><option value="合计">合计</option></select></th>
@@ -662,6 +688,22 @@ tr.device-offline td{background:#fafafa}
             <div class="kpi"><div class="label">一般</div><div class="val">24</div></div>
             <div class="kpi"><div class="label">同意加微</div><div class="val" style="color:var(--success)">41</div></div>
           </div>
+          <div class="card board-table-card">
+            <div class="card-hd">意向 / 加微明细 <span class="base-fields-tip">基础字段：通话ID · 洋葱ID · 外呼手机号</span></div>
+            <div class="card-bd">
+              <div class="table-wrap"><table class="data" id="boardIntentTable">
+                <thead><tr>
+                  <th class="th-filter"><span class="th-lab">通话ID</span><select class="col-filter" data-col="cid" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+                  <th class="th-filter"><span class="th-lab">洋葱ID</span><select class="col-filter" data-col="oid" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+                  <th class="th-filter"><span class="th-lab">外呼手机号</span><select class="col-filter" data-col="phone" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+                  <th class="th-filter"><span class="th-lab">意向</span><select class="col-filter" data-col="intent" onchange="applyTableFilters(this)"><option value="">全部</option><option value="重点意向">重点意向</option><option value="意向">意向</option><option value="一般">一般</option></select></th>
+                  <th class="th-filter"><span class="th-lab">加微状态</span><select class="col-filter" data-col="wx" onchange="applyTableFilters(this)"><option value="">全部</option><option value="已同意">已同意</option><option value="待通过">待通过</option><option value="未发起">未发起</option></select></th>
+                  <th class="th-filter"><span class="th-lab">承接账号</span><select class="col-filter" data-col="acc" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+                </tr></thead>
+                <tbody id="boardIntentBody"></tbody>
+              </table></div>
+            </div>
+          </div>
         </div>
         <div id="btab-b4" class="hidden">
           <div class="card"><div class="card-hd">未接通原因（对齐数据中心）</div><div class="card-bd">
@@ -676,21 +718,38 @@ tr.device-offline td{background:#fafafa}
           </div></div>
         </div>
         <div id="btab-b5" class="hidden">
-          <div class="card">
-            <div class="card-hd">明细导出 · 字段勾选
+          <div class="card board-table-card">
+            <div class="card-hd">明细列表 · 字段勾选导出
               <div class="spacer"></div>
+              <button class="btn sm" onclick="resetTableFilters(document.getElementById('boardDetailTable'));toast('已重置列表筛选','ok')">重置筛选</button>
               <button class="btn sm primary" onclick="toast('已按勾选字段导出 CSV（示意）','ok')">导出 CSV</button>
             </div>
             <div class="card-bd">
-              <div class="alert info">导出口径对齐 pages.yc345.tv/waihudata · 主键 onionId / infoUuid 必选。</div>
-              <div class="grid-3" id="exportFields">
-                <label class="checkbox checked" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box">✓</span> onionId</label>
+              <div class="alert info">列表基础字段统一为 <b>通话ID · 洋葱ID · 外呼手机号</b>；导出口径对齐 pages.yc345.tv/waihudata。</div>
+              <div class="grid-3" id="exportFields" style="margin-bottom:12px">
+                <label class="checkbox checked" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box">✓</span> 通话ID</label>
+                <label class="checkbox checked" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box">✓</span> 洋葱ID</label>
+                <label class="checkbox checked" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box">✓</span> 外呼手机号</label>
                 <label class="checkbox checked" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box">✓</span> 通道(火山/阿里)</label>
                 <label class="checkbox checked" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box">✓</span> 意向等级</label>
                 <label class="checkbox checked" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box">✓</span> AI通话总结</label>
                 <label class="checkbox checked" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box">✓</span> 承接账号</label>
                 <label class="checkbox" onclick="this.classList.toggle('checked');this.querySelector('.box').textContent=this.classList.contains('checked')?'✓':''"><span class="box"></span> 分配销售</label>
               </div>
+              <div class="table-wrap" style="max-height:420px"><table class="data" id="boardDetailTable">
+                <thead><tr>
+                  <th class="th-filter"><span class="th-lab">通话ID</span><select class="col-filter" data-col="cid" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+                  <th class="th-filter"><span class="th-lab">洋葱ID</span><select class="col-filter" data-col="oid" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+                  <th class="th-filter"><span class="th-lab">外呼手机号</span><select class="col-filter" data-col="phone" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+                  <th class="th-filter"><span class="th-lab">通道</span><select class="col-filter" data-col="ch" onchange="applyTableFilters(this)"><option value="">全部</option><option value="火山">火山</option><option value="阿里">阿里</option></select></th>
+                  <th class="th-filter"><span class="th-lab">拨打时间</span><select class="col-filter" data-col="time" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+                  <th>时长</th>
+                  <th class="th-filter"><span class="th-lab">接通</span><select class="col-filter" data-col="ok" onchange="applyTableFilters(this)"><option value="">全部</option><option value="是">是</option><option value="否">否</option></select></th>
+                  <th class="th-filter"><span class="th-lab">意向</span><select class="col-filter" data-col="intent" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+                  <th class="th-filter"><span class="th-lab">加微</span><select class="col-filter" data-col="wx" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+                </tr></thead>
+                <tbody id="boardDetailBody"></tbody>
+              </table></div>
             </div>
           </div>
         </div>
@@ -707,7 +766,8 @@ tr.device-offline td{background:#fafafa}
             </div>
             <div class="table-wrap" style="max-height:480px"><table class="data" id="recTable"><thead><tr>
               <th class="th-filter"><span class="th-lab">通话ID</span><select class="col-filter" data-col="cid" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
-              <th class="th-filter"><span class="th-lab">onionId</span><select class="col-filter" data-col="oid" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+              <th class="th-filter"><span class="th-lab">洋葱ID</span><select class="col-filter" data-col="oid" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+              <th class="th-filter"><span class="th-lab">外呼手机号</span><select class="col-filter" data-col="phone" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
               <th class="th-filter"><span class="th-lab">通道</span><select class="col-filter" data-col="ch" onchange="applyTableFilters(this)"><option value="">全部</option><option value="火山">火山</option><option value="阿里">阿里</option></select></th>
               <th class="th-filter"><span class="th-lab">拨打时间</span><select class="col-filter" data-col="time" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
               <th>时长</th>
@@ -795,6 +855,7 @@ stateDiagram-v2
                 <li>创建任务时公海池分层比例（A–E）合计 ≠100% 不可提交</li>
                 <li>任务明细可按任务切换，意向与池内客户同表，支持批量指定承接人</li>
                 <li>企微承接为列表模式：组织架构快速筛选 + 云设备在线状态；仅在线可添加/开启承接，离线默认不承接；加微策略固定轮询</li>
+                <li>看板 / 通话明细列表基础字段统一：通话ID · 洋葱ID · 外呼手机号</li>
                 <li>分配入库后来源=AI机器人，额度豁免正确</li>
               </ul>
             </div>
@@ -1290,6 +1351,62 @@ function openCallDetail(oid){
   }
   callDetailMask.classList.remove('hidden');
 }
+function maskPhone(i){
+  const tail=String(1000+(i*37)%9000);
+  return '138****'+tail.slice(-4);
+}
+function renderBoardLists(){
+  const sample=document.getElementById('boardSampleBody');
+  const intentTb=document.getElementById('boardIntentBody');
+  const detail=document.getElementById('boardDetailBody');
+  if(sample) sample.innerHTML='';
+  if(intentTb) intentTb.innerHTML='';
+  if(detail) detail.innerHTML='';
+  const intents=['重点意向','意向','一般','意向','重点意向','一般'];
+  const wxs=['已同意','待通过','未发起','已同意','待通过','已同意'];
+  const accs=['张晓雯','李明辉','王芳','张晓雯'];
+  for(let i=0;i<12;i++){
+    const ok=i%3!==1;
+    const ch=i%2?'火山':'阿里';
+    const cid='C-A-'+(2100+i);
+    const oid=rid();
+    const phone=maskPhone(i);
+    const intent=ok?intents[i%intents.length]:'—';
+    const wx=ok?wxs[i%wxs.length]:'—';
+    const time='10-23 '+(9+i%8)+':'+String((i*7)%60).padStart(2,'0');
+    const itTag=intent==='重点意向'?'danger':intent==='意向'?'warning':intent==='一般'?'primary':'';
+    if(sample && i<6){
+      const tr=document.createElement('tr');
+      tr.dataset.cid=cid; tr.dataset.oid=oid; tr.dataset.phone=phone; tr.dataset.ch=ch;
+      tr.dataset.ok=ok?'是':'否'; tr.dataset.intent=intent;
+      tr.innerHTML=`<td class="mono">${cid}</td><td class="mono">${oid}</td><td class="mono">${phone}</td><td>${ch}</td><td>${ok?'是':'否'}</td><td>${intent==='—'?'—':`<span class="tag ${itTag}">${intent}</span>`}</td>`;
+      sample.appendChild(tr);
+    }
+    if(intentTb && ok){
+      const tr=document.createElement('tr');
+      tr.dataset.cid=cid; tr.dataset.oid=oid; tr.dataset.phone=phone; tr.dataset.intent=intent;
+      tr.dataset.wx=wx; tr.dataset.acc=accs[i%accs.length];
+      tr.innerHTML=`<td class="mono">${cid}</td><td class="mono">${oid}</td><td class="mono">${phone}</td>
+        <td><span class="tag ${itTag}">${intent}</span></td>
+        <td>${wx==='已同意'?`<span class="tag success">${wx}</span>`:wx==='待通过'?`<span class="tag warning">${wx}</span>`:wx}</td>
+        <td>${accs[i%accs.length]}</td>`;
+      intentTb.appendChild(tr);
+    }
+    if(detail){
+      const tr=document.createElement('tr');
+      tr.dataset.cid=cid; tr.dataset.oid=oid; tr.dataset.phone=phone; tr.dataset.ch=ch;
+      tr.dataset.time=time; tr.dataset.ok=ok?'是':'否'; tr.dataset.intent=intent; tr.dataset.wx=wx;
+      tr.innerHTML=`<td class="mono">${cid}</td><td class="mono">${oid}</td><td class="mono">${phone}</td><td>${ch}</td>
+        <td>${time}</td><td>${ok?(18+i*5)+'s':'0s'}</td><td>${ok?'是':'否'}</td>
+        <td>${intent==='—'?'—':`<span class="tag ${itTag}">${intent}</span>`}</td><td>${wx}</td>`;
+      detail.appendChild(tr);
+    }
+  }
+  ['boardSampleTable','boardIntentTable','boardDetailTable','boardChTable'].forEach(id=>{
+    const t=document.getElementById(id);
+    if(t){ enrichColFilterOptions(t); applyTableFilters(t.querySelector('select.col-filter')); }
+  });
+}
 function renderRecords(){
   const tb=document.getElementById('recBody');
   if(!tb) return;
@@ -1302,14 +1419,15 @@ function renderRecords(){
     const ch=i%2?'火山':'阿里';
     const cid='C-A-'+(1000+i);
     const oid=rid();
+    const phone=maskPhone(i+20);
     const time='10-23 '+(9+i%8)+':'+String(i*3%60).padStart(2,'0');
     const reason=ok?'—':reasons[i%reasons.length];
     const wxnode=ok&&i%4===0?'已同意':ok?'触达':'—';
     const tr=document.createElement('tr');
-    tr.dataset.cid=cid; tr.dataset.oid=oid; tr.dataset.ch=ch; tr.dataset.time=time;
+    tr.dataset.cid=cid; tr.dataset.oid=oid; tr.dataset.phone=phone; tr.dataset.ch=ch; tr.dataset.time=time;
     tr.dataset.ok=ok?'是':'否'; tr.dataset.eff=eff?'是':'否'; tr.dataset.intent=intent;
     tr.dataset.reason=reason; tr.dataset.wxnode=wxnode;
-    tr.innerHTML=`<td class="mono">${cid}</td><td class="mono">${oid}</td><td>${ch}</td>
+    tr.innerHTML=`<td class="mono">${cid}</td><td class="mono">${oid}</td><td class="mono">${phone}</td><td>${ch}</td>
       <td>${time}</td><td>${ok?(20+i*7)+'s':'0s'}</td>
       <td>${ok?'是':'否'}</td><td>${eff?'是':'否'}</td>
       <td>${intent==='—'?'—':`<span class="tag ${intent==='重点意向'?'danger':intent==='意向'?'warning':'primary'}">${intent}</span>`}</td>
@@ -1320,6 +1438,7 @@ function renderRecords(){
   }
   const table=document.getElementById('recTable');
   enrichColFilterOptions(table); applyTableFilters(table&&table.querySelector('select.col-filter'));
+  renderBoardLists();
 }
 
 function setPoolFilter(el){
