@@ -20,7 +20,7 @@ python3 -m http.server 8765
 
 - Hub：`index.html` — A/B 对比入口、CRM 绑定要点、顶栏方案切换  
 - 方案A：`scheme-a/index.html` — 独立板块 · AI外呼中心  
-- 方案B：`scheme-b/index.html` — 客户池嵌合 · 四步向导  
+- 方案B：`scheme-b/index.html` — 客户池嵌合 · **人工优先 + AI超时兜底**  
 - 文档：`docs/scheme-a-system.md` · `docs/scheme-b-system.md` · `docs/comparison.md`  
 
 ## 在线地址（部署后）
@@ -83,3 +83,13 @@ ai-crm-outbound-design/
 - 看板子 Tab：总览 / 通道 / 意向 / 明细
 - 智能查询 · 个人信息 Tab 保持可切换
 
+
+
+## 方案B 更新（2026-10-23）
+
+- 定位明确为：**人工优先，AI 超时兜底**（不再单独做方案C）
+- 客户池：跟进状态标签、超时提示条、「确认入 AI 队列」
+- 全局配置：新增「超时兜底」页签（开关/时长/次数/确认模式/禁拨）
+- 任务列表：创建方式区分「销售手动 / 系统超时兜底」
+- 系统说明：总览双路径 + 向导流 + 超时兜底流 mermaid
+- 顶栏仅 A/B；已移除半成品 scheme-c
