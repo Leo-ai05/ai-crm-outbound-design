@@ -262,6 +262,19 @@ body.with-ss .app{flex:1;min-height:0;height:auto}
 .layer-ratio-item input[type=number]{width:56px;height:32px;padding:0 6px;border:1px solid var(--border);border-radius:4px;font-size:13px;text-align:center}
 .layer-ratio-actions{display:flex;align-items:center;gap:8px;margin-top:8px}
 
+
+/* column header inline filters */
+table.data th.th-filter{vertical-align:top;padding:8px 10px;min-width:88px}
+table.data th.th-filter .th-lab{display:block;font-size:12px;color:var(--t2);font-weight:500;margin-bottom:4px;white-space:nowrap}
+table.data th.th-filter select.col-filter{
+  display:block;width:100%;min-width:72px;max-width:140px;height:26px;padding:0 6px;
+  border:1px solid var(--border);border-radius:3px;font-size:11px;color:var(--t1);background:#fff;font-weight:400
+}
+table.data th.th-filter select.col-filter:focus{outline:none;border-color:var(--primary)}
+table.data th.th-check{width:36px;vertical-align:middle}
+table.data tr.col-filtered-out{display:none!important}
+.member-table .av{width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;margin-right:6px;vertical-align:middle}
+
 </style>
 </head>
 <body class="with-ss">
@@ -330,9 +343,14 @@ body.with-ss .app{flex:1;min-height:0;height:auto}
           <div class="card-bd">
             <div class="alert info">按「外呼策略默认值」创建任务：线索分配比例对齐公海池分层（A/B/C/D/E 合计100%），通道与意向门槛沿用策略；任务级可改计划量、并发、任务时间与禁拨时段。任务状态含进度，不再单独设「外呼任务监控」页。</div>
             <div class="table-wrap">
-              <table class="data">
+              <table class="data" id="taskTable">
                 <thead><tr>
-                  <th>任务名称</th><th>任务时间</th><th>通道</th><th>计划量</th><th>已呼</th><th>接通</th><th>意向</th><th>进度</th><th>状态</th><th>操作</th>
+                  <th class="th-filter"><span class="th-lab">任务名称</span><select class="col-filter" data-col="name" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+                  <th class="th-filter"><span class="th-lab">任务时间</span><select class="col-filter" data-col="time" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+                  <th class="th-filter"><span class="th-lab">通道</span><select class="col-filter" data-col="ch" onchange="applyTableFilters(this)"><option value="">全部</option><option value="火山">火山</option><option value="阿里">阿里</option></select></th>
+                  <th>计划量</th><th>已呼</th><th>接通</th><th>意向</th><th>进度</th>
+                  <th class="th-filter"><span class="th-lab">状态</span><select class="col-filter" data-col="st" onchange="applyTableFilters(this)"><option value="">全部</option><option value="待开始">待开始</option><option value="进行中">进行中</option><option value="已完成">已完成</option><option value="已暂停">已暂停</option></select></th>
+                  <th>操作</th>
                 </tr></thead>
                 <tbody id="taskListBody"></tbody>
               </table>
@@ -385,20 +403,26 @@ body.with-ss .app{flex:1;min-height:0;height:auto}
               <div class="ft" data-st="已加微" onclick="setPoolFilter(this)">已加微 <span class="n">41</span></div>
               <div class="ft" data-st="已分配" onclick="setPoolFilter(this)">已分配 <span class="n">29</span></div>
             </div>
-            <div class="filter-bar">
-              <div class="filter-item"><label>私域分层</label><select class="inp"><option>全部</option><option>C</option><option>D</option></select></div>
-              <div class="filter-item"><label>来源</label><select class="inp"><option>全部</option><option>抖音信息流</option><option>官网留资</option><option>小程序试听</option><option>腾讯广点通</option></select></div>
-              <div class="filter-item"><label>意向</label><select class="inp"><option>全部</option><option>重点意向</option><option>意向</option><option>一般</option></select></div>
-              <div class="filter-item"><label>加微状态</label><select class="inp"><option>全部</option><option>已同意</option><option>待通过</option><option>未发起</option></select></div>
-              <button class="btn primary" onclick="renderPool()">查询</button>
-              <button class="btn" onclick="toast('筛选已重置','ok');renderPool()">重置</button>
+            <div class="alert info">列表字段支持<strong>表头下拉筛选</strong>；勾选后可 <b>批量分配</b> 到指定承接人/销售。顶部状态 Tab 与「状态」列筛选联动。</div>
+            <div class="toolbar" style="margin-bottom:8px">
+              <button class="btn sm" onclick="resetTableFilters(document.getElementById('poolTable'));toast('已重置列表筛选','ok')">重置表头筛选</button>
             </div>
-            <div class="alert info">支持勾选后 <b>批量分配</b> 到指定承接人/销售；意向待分配与池内客户同表展示。AI 外呼期间销售领取接口返回「AI处理中」。</div>
             <div class="table-wrap" style="max-height:440px">
               <table class="data" id="poolTable">
                 <thead><tr>
-                  <th><span class="checkbox" id="chkAll" onclick="toggleAll(this)"><span class="box"></span></span></th>
-                  <th>onionId</th><th>昵称</th><th>学段</th><th>来源</th><th>分层</th><th>AI外呼次数</th><th>接通</th><th>意向</th><th>加微状态</th><th>承接账号</th><th>状态</th><th>操作</th>
+                  <th class="th-check"><span class="checkbox" id="chkAll" onclick="toggleAll(this)"><span class="box"></span></span></th>
+                  <th class="th-filter"><span class="th-lab">onionId</span><select class="col-filter" data-col="oid" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+                  <th class="th-filter"><span class="th-lab">昵称</span><select class="col-filter" data-col="nick" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+                  <th class="th-filter"><span class="th-lab">学段</span><select class="col-filter" data-col="grade" onchange="applyTableFilters(this)"><option value="">全部</option><option value="初一">初一</option><option value="初二">初二</option><option value="初三">初三</option><option value="高一">高一</option><option value="高二">高二</option><option value="高三">高三</option></select></th>
+                  <th class="th-filter"><span class="th-lab">来源</span><select class="col-filter" data-col="src" onchange="applyTableFilters(this)"><option value="">全部</option><option value="抖音信息流">抖音信息流</option><option value="官网留资">官网留资</option><option value="小程序试听">小程序试听</option><option value="腾讯广点通">腾讯广点通</option></select></th>
+                  <th class="th-filter"><span class="th-lab">分层</span><select class="col-filter" data-col="layer" onchange="applyTableFilters(this)"><option value="">全部</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option></select></th>
+                  <th class="th-filter"><span class="th-lab">AI外呼次数</span><select class="col-filter" data-col="calls" onchange="applyTableFilters(this)"><option value="">全部</option><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></th>
+                  <th class="th-filter"><span class="th-lab">接通</span><select class="col-filter" data-col="conn" onchange="applyTableFilters(this)"><option value="">全部</option><option value="0">0</option><option value="1">1</option><option value="2">2</option></select></th>
+                  <th class="th-filter"><span class="th-lab">意向</span><select class="col-filter" data-col="intent" onchange="applyTableFilters(this)"><option value="">全部</option><option value="—">—</option><option value="一般">一般</option><option value="意向">意向</option><option value="重点意向">重点意向</option></select></th>
+                  <th class="th-filter"><span class="th-lab">加微状态</span><select class="col-filter" data-col="wx" onchange="applyTableFilters(this)"><option value="">全部</option><option value="—">—</option><option value="未发起">未发起</option><option value="待通过">待通过</option><option value="已同意">已同意</option></select></th>
+                  <th class="th-filter"><span class="th-lab">承接账号</span><select class="col-filter" data-col="acc" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+                  <th class="th-filter"><span class="th-lab">状态</span><select class="col-filter" data-col="st" onchange="applyTableFilters(this)"><option value="">全部</option><option value="待呼">待呼</option><option value="外呼中">外呼中</option><option value="意向待分配">意向待分配</option><option value="已加微">已加微</option><option value="已分配">已分配</option></select></th>
+                  <th>操作</th>
                 </tr></thead>
                 <tbody id="poolBody"></tbody>
               </table>
@@ -432,35 +456,43 @@ body.with-ss .app{flex:1;min-height:0;height:auto}
                 <button class="btn" onclick="toast('已刷新企微活码状态','ok')">刷新活码状态</button>
                 <span class="chip">已选 4 人 · 参考渠道活码成员展示</span>
               </div>
-              <div class="member-list" id="memberList">
-                <div class="member-row">
-                  <div class="av">张</div>
-                  <div class="meta"><b>张晓雯</b> <span class="tag success">启用</span><div class="sub">userid: zhangxiaowen · 电销一组 · 今日承接 18 / 上限 40</div>
-                    <div class="progress" style="margin-top:6px;max-width:220px"><i style="width:45%"></i></div></div>
-                  <button class="btn sm" onclick="toast('编辑成员（示意）','ok')">编辑</button>
-                  <button class="btn sm" onclick="this.closest('.member-row').remove();toast('已移除','ok')">移除</button>
-                </div>
-                <div class="member-row">
-                  <div class="av" style="background:var(--purple)">李</div>
-                  <div class="meta"><b>李明辉</b> <span class="tag success">启用</span><div class="sub">userid: liminghui · 电销一组 · 今日承接 12 / 上限 40</div>
-                    <div class="progress" style="margin-top:6px;max-width:220px"><i style="width:30%"></i></div></div>
-                  <button class="btn sm">编辑</button>
-                  <button class="btn sm" onclick="this.closest('.member-row').remove();toast('已移除','ok')">移除</button>
-                </div>
-                <div class="member-row">
-                  <div class="av" style="background:var(--warning)">王</div>
-                  <div class="meta"><b>王芳</b> <span class="tag warning">额度将满</span><div class="sub">userid: wangfang · 电销二组 · 今日承接 36 / 上限 40</div>
-                    <div class="progress" style="margin-top:6px;max-width:220px"><i style="width:90%;background:var(--warning)"></i></div></div>
-                  <button class="btn sm">编辑</button>
-                  <button class="btn sm" onclick="this.closest('.member-row').remove();toast('已移除','ok')">移除</button>
-                </div>
-                <div class="member-row">
-                  <div class="av" style="background:var(--info)">陈</div>
-                  <div class="meta"><b>陈静</b> <span class="tag">停用</span><div class="sub">userid: chenjing · 电销二组 · 仅晚班窗口 · 今日 0 / 20</div>
-                    <div class="progress" style="margin-top:6px;max-width:220px"><i style="width:0%"></i></div></div>
-                  <button class="btn sm" onclick="toast('已启用','ok')">启用</button>
-                  <button class="btn sm" onclick="this.closest('.member-row').remove();toast('已移除','ok')">移除</button>
-                </div>
+              <div class="table-wrap">
+                <table class="data member-table" id="memberTable">
+                  <thead><tr>
+                    <th class="th-filter"><span class="th-lab">成员</span><select class="col-filter" data-col="name" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+                    <th class="th-filter"><span class="th-lab">userid</span><select class="col-filter" data-col="uid" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+                    <th class="th-filter"><span class="th-lab">部门</span><select class="col-filter" data-col="dept" onchange="applyTableFilters(this)"><option value="">全部</option><option value="电销一组">电销一组</option><option value="电销二组">电销二组</option></select></th>
+                    <th class="th-filter"><span class="th-lab">状态</span><select class="col-filter" data-col="st" onchange="applyTableFilters(this)"><option value="">全部</option><option value="启用">启用</option><option value="额度将满">额度将满</option><option value="停用">停用</option></select></th>
+                    <th>今日承接/上限</th>
+                    <th>操作</th>
+                  </tr></thead>
+                  <tbody id="memberList">
+                    <tr data-name="张晓雯" data-uid="zhangxiaowen" data-dept="电销一组" data-st="启用">
+                      <td><span class="av">张</span><b>张晓雯</b></td><td class="mono">zhangxiaowen</td><td>电销一组</td>
+                      <td><span class="tag success">启用</span></td>
+                      <td>18 / 40<div class="progress" style="margin-top:4px;max-width:120px"><i style="width:45%"></i></div></td>
+                      <td class="ops"><button class="btn sm" onclick="toast('编辑成员（示意）','ok')">编辑</button><button class="btn sm" onclick="this.closest('tr').remove();toast('已移除','ok')">移除</button></td>
+                    </tr>
+                    <tr data-name="李明辉" data-uid="liminghui" data-dept="电销一组" data-st="启用">
+                      <td><span class="av" style="background:var(--purple)">李</span><b>李明辉</b></td><td class="mono">liminghui</td><td>电销一组</td>
+                      <td><span class="tag success">启用</span></td>
+                      <td>12 / 40<div class="progress" style="margin-top:4px;max-width:120px"><i style="width:30%"></i></div></td>
+                      <td class="ops"><button class="btn sm">编辑</button><button class="btn sm" onclick="this.closest('tr').remove();toast('已移除','ok')">移除</button></td>
+                    </tr>
+                    <tr data-name="王芳" data-uid="wangfang" data-dept="电销二组" data-st="额度将满">
+                      <td><span class="av" style="background:var(--warning)">王</span><b>王芳</b></td><td class="mono">wangfang</td><td>电销二组</td>
+                      <td><span class="tag warning">额度将满</span></td>
+                      <td>36 / 40<div class="progress" style="margin-top:4px;max-width:120px"><i style="width:90%;background:var(--warning)"></i></div></td>
+                      <td class="ops"><button class="btn sm">编辑</button><button class="btn sm" onclick="this.closest('tr').remove();toast('已移除','ok')">移除</button></td>
+                    </tr>
+                    <tr data-name="陈静" data-uid="chenjing" data-dept="电销二组" data-st="停用">
+                      <td><span class="av" style="background:var(--info)">陈</span><b>陈静</b></td><td class="mono">chenjing</td><td>电销二组</td>
+                      <td><span class="tag">停用</span></td>
+                      <td>0 / 20<div class="progress" style="margin-top:4px;max-width:120px"><i style="width:0%"></i></div></td>
+                      <td class="ops"><button class="btn sm" onclick="toast('已启用','ok')">启用</button><button class="btn sm" onclick="this.closest('tr').remove();toast('已移除','ok')">移除</button></td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
             <div id="wtab-w2" class="hidden">
@@ -563,12 +595,15 @@ body.with-ss .app{flex:1;min-height:0;height:auto}
         </div>
         <div id="btab-b2" class="hidden">
           <div class="card"><div class="card-hd">通道对比 · 火山 vs 阿里</div><div class="card-bd">
-            <div class="table-wrap"><table class="data">
-              <thead><tr><th>通道</th><th>外呼通数</th><th>接通率</th><th>有效接通率</th><th>意向产出</th><th>同意加微</th><th>单通成本估</th><th>并发峰值</th></tr></thead>
+            <div class="table-wrap"><table class="data" id="boardChTable">
+              <thead><tr>
+                <th class="th-filter"><span class="th-lab">通道</span><select class="col-filter" data-col="ch" onchange="applyTableFilters(this)"><option value="">全部</option><option value="火山">火山</option><option value="阿里">阿里</option><option value="合计">合计</option></select></th>
+                <th>外呼通数</th><th>接通率</th><th>有效接通率</th><th>意向产出</th><th>同意加微</th><th>单通成本估</th><th>并发峰值</th>
+              </tr></thead>
               <tbody>
-                <tr><td><b>火山</b></td><td>2,100</td><td>29.1%</td><td>19.8%</td><td>58</td><td>28</td><td>¥0.86</td><td>118</td></tr>
-                <tr><td><b>阿里</b></td><td>1,110</td><td>27.0%</td><td>17.6%</td><td>28</td><td>13</td><td>¥0.79</td><td>76</td></tr>
-                <tr><td>合计</td><td>3,210</td><td>28.4%</td><td>19.1%</td><td>86</td><td>41</td><td>¥0.84</td><td>150</td></tr>
+                <tr data-ch="火山"><td><b>火山</b></td><td>2,100</td><td>29.1%</td><td>19.8%</td><td>58</td><td>28</td><td>¥0.86</td><td>118</td></tr>
+                <tr data-ch="阿里"><td><b>阿里</b></td><td>1,110</td><td>27.0%</td><td>17.6%</td><td>28</td><td>13</td><td>¥0.79</td><td>76</td></tr>
+                <tr data-ch="合计"><td>合计</td><td>3,210</td><td>28.4%</td><td>19.1%</td><td>86</td><td>41</td><td>¥0.84</td><td>150</td></tr>
               </tbody>
             </table></div>
           </div></div>
@@ -619,14 +654,22 @@ body.with-ss .app{flex:1;min-height:0;height:auto}
         <div class="card">
           <div class="card-hd">AI外呼通话明细 <span class="anno new">运营只读 · 口径同 callRecord + 外呼数据中心</span></div>
           <div class="card-bd">
-            <div class="filter-bar">
-              <div class="filter-item"><label>通道</label><select class="inp"><option>全部</option><option>火山</option><option>阿里</option></select></div>
-              <div class="filter-item"><label>结果</label><select class="inp"><option>全部</option><option>接通</option><option>未接通</option><option>有效接通</option></select></div>
-              <div class="filter-item"><label>意向</label><select class="inp"><option>全部</option><option>重点意向</option><option>意向</option><option>一般</option><option>无</option></select></div>
-              <button class="btn primary" onclick="renderRecords()">查询</button>
+            <div class="toolbar" style="margin-bottom:8px">
+              <span class="chip">表头下拉筛选列表字段</span>
+              <button class="btn sm" onclick="resetTableFilters(document.getElementById('recTable'));toast('已重置列表筛选','ok')">重置表头筛选</button>
             </div>
-            <div class="table-wrap" style="max-height:480px"><table class="data"><thead><tr>
-              <th>通话ID</th><th>onionId</th><th>通道</th><th>拨打时间</th><th>时长</th><th>接通</th><th>有效≥10s</th><th>意向</th><th>未接通原因</th><th>加微节点</th><th>总结</th>
+            <div class="table-wrap" style="max-height:480px"><table class="data" id="recTable"><thead><tr>
+              <th class="th-filter"><span class="th-lab">通话ID</span><select class="col-filter" data-col="cid" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+              <th class="th-filter"><span class="th-lab">onionId</span><select class="col-filter" data-col="oid" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+              <th class="th-filter"><span class="th-lab">通道</span><select class="col-filter" data-col="ch" onchange="applyTableFilters(this)"><option value="">全部</option><option value="火山">火山</option><option value="阿里">阿里</option></select></th>
+              <th class="th-filter"><span class="th-lab">拨打时间</span><select class="col-filter" data-col="time" onchange="applyTableFilters(this)"><option value="">全部</option></select></th>
+              <th>时长</th>
+              <th class="th-filter"><span class="th-lab">接通</span><select class="col-filter" data-col="ok" onchange="applyTableFilters(this)"><option value="">全部</option><option value="是">是</option><option value="否">否</option></select></th>
+              <th class="th-filter"><span class="th-lab">有效≥10s</span><select class="col-filter" data-col="eff" onchange="applyTableFilters(this)"><option value="">全部</option><option value="是">是</option><option value="否">否</option></select></th>
+              <th class="th-filter"><span class="th-lab">意向</span><select class="col-filter" data-col="intent" onchange="applyTableFilters(this)"><option value="">全部</option><option value="—">—</option><option value="一般">一般</option><option value="意向">意向</option><option value="重点意向">重点意向</option></select></th>
+              <th class="th-filter"><span class="th-lab">未接通原因</span><select class="col-filter" data-col="reason" onchange="applyTableFilters(this)"><option value="">全部</option><option value="—">—</option><option value="无人接听">无人接听</option><option value="拒接">拒接</option><option value="忙线">忙线</option><option value="关机">关机</option></select></th>
+              <th class="th-filter"><span class="th-lab">加微节点</span><select class="col-filter" data-col="wxnode" onchange="applyTableFilters(this)"><option value="">全部</option><option value="—">—</option><option value="触达">触达</option><option value="已同意">已同意</option></select></th>
+              <th>总结</th>
             </tr></thead><tbody id="recBody"></tbody></table></div>
           </div>
         </div>
@@ -1069,12 +1112,73 @@ bindTabs('#boardTabs', t=>'btab-'+t.dataset.tab);
 bindTabs('#taskDetailTabs', t=>'tdtab-'+t.dataset.tab);
 bindTabs('#callDetailTabs', t=>'cdtab-'+t.dataset.tab);
 
+
+/* ===== column header filters ===== */
+function applyTableFilters(el){
+  const table = el ? el.closest('table') : null;
+  if(!table) return;
+  const filters = [...table.querySelectorAll('select.col-filter')].map(s=>({col:s.dataset.col, val:s.value}));
+  let shown=0;
+  table.querySelectorAll('tbody tr').forEach(tr=>{
+    const ok = filters.every(f=>{
+      if(!f.val) return true;
+      const dv = tr.dataset[f.col];
+      return dv!==undefined ? dv===f.val : false;
+    });
+    tr.classList.toggle('col-filtered-out', !ok);
+    if(ok) shown++;
+  });
+  const totalEl = table.id==='poolTable' ? document.getElementById('poolTotal') : null;
+  if(totalEl) totalEl.textContent=String(shown);
+  if(table.id==='poolTable'){
+    updateBatchBtn();
+    const stSel=table.querySelector('select.col-filter[data-col="st"]');
+    if(stSel){
+      poolFilter = stSel.value || 'all';
+      document.querySelectorAll('#poolStatusTabs .ft').forEach(x=>{
+        x.classList.toggle('active', x.dataset.st===poolFilter || (poolFilter==='all' && x.dataset.st==='all'));
+      });
+    }
+  }
+}
+function resetTableFilters(table){
+  if(!table) return;
+  table.querySelectorAll('select.col-filter').forEach(s=>{ s.value=''; });
+  // also reset status tabs to 全部
+  if(table.id==='poolTable'){
+    poolFilter='all';
+    document.querySelectorAll('#poolStatusTabs .ft').forEach((x,i)=>x.classList.toggle('active',i===0));
+  }
+  applyTableFilters(table.querySelector('select.col-filter')||table);
+}
+function enrichColFilterOptions(table){
+  if(!table) return;
+  table.querySelectorAll('select.col-filter').forEach(sel=>{
+    const col=sel.dataset.col;
+    const cur=sel.value;
+    const vals=new Set();
+    table.querySelectorAll('tbody tr').forEach(tr=>{
+      const v=tr.dataset[col];
+      if(v!==undefined && v!=='') vals.add(v);
+    });
+    // keep existing preset options; append missing from data
+    const have=new Set([...sel.options].map(o=>o.value).filter(Boolean));
+    [...vals].sort().forEach(v=>{
+      if(!have.has(v)){
+        const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o);
+      }
+    });
+    sel.value=cur;
+  });
+}
+
 function renderTasks(){
   const tb=document.getElementById('taskListBody');
   if(!tb) return;
   tb.innerHTML='';
   TASKS.forEach(t=>{
     const tr=document.createElement('tr');
+    tr.dataset.name=t.name; tr.dataset.time=t.time; tr.dataset.ch=t.ch; tr.dataset.st=t.st;
     const barColor=t.pct===100?'background:var(--success)':'';
     tr.innerHTML=`<td><b>${t.name}</b><div class="mono small">${t.id}</div></td>
       <td>${t.time}</td><td>${t.ch}</td><td>${t.plan.toLocaleString()}</td>
@@ -1089,6 +1193,8 @@ function renderTasks(){
       </td>`;
     tb.appendChild(tr);
   });
+  const table=document.getElementById('taskTable');
+  enrichColFilterOptions(table); applyTableFilters(table&&table.querySelector('select.col-filter'));
 }
 function goTaskDetail(id){
   const sel=document.getElementById('detailTaskSel');
@@ -1135,23 +1241,37 @@ function renderRecords(){
     const ok=i%3!==1;
     const eff=ok&&(20+i*7)>=10;
     const intent=ok?(i%5===0?'重点意向':i%2?'意向':'一般'):'—';
+    const ch=i%2?'火山':'阿里';
+    const cid='C-A-'+(1000+i);
+    const oid=rid();
+    const time='10-23 '+(9+i%8)+':'+String(i*3%60).padStart(2,'0');
+    const reason=ok?'—':reasons[i%reasons.length];
+    const wxnode=ok&&i%4===0?'已同意':ok?'触达':'—';
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td class="mono">C-A-${1000+i}</td><td class="mono">${rid()}</td><td>${i%2?'火山':'阿里'}</td>
-      <td>10-23 ${9+i%8}:${String(i*3%60).padStart(2,'0')}</td><td>${ok?(20+i*7)+'s':'0s'}</td>
+    tr.dataset.cid=cid; tr.dataset.oid=oid; tr.dataset.ch=ch; tr.dataset.time=time;
+    tr.dataset.ok=ok?'是':'否'; tr.dataset.eff=eff?'是':'否'; tr.dataset.intent=intent;
+    tr.dataset.reason=reason; tr.dataset.wxnode=wxnode;
+    tr.innerHTML=`<td class="mono">${cid}</td><td class="mono">${oid}</td><td>${ch}</td>
+      <td>${time}</td><td>${ok?(20+i*7)+'s':'0s'}</td>
       <td>${ok?'是':'否'}</td><td>${eff?'是':'否'}</td>
       <td>${intent==='—'?'—':`<span class="tag ${intent==='重点意向'?'danger':intent==='意向'?'warning':'primary'}">${intent}</span>`}</td>
-      <td>${ok?'—':reasons[i%reasons.length]}</td>
-      <td>${ok&&i%4===0?'已同意':ok?'触达':'—'}</td>
-      <td><button class="btn sm" onclick="openCallDetail('${rid()}')">总结</button></td>`;
+      <td>${reason}</td>
+      <td>${wxnode}</td>
+      <td><button class="btn sm" onclick="openCallDetail('${oid}')">总结</button></td>`;
     tb.appendChild(tr);
   }
+  const table=document.getElementById('recTable');
+  enrichColFilterOptions(table); applyTableFilters(table&&table.querySelector('select.col-filter'));
 }
 
 function setPoolFilter(el){
   document.querySelectorAll('#poolStatusTabs .ft').forEach(x=>x.classList.remove('active'));
   el.classList.add('active');
   poolFilter=el.dataset.st;
-  renderPool();
+  const table=document.getElementById('poolTable');
+  const stSel=table&&table.querySelector('select.col-filter[data-col="st"]');
+  if(stSel){ stSel.value = poolFilter==='all' ? '' : poolFilter; }
+  if(table) applyTableFilters(stSel||table.querySelector('select.col-filter'));
 }
 function onDetailTaskChange(){ renderPool(); toast('已切换任务明细','ok'); }
 
@@ -1159,25 +1279,33 @@ function renderPool(){
   const tb=document.getElementById('poolBody');
   if(!tb) return;
   tb.innerHTML='';
-  let shown=0;
   for(let i=0;i<18;i++){
     const st=STATES[i%STATES.length];
-    if(poolFilter!=='all' && st!==poolFilter) continue;
     const layer=LAYERS[i%LAYERS.length];
     const intent=INTENTS[i%INTENTS.length];
-    const wx=WX[i%WX.length];
+    const wxRaw=WX[i%WX.length];
+    const wx=wxRaw==='未发起'?'—':wxRaw;
     const acc=ACC[i%ACC.length];
+    const grade=GRADES[i%6];
+    const src=SOURCES[i%SOURCES.length];
+    const nick=NAMES[i%NAMES.length]+'家长';
+    const oid=rid();
+    const calls=String(i%4);
+    const conn=String(i%3);
     const itTag=intent==='重点意向'?'danger':intent==='意向'?'warning':intent==='一般'?'primary':'';
     const wxTag=wx==='已同意'?'success':wx==='待通过'?'warning':'';
     const stTag=st==='外呼中'?'primary':st==='意向待分配'?'warning':st==='已加微'||st==='已分配'?'success':'';
     const tr=document.createElement('tr');
+    tr.dataset.oid=oid; tr.dataset.nick=nick; tr.dataset.grade=grade; tr.dataset.src=src;
+    tr.dataset.layer=layer; tr.dataset.calls=calls; tr.dataset.conn=conn;
+    tr.dataset.intent=intent; tr.dataset.wx=wx; tr.dataset.acc=acc; tr.dataset.st=st;
     tr.innerHTML=`<td><span class="checkbox" onclick="toggleRowChk(this)"><span class="box"></span></span></td>
-      <td class="mono">${rid()}</td><td>${NAMES[i%NAMES.length]}家长</td><td>${GRADES[i%6]}</td>
-      <td>${SOURCES[i%SOURCES.length]}</td>
+      <td class="mono">${oid}</td><td>${nick}</td><td>${grade}</td>
+      <td>${src}</td>
       <td><span class="tag layer-${layer}">${layer}</span></td>
-      <td>${i%4}</td><td>${i%3}</td>
+      <td>${calls}</td><td>${conn}</td>
       <td>${intent==='—'?'—':`<span class="tag ${itTag}">${intent}</span>`}</td>
-      <td>${wx==='未发起'?'—':`<span class="tag ${wxTag}">${wx}</span>`}</td>
+      <td>${wx==='—'?'—':`<span class="tag ${wxTag}">${wx}</span>`}</td>
       <td>${acc}</td>
       <td><span class="tag ${stTag}">${st}</span></td>
       <td class="ops">
@@ -1186,10 +1314,13 @@ function renderPool(){
         <button class="btn sm" onclick="detailMask.classList.remove('hidden')">详情</button>
       </td>`;
     tb.appendChild(tr);
-    shown++;
   }
-  poolTotal.textContent=String(shown||18);
-  updateBatchBtn();
+  const table=document.getElementById('poolTable');
+  enrichColFilterOptions(table);
+  // re-apply tab/status filter
+  const stSel=table&&table.querySelector('select.col-filter[data-col="st"]');
+  if(stSel){ stSel.value = poolFilter==='all' ? '' : poolFilter; }
+  applyTableFilters(stSel||(table&&table.querySelector('select.col-filter')));
 }
 function toggleRowChk(el){
   el.classList.toggle('checked');
@@ -1206,7 +1337,7 @@ function toggleAll(el){
   updateBatchBtn();
 }
 function updateBatchBtn(){
-  const n=document.querySelectorAll('#poolBody .checkbox.checked').length;
+  const n=[...document.querySelectorAll('#poolBody tr:not(.col-filtered-out) .checkbox.checked')].length;
   const btn=document.getElementById('btnBatchAssign');
   if(btn){ btn.disabled=n===0; btn.textContent=n?`批量分配（${n}）`:'批量分配'; }
   const ac=document.getElementById('assignCount');
@@ -1214,7 +1345,7 @@ function updateBatchBtn(){
 }
 
 function openAssign(batch){
-  const n=document.querySelectorAll('#poolBody .checkbox.checked').length;
+  const n=[...document.querySelectorAll('#poolBody tr:not(.col-filtered-out) .checkbox.checked')].length;
   const ac=document.getElementById('assignCount');
   if(ac) ac.value=(batch&&n?n:1)+' 条'+(batch&&n>1?'（批量）':'');
   assignMask.classList.remove('hidden');
@@ -1326,17 +1457,19 @@ function confirmOrgModal(){
   if(!orgSelected.size){ toast('请至少选择一名成员','err'); return; }
   const list=document.getElementById('memberList');
   orgSelected.forEach(p=>{
-    const row=document.createElement('div');
-    row.className='member-row';
-    row.innerHTML=`<div class="av">${p.name[0]}</div>
-      <div class="meta"><b>${p.name}</b> <span class="tag success">启用</span>
-        <div class="sub">userid: ${p.uid} · ${p.dept} · 今日承接 0 / 上限 40</div>
-        <div class="progress" style="margin-top:6px;max-width:220px"><i style="width:0%"></i></div></div>
-      <button class="btn sm">编辑</button>
-      <button class="btn sm" onclick="this.closest('.member-row').remove();toast('已移除','ok')">移除</button>`;
-    list.appendChild(row);
+    const tr=document.createElement('tr');
+    tr.dataset.name=p.name; tr.dataset.uid=p.uid; tr.dataset.dept=p.dept; tr.dataset.st='启用';
+    tr.innerHTML=`<td><span class="av">${p.name[0]}</span><b>${p.name}</b></td>
+      <td class="mono">${p.uid}</td><td>${p.dept}</td>
+      <td><span class="tag success">启用</span></td>
+      <td>0 / 40<div class="progress" style="margin-top:4px;max-width:120px"><i style="width:0%"></i></div></td>
+      <td class="ops"><button class="btn sm">编辑</button>
+      <button class="btn sm" onclick="this.closest('tr').remove();toast('已移除','ok')">移除</button></td>`;
+    list.appendChild(tr);
   });
   closeOrgModal();
+  const table=document.getElementById('memberTable');
+  enrichColFilterOptions(table); applyTableFilters(table&&table.querySelector('select.col-filter'));
   toast('已添加 '+orgSelected.size+' 名承接成员','ok');
 }
 function filterOrgTree(){
@@ -1351,6 +1484,9 @@ function toggleDept(el){ /* visual only */ }
 function selPill(el){ el.parentElement.querySelectorAll('.pill').forEach(p=>p.classList.remove('on')); el.classList.add('on'); }
 
 renderTasks(); renderPool(); renderRecords();
+enrichColFilterOptions(document.getElementById('memberTable'));
+enrichColFilterOptions(document.getElementById('boardChTable'));
+
 </script>
 
 </body>
