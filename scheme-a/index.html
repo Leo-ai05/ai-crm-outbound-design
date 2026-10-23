@@ -216,6 +216,19 @@ body.with-ss .app{flex:1;min-height:0;height:auto}
 
 
 /* === Scheme A IA redesign extras === */
+/* realtime observe collapsible */
+.card-hd .spacer{flex:1}
+.rt-observe .card-hd{cursor:pointer;user-select:none}
+.rt-observe .card-hd .rt-toggle{font-size:12px;color:var(--t3);font-weight:400;display:inline-flex;align-items:center;gap:4px}
+.rt-observe.collapsed .rt-body{display:none}
+.rt-observe .rt-live{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--success);font-weight:500;margin-left:8px}
+.rt-observe .rt-live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 0 3px rgb(103 194 58 / 25%);animation:rtpulse 1.4s ease infinite}
+@keyframes rtpulse{0%,100%{box-shadow:0 0 0 2px rgb(103 194 58 / 20%)}50%{box-shadow:0 0 0 5px rgb(103 194 58 / 8%)}}
+.rt-mini-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
+.rt-mini-table th{background:#f5f7fa;color:var(--t2);font-weight:500;padding:8px 10px;text-align:left;border-bottom:1px solid var(--border-light)}
+.rt-mini-table td{padding:8px 10px;border-bottom:1px solid #f2f6fc;color:var(--t1)}
+.rt-hint{font-size:11px;color:var(--t3);margin-top:8px}
+
 .ratio-row{display:grid;grid-template-columns:140px 1fr 72px;gap:10px;align-items:center;margin-bottom:10px}
 .ratio-row input[type=number]{width:72px;height:32px;padding:0 8px;border:1px solid var(--border);border-radius:4px;font-size:13px}
 .ratio-total{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:4px;background:#f5f7fa;font-size:13px}
@@ -360,6 +373,54 @@ tr.device-offline td{background:#fafafa}
 
       <!-- ========== VIEW: AI任务 ========== -->
       <div class="view on" id="view-tasks">
+        <!-- 实时观察：折叠自原「外呼任务监控」，置于 AI任务列表上方 -->
+        <div class="card rt-observe" id="realtimeObserve">
+          <div class="card-hd" onclick="toggleRealtimeObserve()">
+            实时观察 <span class="anno mod">折叠自原任务监控</span>
+            <span class="rt-live">LIVE</span>
+            <div class="spacer"></div>
+            <span class="rt-toggle" id="rtToggleLabel">收起 ▴</span>
+          </div>
+          <div class="card-bd rt-body" id="realtimeObserveBody">
+            <div class="kpi-row" style="margin-bottom:10px">
+              <div class="kpi"><div class="label">进行中任务</div><div class="val">2 <small>个</small></div><div class="delta up">待开始 1 · 已完成 1</div></div>
+              <div class="kpi"><div class="label">当前并发</div><div class="val">86 <small>/ 150</small></div><div class="delta">独占占用 12 路</div></div>
+              <div class="kpi"><div class="label">今日已呼</div><div class="val">4,010 <small>通</small></div><div class="delta">计划 6,300</div></div>
+              <div class="kpi"><div class="label">近 5 分钟接通率</div><div class="val">27.8%</div><div class="delta up">有效≥10s 16.8%</div></div>
+              <div class="kpi"><div class="label">排队等待</div><div class="val">214 <small>条</small></div><div class="delta">待呼回填中</div></div>
+              <div class="kpi"><div class="label">意向待分配</div><div class="val" style="color:var(--warning)">62</div><div class="delta up">重点 11</div></div>
+            </div>
+            <div class="table-wrap">
+              <table class="rt-mini-table">
+                <thead><tr>
+                  <th>进行中任务</th><th>通道</th><th>并发占用</th><th>已呼 / 计划</th><th>接通率</th><th>意向</th><th>状态</th>
+                </tr></thead>
+                <tbody>
+                  <tr>
+                    <td>早班·C/D 吞吐 · A-20261023-01</td>
+                    <td><span class="tag primary">火山</span></td>
+                    <td>8 / 8</td>
+                    <td>2,860 / 4,000</td>
+                    <td>28.1%</td>
+                    <td>71</td>
+                    <td><span class="tag success">进行中</span></td>
+                  </tr>
+                  <tr>
+                    <td>午后·重播未接 · A-20261023-02</td>
+                    <td><span class="tag">阿里</span></td>
+                    <td>4 / 4</td>
+                    <td>1,150 / 2,300</td>
+                    <td>26.9%</td>
+                    <td>28</td>
+                    <td><span class="tag success">进行中</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="rt-hint">原「外呼任务监控」已并入本板块；可折叠后专注下方任务列表操作。数据每 15s 刷新（原型示意）。</div>
+          </div>
+        </div>
+
         <div class="kpi-row">
           <div class="kpi"><div class="label">今日任务数</div><div class="val">3 <small>个</small></div><div class="delta up">进行中 2 · 已完成 1</div></div>
           <div class="kpi"><div class="label">计划外呼量</div><div class="val">6,300 <small>通</small></div><div class="delta">已呼 4,010</div></div>
@@ -375,7 +436,7 @@ tr.device-offline td{background:#fafafa}
             <button class="btn sm primary" onclick="openCreateTask()">＋ 新建AI外呼任务</button>
           </div>
           <div class="card-bd">
-            <div class="alert info">按「外呼策略默认值」创建任务：线索分配比例对齐公海池分层（A/B/C/D/E 合计100%），通道与意向门槛沿用策略；任务级可改计划量、并发、任务时间与禁拨时段。任务状态含进度，不再单独设「外呼任务监控」页。</div>
+            <div class="alert info">按「外呼策略默认值」创建任务：线索分配比例对齐公海池分层（A/B/C/D/E 合计100%），通道与意向门槛沿用策略；任务级可改计划量、并发、任务时间与禁拨时段。任务状态含进度；实时观察见页面上方折叠板块。</div>
             <div class="table-wrap">
               <table class="data" id="taskTable">
                 <thead><tr>
@@ -388,14 +449,6 @@ tr.device-offline td{background:#fafafa}
                 </tr></thead>
                 <tbody id="taskListBody"></tbody>
               </table>
-            </div>
-            <div class="cfg-block" style="margin-top:12px">
-              <h4>实时观察（折叠自原任务监控）</h4>
-              <div class="grid-3">
-                <div class="kpi"><div class="label">当前并发</div><div class="val">86 <small>/ 150</small></div></div>
-                <div class="kpi"><div class="label">近 5 分钟接通率</div><div class="val">27.8%</div></div>
-                <div class="kpi"><div class="label">排队等待</div><div class="val">214 <small>条</small></div></div>
-              </div>
             </div>
           </div>
         </div>
@@ -1191,6 +1244,15 @@ let poolFilter='all';
 let orgSelected=new Map();
 
 function rid(){return 'ON'+Math.floor(10000000+Math.random()*89999999)}
+
+function toggleRealtimeObserve(){
+  var el=document.getElementById('realtimeObserve');
+  if(!el) return;
+  el.classList.toggle('collapsed');
+  var lab=document.getElementById('rtToggleLabel');
+  if(lab) lab.textContent=el.classList.contains('collapsed')?'展开 ▾':'收起 ▴';
+}
+
 function toast(text,type){
   const w=document.getElementById('toasts');
   const d=document.createElement('div');
