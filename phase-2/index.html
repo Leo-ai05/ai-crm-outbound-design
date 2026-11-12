@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>武汉电销系统 · AI外呼中心（演示）</title>
+<style>
+:root{
+  --primary:#409eff;--primary-light:#ecf5ff;--primary-dark:#337ecc;
+  --success:#67c23a;--success-light:#f0f9eb;--warning:#e6a23c;--warning-light:#fdf6ec;
+  --danger:#f56c6c;--danger-light:#fef0f0;--info:#909399;--info-light:#f4f4f5;
+  --t1:#303133;--t2:#606266;--t3:#909399;--t4:#c0c4cc;
+  --border:#dcdfe6;--border-light:#ebeef5;--bg:#f0f2f5;--card:#fff;
+  --sidebar-bg:#001529;--sidebar-sub:#000c17;--sidebar-text:#a6adb4;
+  --radius:4px;--shadow:0 2px 12px 0 rgb(0 0 0 / 8%);
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;font-size:14px;color:var(--t1);background:var(--bg);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit}
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{flex:0 0 210px;width:210px;background:var(--sidebar-bg);color:var(--sidebar-text);display:flex;flex-direction:column;overflow-y:auto}
+.sidebar-logo{height:50px;padding:0 16px;display:flex;align-items:center;gap:8px;background:var(--sidebar-sub);color:#fff;font-weight:600;font-size:14px}
+.sidebar-logo .dot{width:8px;height:8px;border-radius:50%;background:var(--primary)}
+.sidebar-logo .sub{font-size:10px;font-weight:400;color:#5c6b7a;margin-left:auto}
+.nav-group{padding:14px 16px 6px;font-size:11px;letter-spacing:.6px;color:#5c6b7a}
+.nav-item{display:flex;align-items:center;gap:8px;padding:10px 16px 10px 24px;font-size:13px;cursor:pointer;transition:.15s;border:0;background:transparent;color:inherit;width:100%;text-align:left}
+.nav-item:hover{color:#fff;background:rgb(255 255 255 / 6%)}
+.nav-item.active{color:#fff;background:var(--primary)}
+.nav-item.locked{opacity:.55}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.demo-bar{flex-shrink:0;background:#fff7e6;border-bottom:1px solid #f5dab1;color:#8a5a12;padding:6px 16px;font-size:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.demo-bar b{color:#ad6800}
+.topbar{height:50px;background:#fff;border-bottom:1px solid var(--border-light);display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0}
+.crumb{font-size:13px;color:var(--t2)}
+.crumb b{color:var(--t1)}
+.spacer{flex:1}
+.role-select,.ctrl{height:28px;border:1px solid var(--border);border-radius:var(--radius);padding:0 8px;background:#fff;color:var(--t1)}
+.page{flex:1;overflow:auto;padding:16px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:12px}
+.card h3{margin:0 0 12px;font-size:15px;font-weight:600}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}
+.mt8{margin-top:8px}.mt12{margin-top:12px}
+.hidden{display:none!important}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;height:32px;padding:0 14px;border:1px solid var(--border);border-radius:var(--radius);background:#fff;color:var(--t1);cursor:pointer;line-height:1}
+.btn:hover{border-color:var(--primary);color:var(--primary)}
+.btn:disabled,.btn.disabled{opacity:.45;cursor:not-allowed;color:var(--t3);border-color:var(--border);background:#f5f7fa}
+.btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-dark);color:#fff}
+.btn-primary:disabled{background:#a0cfff;border-color:#a0cfff;color:#fff;opacity:1}
+.btn-danger{color:var(--danger);border-color:#fbc4c4}
+.btn-text{border:0;background:transparent;color:var(--primary);height:auto;padding:0 4px}
+.btn-sm{height:26px;padding:0 8px;font-size:12px}
+.input,.select,textarea.input{height:32px;border:1px solid var(--border);border-radius:var(--radius);padding:0 8px;min-width:140px;background:#fff}
+textarea.input{height:auto;padding:8px;min-height:72px;width:100%;resize:vertical}
+.input:focus,.select:focus,textarea.input:focus{outline:0;border-color:var(--primary)}
+.label{font-size:12px;color:var(--t2);margin-right:4px}
+.hint{font-size:12px;color:var(--t3)}
+.err{font-size:12px;color:var(--danger);margin-top:4px}
+.stat-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.stat{background:var(--bg);border-radius:var(--radius);padding:10px 12px}
+.stat .n{font-size:20px;font-weight:700;color:var(--t1)}
+.stat .k{font-size:12px;color:var(--t3);margin-top:2px}
+.obs-head{display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--border-light);text-align:left;vertical-align:middle}
+table .ops,table th:last-child{position:sticky;right:0;background:#fff;z-index:1;box-shadow:-4px 0 8px rgb(0 0 0 / 4%)}
+th{background:#fafafa;color:var(--t2);font-weight:600;white-space:nowrap}
+td{color:var(--t1)}
+tr:hover td{background:#f5f7fa}
+.tag{display:inline-block;padding:0 6px;height:20px;line-height:20px;border-radius:2px;font-size:12px}
+.tag-blue{background:var(--primary-light);color:var(--primary)}
+.tag-green{background:var(--success-light);color:var(--success)}
+.tag-orange{background:var(--warning-light);color:#b88230}
+.tag-red{background:var(--danger-light);color:var(--danger)}
+.tag-gray{background:var(--info-light);color:var(--t2)}
+.tag-purple{background:#f5f0ff;color:#7c3aed}
+.dash{color:var(--t4)}
+.ellipsis{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border-light);margin-bottom:12px}
+.tab{padding:8px 16px;cursor:pointer;color:var(--t2);border-bottom:2px solid transparent;background:transparent;border-top:0;border-left:0;border-right:0}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+.mask{position:fixed;inset:0;background:rgb(0 0 0 / 45%);z-index:40;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px}
+.modal{background:#fff;border-radius:6px;width:720px;max-width:100%;max-height:calc(100vh - 48px);overflow:auto;box-shadow:0 8px 24px rgb(0 0 0 / 18%)}
+.modal-lg{width:860px}
+.modal-sm{width:480px}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:560px;max-width:100%;background:#fff;z-index:50;box-shadow:-4px 0 16px rgb(0 0 0 / 12%);display:flex;flex-direction:column}
+.drawer-h,.modal-h{height:50px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-light);font-weight:600;flex-shrink:0}
+.drawer-b,.modal-b{padding:16px;overflow:auto;flex:1}
+.modal-f,.drawer-f{padding:10px 16px;border-top:1px solid var(--border-light);display:flex;justify-content:flex-end;gap:8px;flex-shrink:0}
+.close-x{border:0;background:transparent;font-size:18px;cursor:pointer;color:var(--t3)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px}
+.form-item{display:flex;flex-direction:column;gap:4px}
+.form-item.full{grid-column:1/-1}
+.form-item label{font-size:13px;color:var(--t2)}
+.form-item label em{color:var(--danger);font-style:normal;margin-right:2px}
+.section-title{font-size:13px;font-weight:600;margin:8px 0 8px;padding-left:8px;border-left:3px solid var(--primary)}
+.progress{height:6px;background:#ebeef5;border-radius:3px;overflow:hidden;min-width:80px}
+.progress>i{display:block;height:100%;background:var(--primary)}
+.toast-wrap{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:80;display:flex;flex-direction:column;gap:8px}
+.toast{background:#fff;border-radius:4px;box-shadow:var(--shadow);padding:10px 16px;min-width:260px;border-left:3px solid var(--primary);font-size:13px}
+.toast.ok{border-left-color:var(--success)}
+.toast.err{border-left-color:var(--danger)}
+.toast.warn{border-left-color:var(--warning)}
+.empty{text-align:center;color:var(--t3);padding:40px 16px}
+.switch{position:relative;width:36px;height:20px;display:inline-block}
+.switch input{display:none}
+.switch i{position:absolute;inset:0;background:#dcdfe6;border-radius:10px;cursor:pointer;transition:.15s}
+.switch i:before{content:"";position:absolute;width:16px;height:16px;left:2px;top:2px;background:#fff;border-radius:50%;transition:.15s}
+.switch input:checked+i{background:var(--primary)}
+.switch input:checked+i:before{transform:translateX(16px)}
+.switch input:disabled+i{opacity:.45;cursor:not-allowed}
+.avatar{width:24px;height:24px;border-radius:50%;background:var(--primary);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;margin-right:6px}
+.member{display:flex;align-items:center}
+.org-item{display:flex;align-items:center;gap:8px;padding:8px;border-bottom:1px solid var(--border-light)}
+.org-item.off{opacity:.5;background:#fafafa}
+.kv{display:grid;grid-template-columns:120px 1fr;gap:8px 12px;font-size:13px}
+.kv .k{color:var(--t3)}
+.tip{position:relative}
+.tip:hover .tipbox{display:block}
+.tipbox{display:none;position:absolute;left:0;bottom:120%;background:#303133;color:#fff;padding:6px 8px;border-radius:4px;font-size:12px;width:220px;z-index:5;white-space:normal}
+.quota{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.muted{color:var(--t3);font-size:12px}
+.ratio-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ratio-row .input{width:72px;min-width:72px}
+.chip{padding:4px 10px;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-size:12px;background:#fff}
+.chip.on{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
+.ops a,.ops .btn-text{margin-right:6px}
+.guide ol{padding-left:20px;line-height:1.8}
+.guide h4{margin:16px 0 8px}
+.warn-text{color:var(--danger)}
+.ok-text{color:var(--success)}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.pager{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:12px;color:var(--t3);font-size:12px}
+.confirm-box{background:#fff;border-radius:6px;width:400px;padding:20px}
+.offline{color:var(--danger)}
+.online{color:var(--success)}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><span class="dot"></span>武汉电销 CRM<span class="sub">演示</span></div>
+    <div class="nav-group">销售工作台</div>
+    <button class="nav-item" id="nav-pool" data-page="pool">客户池</button>
+    <div class="nav-group">人工智能外呼中心</div>
+    <button class="nav-item" id="nav-tasks" data-page="tasks">AI任务</button>
+    <button class="nav-item" id="nav-wecom" data-page="wecom">企微承接账号</button>
+    <button class="nav-item" id="nav-guide" data-page="guide">系统说明</button>
+  </aside>
+  <div class="main">
+    <div class="demo-bar">
+      <b>演示数据</b>
+      <span>本页全部为演示数据，不会发起真实外呼，也不会发送真实企业微信通知或站内消息。</span>
+      <span>当前模拟时间：<b id="simClock"></b></span>
+      <button class="btn btn-sm" id="btnSimDay">模拟工作时段 10:00</button>
+      <button class="btn btn-sm" id="btnSimNight">模拟政策禁呼 21:30</button>
+    </div>
+    <div class="topbar">
+      <div class="crumb" id="crumb"></div>
+      <div class="spacer"></div>
+      <span class="label">当前角色</span>
+      <select class="role-select" id="roleSel">
+        <option value="admin">管理员</option>
+        <option value="ops">运营</option>
+        <option value="sales">销售（周敏）</option>
+        <option value="testseat">测试坐席（一期拦截）</option>
+        <option value="other">其他未授权人员</option>
+      </select>
+    </div>
+    <div class="page" id="page"></div>
+  </div>
+</div>
+<div class="toast-wrap" id="toasts"></div>
+<div id="overlay"></div>
+<script>
+const INTENT_TIPS = {
+  A: "A：直接跟进，已发送企微通知且用户已成功加上企业微信",
+  B: "B：优先跟进，已发送企微通知且用户同意加微",
+  C: "C：针对性跟进，未走到加微节点或明确不同意加微",
+  D: "D：再次触达，开场后快速挂断"
+};
+const TOTAL_CONCURRENCY = 20;
+const PAGE_SIZE = 8;
+const SALES = ["周敏","李强","王芳","陈涛"];
+const AGENTS = {
+  "火山": [{id:"hs-1",name:"火山·公海通话语术A",ok:true},{id:"hs-2",name:"火山·停用语术",ok:false}],
+  "阿里": [{id:"ali-1",name:"阿里·回访通话语术B",ok:true},{id:"ali-2",name:"阿里·停用语术",ok:false}]
+};
+
+function clone(o){return JSON.parse(JSON.stringify(o));}
+function pad(n){return String(n).padStart(2,"0");}
+function fmt(dt){return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;}
+const BASE_NOW=new Date(2026,10,12,10,15,0);
+function todayStr(h,m){const d=BASE_NOW;return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(h)}:${pad(m)}`;}
+function parseDT(s){return new Date(s);}
+function inPolicy(dt){const h=dt.getHours(),mi=dt.getMinutes();const t=h*60+mi;return t>=21*60 || t<9*60;}
+function toast(msg,type="ok"){const el=document.createElement("div");el.className="toast "+(type||"ok");el.textContent=msg;document.getElementById("toasts").appendChild(el);setTimeout(()=>el.remove(),3200);}
+function dash(v){return (v===undefined||v===null||v===""||v==="—")?'<span class="dash">—</span>':esc(v);}
+function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function canConfig(){return state.role==="admin"||state.role==="ops";}
+function isSalesLike(){return state.role==="sales"||state.role==="testseat"||state.role==="other";}
+
+const seed = {
+  tasks: [
+    {id:"T20261112-001",name:"早间公海吞吐",channel:"火山",agent:"hs-1",plan:200,called:86,connected:31,intent:9,status:"进行中",start:todayStr(9,30),end:todayStr(18,0),concurrency:8,threshold:"B 及以上",ratios:{A:5,B:15,C:5,D:5,E:70},redial:true,redialTimes:2,redialGap:30,blocks:[{name:"午休",start:"12:00",end:"13:00"}],fails:3,enough:true,
+      logs:[{t:"今天 09:28",a:"创建任务"},{t:"今天 09:30",a:"系统开始调度"},{t:"今天 09:30",a:"启动"}]},
+    {id:"T20261112-002",name:"午后自助回捞",channel:"阿里",agent:"ali-1",plan:80,called:22,connected:8,intent:2,status:"已暂停",start:todayStr(13,0),end:todayStr(17,30),concurrency:4,threshold:"B 及以上",ratios:{A:5,B:15,C:5,D:5,E:70},redial:true,redialTimes:2,redialGap:20,blocks:[],fails:1,enough:true,
+      logs:[{t:"今天 12:40",a:"创建任务"},{t:"今天 13:00",a:"启动"},{t:"今天 14:10",a:"暂停"}]},
+    {id:"T20261112-003",name:"晚间补充（线索偏少）",channel:"火山",agent:"hs-1",plan:60,called:0,connected:0,intent:0,status:"待开始",start:todayStr(16,0),end:todayStr(20,30),concurrency:3,threshold:"A 及以上",ratios:{A:10,B:10,C:10,D:10,E:60},redial:true,redialTimes:1,redialGap:40,blocks:[],fails:0,enough:false,
+      logs:[{t:"今天 11:02",a:"创建任务"}]},
+    {id:"T20261111-008",name:"昨日收尾",channel:"阿里",agent:"ali-1",plan:120,called:120,connected:44,intent:11,status:"已完成",start:"2026-11-11T09:30",end:"2026-11-11T18:00",concurrency:5,threshold:"C 及以上",ratios:{A:5,B:15,C:5,D:5,E:70},redial:false,redialTimes:2,redialGap:30,blocks:[],fails:0,enough:true,
+      logs:[{t:"昨天 09:20",a:"创建任务"},{t:"昨天 09:30",a:"启动"},{t:"昨天 18:00",a:"系统完成"}]}
+  ],
+  leads: [
+    {fid:"F10021",oid:"Y88210021",phone:"138****1021",stage:"初中",layer:"B",seat:"—",intentSale:"—",callStatus:"有效接通 16 秒",aiStatus:"有效接通未加微",grade:"B",summary:"家长关注价格，同意了解课程安排。",calls:1,last:"今天 10:16",source:"公海池",pool:"公海池",added:false,task:"T20261112-001",flow:"意向待分配",wecom:"王承接",note:"达到意向门槛，待指定承接人",hasPhone:true,locked:false,aiIn:true},
+    {fid:"F10022",oid:"Y88210022",phone:"139****1022",stage:"小学",layer:"A",seat:"—",intentSale:"—",callStatus:"有效接通 42 秒",aiStatus:"有效接通未加微",grade:"A",summary:"明确表示想看课程表，沟通较顺畅。",calls:1,last:"今天 10:22",source:"公海池",pool:"公海池",added:false,task:"T20261112-001",flow:"意向待分配",wecom:"刘承接",note:"达到意向门槛，待指定承接人",hasPhone:true,locked:false,aiIn:true},
+    {fid:"F10023",oid:"Y88210023",phone:"137****1023",stage:"高中",layer:"C",seat:"—",intentSale:"—",callStatus:"有效接通 28 秒",aiStatus:"有效接通已加微",grade:"B",summary:"已通过企业微信好友，等待销售承接。",calls:1,last:"今天 10:40",source:"公海池",pool:"公海池",added:true,task:"T20261112-001",flow:"已加微",wecom:"王承接",note:"加微通过且销售尚未二次外呼",hasPhone:true,locked:false,aiIn:true},
+    {fid:"F10024",oid:"Y88210024",phone:"136****1024",stage:"初中",layer:"B",seat:"周敏",intentSale:"B",callStatus:"有效接通 33 秒",aiStatus:"有效接通已加微",grade:"A",summary:"已指定给周敏，总结已同步至详情。",calls:2,last:"今天 11:05",source:"人工智能机器人",pool:"公海池",added:true,task:"T20261112-001",flow:"已分配",wecom:"王承接",note:"已指定承接人入库，不占未拨打领取额度",hasPhone:true,locked:false,aiIn:true},
+    {fid:"F10025",oid:"Y88210025",phone:"135****1025",stage:"小学",layer:"A",seat:"李强",intentSale:"A",callStatus:"有效接通 21 秒",aiStatus:"有效接通未加微",grade:"C",summary:"家长先了解再决定，暂未加微。",calls:3,last:"今天 11:20",source:"人工智能机器人",pool:"公海池",added:false,task:"T20261112-002",flow:"已分配",wecom:"刘承接",note:"已指定承接人入库",hasPhone:true,locked:false,aiIn:true},
+    {fid:"F10026",oid:"Y88210026",phone:"134****1026",stage:"初中",layer:"E",seat:"—",intentSale:"—",callStatus:"外呼中（演示）",aiStatus:"—",grade:"—",summary:"",calls:0,last:"",source:"公海池",pool:"公海池",added:false,task:"T20261112-001",flow:"人工智能处理中",wecom:"—",note:"已被任务锁定，尚未出最终结果",hasPhone:true,locked:true,aiIn:true},
+    {fid:"F10027",oid:"Y88210027",phone:"133****1027",stage:"高中",layer:"D",seat:"—",intentSale:"—",callStatus:"有效接通 18 秒",aiStatus:"有效接通未加微",grade:"D",summary:"开场后很快结束，未达加微门槛。",calls:1,last:"今天 10:08",source:"公海池",pool:"公海池",added:false,task:"T20261112-001",flow:"—",wecom:"—",note:"已入库但未达意向门槛，默认归属待确认",hasPhone:true,locked:false,aiIn:true,todayFollow:true},
+    {fid:"F10028",oid:"Y88210028",phone:"132****1028",stage:"小学",layer:"E",seat:"—",intentSale:"—",callStatus:"接通 6 秒",aiStatus:"无效接通",grade:"C",summary:"通话不足 10 秒，即使后续加微仍保持无效接通。",calls:1,last:"今天 09:52",source:"公海池",pool:"公海池",added:false,task:"T20261112-001",flow:"—",wecom:"—",note:"无效接通已入库",hasPhone:true,locked:false,aiIn:true,todayFollow:true},
+    {fid:"F10029",oid:"Y88210029",phone:"131****1029",stage:"初中",layer:"E",seat:"—",intentSale:"—",callStatus:"未接通",aiStatus:"未接通",grade:"—",summary:"档次用完仍未接通，已按未接通入库。",calls:3,last:"今天 09:48",source:"公海池",pool:"公海池",added:false,task:"T20261112-002",flow:"—",wecom:"—",note:"公海未接通入库，流转不是意向待分配",hasPhone:true,locked:false,aiIn:true,todayFollow:true},
+    {fid:"F10030",oid:"Y88210030",phone:"130****1030",stage:"小学",layer:"C",seat:"周敏",intentSale:"B",callStatus:"已外呼 40 秒",aiStatus:"—",grade:"—",summary:"",calls:4,last:"昨天 16:12",source:"销售领取",pool:"公海池",added:false,task:"—",flow:"—",wecom:"—",note:"",hasPhone:true,locked:false,aiIn:false},
+    {fid:"F10031",oid:"Y88210031",phone:"159****1031",stage:"初中",layer:"B",seat:"—",intentSale:"—",callStatus:"有效接通 25 秒",aiStatus:"有效接通未加微",grade:"未分层",summary:"生成失败",calls:1,last:"今天 11:33",source:"公海池",pool:"公海池",added:false,task:"T20261112-002",flow:"—",wecom:"—",note:"评分未回传成功，仍按接通规则入库",hasPhone:true,locked:false,aiIn:true,todayFollow:true,summaryFail:true},
+    {fid:"F10032",oid:"Y88210032",phone:"—",stage:"高中",layer:"A",seat:"周敏",intentSale:"C",callStatus:"暂无呼叫记录",aiStatus:"—",grade:"—",summary:"",calls:0,last:"",source:"销售领取",pool:"公海池",added:false,task:"—",flow:"—",wecom:"—",note:"",hasPhone:false,locked:false,aiIn:false},
+    {fid:"F10033",oid:"Y88210033",phone:"158****1033",stage:"小学",layer:"B",seat:"—",intentSale:"—",callStatus:"未领取",aiStatus:"—",grade:"—",summary:"",calls:0,last:"",source:"公海池",pool:"公海池",added:false,task:"—",flow:"—",wecom:"—",note:"可被申请的公共线索（演示）",hasPhone:true,locked:false,aiIn:false,public:true},
+    {fid:"F10034",oid:"Y88210034",phone:"157****1034",stage:"初中",layer:"A",seat:"—",intentSale:"—",callStatus:"有效接通 30 秒",aiStatus:"有效接通未加微",grade:"B",summary:"同意加微，但云设备当时离线，邀请待补发。",calls:1,last:"今天 14:18",source:"公海池",pool:"自助线索池",added:false,task:"T20261112-002",flow:"意向待分配",wecom:"—",note:"静默或离线时仍按结果入库，条件恢复后补发",hasPhone:true,locked:false,aiIn:true}
+  ],
+  members: [
+    {id:"m1",name:"王承接",account:"wangchengjie",org:"武汉电销 / 一组",online:true,today:18,cap:40,status:"启用",on:true},
+    {id:"m2",name:"刘承接",account:"liuchengjie",org:"武汉电销 / 二组",online:true,today:36,cap:40,status:"额度将满",on:true},
+    {id:"m3",name:"陈承接",account:"chenchengjie",org:"武汉电销 / 一组",online:false,today:4,cap:30,status:"启用",on:false},
+    {id:"m4",name:"赵承接",account:"zhaochengjie",org:"武汉电销 / 三组",online:true,today:0,cap:40,status:"启用",on:false}
+  ],
+  orgPeople: [
+    {id:"m1",name:"王承接",account:"wangchengjie",org:"武汉电销 / 一组",online:true},
+    {id:"m2",name:"刘承接",account:"liuchengjie",org:"武汉电销 / 二组",online:true},
+    {id:"m3",name:"陈承接",account:"chenchengjie",org:"武汉电销 / 一组",online:false},
+    {id:"m4",name:"赵承接",account:"zhaochengjie",org:"武汉电销 / 三组",online:true},
+    {id:"m5",name:"周设备离线",account:"zhouoffline",org:"武汉电销 / 二组",online:false},
+    {id:"m6",name:"孙新成员",account:"sunxin",org:"武汉电销 / 三组",online:true}
+  ],
+  policy: {channel:"演示渠道",nick:"课程顾问小王",invite:"您好，我是课程顾问，想加您企业微信方便发送课表。",welcome:"已通过好友，后续我会把适合的学习安排发给您。",retry:"失败后换账号重试 1 次",quiet:"22:00 至 08:00",threshold:"B 及以上",exempt:true,autoSource:true,defaultCap:40}
+};
+
+const state = {
+  role:"admin",
+  page:"tasks",
+  now: new Date(BASE_NOW.getTime()),
+  tasks: clone(seed.tasks),
+  leads: clone(seed.leads),
+  members: clone(seed.members),
+  policy: clone(seed.policy),
+  taskFilter:{name:"",channel:"",status:"",date:""},
+  poolView:"全部客户",
+  poolFilter:{fid:"",oid:"",phone:"",task:"",aiStatus:"",grade:"",flow:"",layer:"",wecom:""},
+  poolPage:1,
+  selected:new Set(),
+  obsOpen:true,
+  wecomTab:"members",
+  orgFilter:"全部",
+  wecomSaved:true
+};
+
+function usedConcurrency(){return state.tasks.filter(t=>t.status==="进行中").reduce((s,t)=>s+Number(t.concurrency||0),0);}
+function freeConcurrency(){return Math.max(0,TOTAL_CONCURRENCY-usedConcurrency());}
+function taskById(id){return state.tasks.find(t=>t.id===id);}
+function progressOf(t){return t.plan?Math.min(100,Math.round(t.called/t.plan*100)):0;}
+function tickClock(){document.getElementById("simClock").textContent=fmt(state.now)+(inPolicy(state.now)?"（政策禁呼）":"");}
+
+function setPage(p,opts={}){
+  if((p==="tasks"||p==="wecom") && !canConfig()){
+    toast("当前角色无权进入该配置页","err");
+    p="pool";
+  }
+  state.page=p;
+  if(!opts.keepPoolPage) state.poolPage=1;
+  render();
+}
+
+function render(){
+  tickClock();
+  const crumb={pool:"客户池",tasks:"人工智能外呼中心 / AI任务",wecom:"人工智能外呼中心 / 企微承接账号",guide:"人工智能外呼中心 / 系统说明"}[state.page];
+  document.getElementById("crumb").innerHTML=`<b>${crumb}</b>`;
+  document.querySelectorAll(".nav-item").forEach(el=>el.classList.toggle("active",el.dataset.page===state.page));
+  const root=document.getElementById("page");
+  if(state.page==="tasks") root.innerHTML=renderTasks();
+  else if(state.page==="pool") root.innerHTML=renderPool();
+  else if(state.page==="wecom") root.innerHTML=renderWecom();
+  else root.innerHTML=renderGuide();
+  bindPage();
+}
+
+/* ---------- AI 任务 ---------- */
+function runningTasks(){return state.tasks.filter(t=>t.status==="进行中");}
+function queuedCount(){return runningTasks().reduce((s,t)=>s+Math.max(0,t.plan-t.called),0);}
+function pendingAssign(){return state.leads.filter(l=>l.flow==="意向待分配").length;}
+function todayCalled(){const day=fmt(state.now).slice(0,10);return state.tasks.filter(t=>fmt(new Date(t.start)).slice(0,10)===day).reduce((s,t)=>s+t.called,0);}
+function connectRate(){const c=state.tasks.reduce((s,t)=>s+t.called,0),ok=state.tasks.reduce((s,t)=>s+t.connected,0);return c?Math.round(ok/c*100)+"%":"0%";}
+
+function renderTasks(){
+  const f=state.taskFilter;
+  let list=state.tasks.filter(t=>{
+    if(f.name && !t.name.includes(f.name) && !t.id.includes(f.name)) return false;
+    if(f.channel && t.channel!==f.channel) return false;
+    if(f.status && t.status!==f.status) return false;
+    return true;
+  });
+  const run=runningTasks();
+  return `
+  <div class="card">
+    <div class="obs-head" id="obsToggle"><h3 style="margin:0">实时观察</h3><span class="hint">${state.obsOpen?"收起":"展开"}</span></div>
+    <div class="${state.obsOpen?"":"hidden"}" id="obsBody">
+      <div class="stat-grid mt12">
+        <div class="stat"><div class="n">${run.length}</div><div class="k">进行中任务</div></div>
+        <div class="stat"><div class="n">${usedConcurrency()} / ${TOTAL_CONCURRENCY}</div><div class="k">已占用 / 可分配并发（可分配 ${freeConcurrency()}）</div></div>
+        <div class="stat"><div class="n">${todayCalled()}</div><div class="k">今日已呼</div></div>
+        <div class="stat"><div class="n">${connectRate()}</div><div class="k">接通率（演示）</div></div>
+        <div class="stat"><div class="n">${queuedCount()}</div><div class="k">排队等待（按剩余计划估算）</div></div>
+        <div class="stat"><div class="n">${pendingAssign()}</div><div class="k">意向待分配</div></div>
+      </div>
+      <p class="hint mt8">只汇总任务执行情况，不展示漏斗对比或通话抽样名单。待呼、正在外呼中的名单不在客户池展开。</p>
+      ${run.length?`<table class="mt12"><thead><tr><th>任务名称</th><th>通道</th><th>并发占用</th><th>已呼 / 计划</th><th>接通率</th><th>意向</th><th>状态</th></tr></thead><tbody>
+        ${run.map(t=>`<tr><td>${esc(t.name)}<div class="muted">${esc(t.id)}</div></td><td>${esc(t.channel)}</td><td>${t.concurrency}</td><td>${t.called} / ${t.plan}</td><td>${t.called?Math.round(t.connected/t.called*100)+"%":"0%"}</td><td>${t.intent}</td><td>${statusTag(t.status)}</td></tr>`).join("")}
+      </tbody></table>`:""}
+    </div>
+  </div>
+  <div class="card">
+    <div class="toolbar mb12">
+      <div class="row">
+        <input class="input" id="tfName" placeholder="任务名称或编号" value="${esc(f.name)}">
+        <select class="select" id="tfChannel"><option value="">全部通道</option><option ${f.channel==="火山"?"selected":""}>火山</option><option ${f.channel==="阿里"?"selected":""}>阿里</option></select>
+        <select class="select" id="tfStatus"><option value="">全部状态</option>${["待开始","进行中","已暂停","已完成"].map(s=>`<option ${f.status===s?"selected":""}>${s}</option>`).join("")}</select>
+        <button class="btn btn-primary" id="tfQuery">查询</button>
+        <button class="btn" id="tfRefresh">刷新</button>
+      </div>
+      <button class="btn btn-primary" id="btnNewTask">新建AI外呼任务</button>
+    </div>
+    ${list.length?`<table><thead><tr><th>任务名称</th><th>任务时间</th><th>通道</th><th>计划量</th><th>已呼</th><th>接通</th><th>意向</th><th>进度</th><th>状态</th><th>操作</th></tr></thead><tbody>
+      ${list.map(t=>`<tr>
+        <td>${esc(t.name)}<div class="muted">${esc(t.id)}</div></td>
+        <td>${esc(fmtRange(t.start,t.end))}</td>
+        <td>${esc(t.channel)}</td>
+        <td>${t.plan}</td>
+        <td>${t.called||0}</td>
+        <td>${t.connected||0}</td>
+        <td>${t.intent||0}</td>
+        <td><div class="progress"><i style="width:${progressOf(t)}%"></i></div><div class="muted">${progressOf(t)}%</div></td>
+        <td>${statusTag(t.status)}</td>
+        <td class="ops">
+          <button class="btn-text" data-act="viewcust" data-id="${t.id}">查看客户</button>
+          <button class="btn-text" data-act="detail" data-id="${t.id}">详情</button>
+          <button class="btn-text" data-act="edit" data-id="${t.id}">编辑</button>
+          ${t.status==="待开始"||t.status==="已暂停"?`<button class="btn-text" data-act="start" data-id="${t.id}">启动</button>`:""}
+          ${t.status==="进行中"?`<button class="btn-text" data-act="pause" data-id="${t.id}">暂停</button>`:""}
+        </td>
+      </tr>`).join("")}
+    </tbody></table>`:`<div class="empty">暂无 AI 外呼任务<br><button class="btn btn-primary mt12" id="btnNewTaskEmpty">新建AI外呼任务</button></div>`}
+  </div>`;
+}
+function statusTag(s){const m={待开始:"tag-gray",进行中:"tag-blue",已暂停:"tag-orange",已完成:"tag-green"};return `<span class="tag ${m[s]||"tag-gray"}">${s}</span>`}
+function flowTag(s){if(!s||s==="—")return dash("—");const m={"意向待分配":"tag-orange","已加微":"tag-green","已分配":"tag-blue","人工智能处理中":"tag-purple"};return `<span class="tag ${m[s]||"tag-gray"}">${s}</span>`}
+function fmtRange(a,b){const x=new Date(a),y=new Date(b);return `${fmt(x)} 至 ${fmt(y).slice(11)}`;}
+
+function startTask(id){
+  const t=taskById(id); if(!t) return;
+  if(t.status!=="待开始"&&t.status!=="已暂停") return;
+  if(!enoughAgent(t)) {toast("请选择可用的通话智能体","err");return;}
+  if(inPolicy(state.now)) toast("当前处于每日 21:00 至次日 09:00 的政策禁呼时段，已启动任务，但不会发起新的拨打","warn");
+  else toast("任务已启动");
+  if(!t.enough) toast("可用线索不足，将按实际可抽数量执行","warn");
+  const onlineOn=state.members.some(m=>m.online&&m.on&&m.today<m.cap);
+  if(!onlineOn) toast("当前没有在线可承接账号，任务仍可启动，加微阶段将跳过离线账号（该策略待确认）","warn");
+  t.status="进行中";
+  t.logs.push({t:fmt(state.now).slice(5),a:"启动"});
+  render();
+}
+function pauseTask(id){
+  const t=taskById(id); if(!t||t.status!=="进行中") return;
+  t.status="已暂停";
+  t.logs.push({t:fmt(state.now).slice(5),a:"暂停"});
+  toast("已暂停。不再抽取新线索。已领出未打完的档次按剩余规则打完");
+  render();
+}
+function enoughAgent(t){const list=AGENTS[t.channel]||[];return list.some(a=>a.id===t.agent&&a.ok);}
+function viewCustomers(taskId){
+  state.poolFilter.task=taskId;
+  state.poolView="全部客户";
+  state.selected=new Set();
+  state.page="pool";
+  state.poolPage=1;
+  render();
+  toast("已按任务筛选客户池");
+}
+
+/* ---------- 新建/编辑任务 ---------- */
+function openTaskModal(editId){
+  const t=editId?clone(taskById(editId)):null;
+  const ratios=t?t.ratios:{A:5,B:15,C:5,D:5,E:70};
+  const blocks=t&&t.blocks.length?clone(t.blocks):[];
+  const start=t?t.start:todayStr(9,30);
+  const end=t?t.end:todayStr(18,0);
+  showModal(`
+    <div class="modal modal-lg">
+      <div class="modal-h"><span>${editId?"编辑 AI 外呼任务":"新建AI外呼任务"}</span><button class="close-x" data-close>×</button></div>
+      <div class="modal-b">
+        <div class="section-title">基本信息</div>
+        <div class="form-grid">
+          <div class="form-item"><label><em>*</em>任务名称</label><input class="input" id="fName" value="${esc(t?t.name:"")}"><div class="err" id="eName"></div></div>
+          <div class="form-item"><label><em>*</em>通道</label><select class="select" id="fChannel"><option value="">请选择</option><option ${t&&t.channel==="火山"?"selected":""}>火山</option><option ${t&&t.channel==="阿里"?"selected":""}>阿里</option></select><div class="err" id="eChannel"></div></div>
+          <div class="form-item"><label><em>*</em>通话智能体</label><select class="select" id="fAgent"></select><div class="err" id="eAgent"></div><div class="hint">本系统不创建、不编辑智能体，只需选择可用项。</div></div>
+          <div class="form-item"><label><em>*</em>计划外呼量</label><input class="input" id="fPlan" type="number" min="1" max="99999" value="${t?t.plan:100}"><div class="err" id="ePlan"></div></div>
+          <div class="form-item"><label><em>*</em>意向门槛</label><select class="select" id="fTh">${["A 及以上","B 及以上","C 及以上"].map(x=>`<option ${((t?t.threshold:"B 及以上")===x)?"selected":""}>${x}</option>`).join("")}</select><div class="hint">默认建议「B 及以上」，待确认。只使用一期 A–D 等级。</div></div>
+        </div>
+        <div class="section-title">并发配置</div>
+        <div class="form-grid">
+          <div class="form-item"><label>可分配并发</label><div>当前可分配 ${freeConcurrency()}，总并发 ${TOTAL_CONCURRENCY}${t&&t.status==="进行中"?"（含本任务已占用 "+t.concurrency+"）":""}</div></div>
+          <div class="form-item"><label><em>*</em>并发模式</label><div>独占（本期仅此模式，任务预先占用并发，不被其他任务抢占）</div></div>
+          <div class="form-item"><label><em>*</em>任务并发</label><input class="input" id="fConc" type="number" min="1" value="${t?t.concurrency:1}"><div class="err" id="eConc"></div></div>
+        </div>
+        <div class="section-title">时间配置</div>
+        <div class="form-grid">
+          <div class="form-item"><label><em>*</em>开始时间</label><input class="input" id="fStart" type="datetime-local" value="${esc(start)}"><div class="err" id="eStart"></div></div>
+          <div class="form-item"><label><em>*</em>结束时间</label><input class="input" id="fEnd" type="datetime-local" value="${esc(end)}"><div class="err" id="eEnd"></div></div>
+          <div class="form-item full"><label>政策禁呼说明</label><div class="hint">每日 21:00 至次日 09:00，系统均不可外呼。任务时间不能突破该时段。</div></div>
+          <div class="form-item full"><label>禁拨时段</label><div id="fBlocks"></div><button type="button" class="btn btn-sm mt8" id="addBlock">添加禁拨时段</button><div class="err" id="eBlocks"></div></div>
+          <div class="form-item"><label>未接再呼</label><label class="switch"><input type="checkbox" id="fRedial" ${t? (t.redial?"checked":"") :"checked"}><i></i></label><div class="hint">关闭则只打首次。只对未接通再建下一档。</div></div>
+          <div class="form-item"><label>再呼次数 / 间隔（分钟）</label><div class="row"><input class="input" style="width:90px" id="fTimes" type="number" value="${t?t.redialTimes:2}"><input class="input" style="width:90px" id="fGap" type="number" value="${t?t.redialGap:30}"></div><div class="err" id="eRedial"></div></div>
+        </div>
+        <div class="section-title">线索分配比例（合计必须等于 100%）</div>
+        <div class="ratio-row" id="fRatios">${["A","B","C","D","E"].map(k=>`<span>分层 ${k} <input class="input ratio" data-k="${k}" type="number" min="0" max="100" value="${ratios[k]}"></span>`).join("")}
+          <button type="button" class="btn btn-sm" id="resetRatio">重置</button>
+          <span id="ratioSum"></span>
+        </div>
+        <div class="err" id="eRatio"></div>
+        <p class="hint">默认 5、15、5、5、70。占比为 0 的分层不抽取。计划量与比例分开填写。高净值、已是在岗销售企业微信好友、黑名单、空号等现网不可呼线索强制不抽取。</p>
+      </div>
+      <div class="modal-f"><button class="btn" data-close>取消</button><button class="btn btn-primary" id="saveTask">确定</button></div>
+    </div>`, ()=>{
+      const blockBox=document.getElementById("fBlocks");
+      const data={blocks};
+      const paintBlocks=()=>{
+        blockBox.innerHTML=data.blocks.map((b,i)=>`<div class="row mb8">
+          <input class="input" data-bk="name" data-i="${i}" placeholder="名称" value="${esc(b.name||"")}">
+          <input class="input" data-bk="start" data-i="${i}" type="time" value="${esc(b.start||"12:00")}">
+          <span>至</span>
+          <input class="input" data-bk="end" data-i="${i}" type="time" value="${esc(b.end||"13:00")}">
+          <button class="btn btn-sm" data-delb="${i}">删除</button>
+        </div>`).join("")||'<span class="hint">可添加多条禁拨时段</span>';
+      };
+      paintBlocks();
+      const fillAgents=()=>{
+        const ch=document.getElementById("fChannel").value;
+        const sel=document.getElementById("fAgent");
+        const list=AGENTS[ch]||[];
+        sel.innerHTML=`<option value="">请选择可用的通话智能体</option>`+list.map(a=>`<option value="${a.id}" ${t&&t.agent===a.id?"selected":""} ${a.ok?"":"disabled"}>${esc(a.name)}${a.ok?"":"（已停用）"}</option>`).join("");
+      };
+      fillAgents();
+      document.getElementById("fChannel").onchange=fillAgents;
+      document.getElementById("addBlock").onclick=()=>{data.blocks.push({name:"",start:"12:00",end:"13:00"});paintBlocks();};
+      blockBox.addEventListener("click",e=>{if(e.target.dataset.delb){data.blocks.splice(+e.target.dataset.delb,1);paintBlocks();}});
+      blockBox.addEventListener("input",e=>{const i=e.target.dataset.i,k=e.target.dataset.bk;if(k) data.blocks[i][k]=e.target.value;});
+      const sumEl=()=>{
+        const o=readRatios(); const s=o.A+o.B+o.C+o.D+o.E;
+        document.getElementById("ratioSum").innerHTML=s===100?`<span class="ok-text">合计 ${s}%</span>`:`<span class="warn-text">合计 ${s}%（须等于 100% 才能创建）</span>`;
+        return s;
+      };
+      document.getElementById("fRatios").addEventListener("input",sumEl);
+      document.getElementById("resetRatio").onclick=()=>{document.querySelectorAll(".ratio").forEach(inp=>inp.value=({A:5,B:15,C:5,D:5,E:70}[inp.dataset.k]));sumEl();};
+      sumEl();
+      document.getElementById("saveTask").onclick=()=>submitTask(editId,data);
+    });
+}
+function readRatios(){const o={};document.querySelectorAll(".ratio").forEach(inp=>o[inp.dataset.k]=Number(inp.value||0));return o;}
+function clearErr(){document.querySelectorAll(".err").forEach(e=>e.textContent="");}
+function submitTask(editId,data){
+  clearErr();
+  let bad=false;
+  const name=document.getElementById("fName").value.trim();
+  if(!name){document.getElementById("eName").textContent="请填写任务名称";bad=true;}
+  const dup=state.tasks.some(t=>t.name===name&&t.id!==editId&&t.status!=="已完成");
+  if(name&&dup){document.getElementById("eName").textContent="任务名称不能重复";bad=true;}
+  const channel=document.getElementById("fChannel").value;
+  if(!channel){document.getElementById("eChannel").textContent="请选择通道";bad=true;}
+  const agent=document.getElementById("fAgent").value;
+  const ag=(AGENTS[channel]||[]).find(a=>a.id===agent);
+  if(!ag||!ag.ok){document.getElementById("eAgent").textContent="请选择可用的通话智能体";bad=true;}
+  const plan=Number(document.getElementById("fPlan").value);
+  if(!Number.isInteger(plan)||plan<1||plan>99999){document.getElementById("ePlan").textContent="计划外呼量需为 1 到 99999 的整数";bad=true;}
+  const old=editId?taskById(editId):null;
+  if(old && plan<old.called){document.getElementById("ePlan").textContent="计划量不可改得小于已呼量";bad=true;}
+  const cap=freeConcurrency()+(old&&old.status==="进行中"?old.concurrency:0);
+  const conc=Number(document.getElementById("fConc").value);
+  if(!Number.isInteger(conc)||conc<1||conc>cap){document.getElementById("eConc").textContent=`任务并发请输入 1–${cap} 的整数`;bad=true;}
+  const start=document.getElementById("fStart").value, end=document.getElementById("fEnd").value;
+  const ds=parseDT(start), de=parseDT(end);
+  if(!(de>ds)){document.getElementById("eEnd").textContent="结束时间需晚于开始时间";bad=true;}
+  if(de>ds && (inPolicy(ds)||inPolicy(de)||crossesPolicy(ds,de))){document.getElementById("eStart").textContent="任务时间不能突破每日 21:00 至次日 09:00 的政策禁呼时段";bad=true;}
+  const blocks=data.blocks;
+  let bmsg="";
+  for(let i=0;i<blocks.length;i++){
+    if(!blocks[i].start||!blocks[i].end||blocks[i].end<=blocks[i].start){bmsg="禁拨时段结束时间需晚于开始时间";break;}
+    for(let j=0;j<i;j++){
+      if(!(blocks[i].end<=blocks[j].start || blocks[i].start>=blocks[j].end)){bmsg="禁拨时段不可互相重叠";break;}
+    }
+  }
+  if(bmsg){document.getElementById("eBlocks").textContent=bmsg;bad=true;}
+  const redial=document.getElementById("fRedial").checked;
+  const times=Number(document.getElementById("fTimes").value), gap=Number(document.getElementById("fGap").value);
+  if(redial){
+    if(!Number.isInteger(times)||times<0||times>4){document.getElementById("eRedial").textContent="再呼次数需为 0 到 4 的整数";bad=true;}
+    else if(!Number.isInteger(gap)||gap<=0){document.getElementById("eRedial").textContent="再呼间隔需为正整数分钟";bad=true;}
+  }
+  const ratios=readRatios();
+  const sum=ratios.A+ratios.B+ratios.C+ratios.D+ratios.E;
+  if(sum!==100){document.getElementById("eRatio").textContent="合计须等于 100% 才能创建";bad=true;}
+  if(bad) return;
+  const payload={name,channel,agent,plan,called:old?old.called:0,connected:old?old.connected:0,intent:old?old.intent:0,status:old?old.status:"待开始",start,end,concurrency:conc,threshold:document.getElementById("fTh").value,ratios,redial,redialTimes:times,redialGap:gap,blocks,fails:old?old.fails:0,enough:old?old.enough:true,logs:old?old.logs.slice():[{t:fmt(state.now).slice(5),a:"创建任务"}],id:old?old.id:("T"+fmt(state.now).replace(/[-: ]/g,"").slice(0,8)+"-"+pad(state.tasks.length+1))};
+  if(old){
+    Object.assign(old,payload);
+    old.logs.push({t:fmt(state.now).slice(5),a:"编辑"});
+    toast("保存成功，立即生效");
+  }else{
+    if(ds<=state.now && de>state.now && !inPolicy(state.now)) payload.status="进行中";
+    state.tasks.unshift(payload);
+    toast("已创建 AI 外呼任务");
+  }
+  closeOverlay(); render();
+}
+function crossesPolicy(a,b){
+  // if any minute in [a,b) falls in 21:00-09:00
+  const cur=new Date(a);
+  while(cur<b){if(inPolicy(cur)) return true; cur.setMinutes(cur.getMinutes()+30);}
+  return inPolicy(b);
+}
+
+/* ---------- 任务详情 ---------- */
+function openTaskDetail(id){
+  const t=taskById(id); if(!t) return;
+  let tab="概览";
+  const body=()=>{
+    if(tab==="概览") return `<div class="kv">
+      <div class="k">计划 / 已呼 / 接通 / 意向</div><div>${t.plan} / ${t.called} / ${t.connected} / ${t.intent}</div>
+      <div class="k">进度</div><div>${progressOf(t)}%</div>
+      <div class="k">任务时间</div><div>${esc(fmtRange(t.start,t.end))}</div>
+      <div class="k">通道与并发</div><div>${esc(t.channel)}，独占 ${t.concurrency} 路</div>
+      <div class="k">分层比例</div><div>A ${t.ratios.A}% / B ${t.ratios.B}% / C ${t.ratios.C}% / D ${t.ratios.D}% / E ${t.ratios.E}%</div>
+      <div class="k">状态</div><div>${statusTag(t.status)}</div>
+      <div class="k">意向门槛</div><div>${esc(t.threshold)}</div>
+    </div>`;
+    if(tab==="失败重试摘要") return `<p>因创建失败或结果未回而停留在本档的条数：<b>${t.fails}</b></p>
+      <p class="hint">失败不得按未接通处理，本档不入库、不跳到下一档。</p>
+      <button class="btn btn-primary" id="retryFail">重试本档创建</button>`;
+    return `<table><thead><tr><th>时间</th><th>操作</th></tr></thead><tbody>${t.logs.map(l=>`<tr><td>${esc(l.t)}</td><td>${esc(l.a)}</td></tr>`).join("")}</tbody></table>`;
+  };
+  const paint=()=>{
+    showDrawer(`
+      <div class="drawer-h"><span>任务详情 · ${esc(t.name)}</span><button class="close-x" data-close>×</button></div>
+      <div class="drawer-b">
+        <div class="tabs">${["概览","失败重试摘要","操作日志"].map(x=>`<button class="tab ${tab===x?"active":""}" data-tab="${x}">${x}</button>`).join("")}</div>
+        <div id="tdBody">${body()}</div>
+      </div>
+      <div class="drawer-f"><button class="btn" data-close>关闭</button><button class="btn btn-primary" id="tdView">查看客户</button></div>
+    `,()=>{
+      document.querySelectorAll("[data-tab]").forEach(el=>el.onclick=()=>{tab=el.dataset.tab;paint();});
+      const r=document.getElementById("retryFail");
+      if(r) r.onclick=()=>{t.fails=0;t.logs.push({t:fmt(state.now).slice(5),a:"重试本档创建"});toast("已重试本档创建，不按未接通处理");paint();};
+      document.getElementById("tdView").onclick=()=>{closeOverlay();viewCustomers(t.id);};
+    });
+  };
+  paint();
+}
+
+/* ---------- 客户池 ---------- */
+function visibleLeads(){
+  let list=state.leads.slice();
+  if(state.role==="sales"||state.role==="testseat"||state.role==="other") list=list.filter(l=>l.seat==="周敏");
+  const v=state.poolView;
+  if(v==="今日待跟进") list=list.filter(l=>l.aiIn && l.flow!=="人工智能处理中" && ["有效接通未加微","无效接通","未接通"].includes(l.aiStatus));
+  if(v==="意向待分配") list=list.filter(l=>l.flow==="意向待分配");
+  if(v==="已加微") list=list.filter(l=>l.flow==="已加微");
+  if(v==="已分配") list=list.filter(l=>l.flow==="已分配");
+  if(v==="人工智能处理中") list=list.filter(l=>l.flow==="人工智能处理中");
+  const f=state.poolFilter;
+  return list.filter(l=>{
+    if(f.fid && !l.fid.includes(f.fid)) return false;
+    if(f.oid && !l.oid.includes(f.oid)) return false;
+    if(f.phone && !l.phone.includes(f.phone)) return false;
+    if(f.task && l.task!==f.task) return false;
+    if(f.aiStatus && l.aiStatus!==f.aiStatus) return false;
+    if(f.grade && String(l.grade)!==f.grade) return false;
+    if(f.flow && l.flow!==f.flow) return false;
+    if(f.layer && l.layer!==f.layer) return false;
+    if(f.wecom && l.wecom!==f.wecom) return false;
+    return true;
+  });
+}
+function showAiCols(){return state.role!=="other";} // 其他未授权沿用一期不展示，待确认
+function renderPool(){
+  const views=["全部客户","今日待跟进","意向待分配","已加微","已分配"].concat(canConfig()?["人工智能处理中"]:[]);
+  const f=state.poolFilter;
+  const all=visibleLeads();
+  const pages=Math.max(1,Math.ceil(all.length/PAGE_SIZE));
+  if(state.poolPage>pages) state.poolPage=pages;
+  const rows=all.slice((state.poolPage-1)*PAGE_SIZE,state.poolPage*PAGE_SIZE);
+  const canAssign=canConfig() && state.poolView!=="人工智能处理中";
+  return `
+  <div class="card">
+    <div class="tabs">${views.map(v=>`<button class="tab ${state.poolView===v?"active":""}" data-view="${v}">${v}</button>`).join("")}</div>
+    <div class="row mb12">
+      <input class="input" id="pfFid" placeholder="家庭编号" value="${esc(f.fid)}">
+      <input class="input" id="pfOid" placeholder="洋葱编号" value="${esc(f.oid)}">
+      <input class="input" id="pfPhone" placeholder="客户手机号" value="${esc(f.phone)}">
+      <select class="select" id="pfTask"><option value="">所属任务</option>${state.tasks.map(t=>`<option value="${t.id}" ${f.task===t.id?"selected":""}>${esc(t.name)}</option>`).join("")}</select>
+      <select class="select" id="pfAi"><option value="">人工智能外呼状态</option>${["有效接通未加微","无效接通","有效接通已加微","未接通"].map(s=>`<option ${f.aiStatus===s?"selected":""}>${s}</option>`).join("")}</select>
+      <select class="select" id="pfGrade"><option value="">意向等级</option>${["A","B","C","D","未分层"].map(s=>`<option ${f.grade===s?"selected":""}>${s}</option>`).join("")}</select>
+      <select class="select" id="pfFlow"><option value="">流转状态</option>${["人工智能处理中","意向待分配","已加微","已分配"].map(s=>`<option ${f.flow===s?"selected":""}>${s}</option>`).join("")}</select>
+      <select class="select" id="pfLayer"><option value="">分层</option>${["A","B","C","D","E"].map(s=>`<option ${f.layer===s?"selected":""}>${s}</option>`).join("")}</select>
+      <select class="select" id="pfWecom"><option value="">承接账号</option>${[...new Set(state.members.map(m=>m.name))].map(n=>`<option ${f.wecom===n?"selected":""}>${n}</option>`).join("")}</select>
+      <button class="btn btn-primary" id="pfQuery">查询</button>
+      <button class="btn" id="pfReset">重置</button>
+      <button class="btn" id="pfSaveView">另存为</button>
+    </div>
+    <div class="toolbar mb8">
+      <div class="hint">列表中的名单均为演示数据。待呼 / 外呼中名单不在此展开。</div>
+      <div class="row">
+        ${canAssign?`<button class="btn btn-primary" id="btnBatch" ${state.selected.size?"":"disabled"}>批量分配${state.selected.size?`（${state.selected.size}）`:""}</button>`:""}
+        <button class="btn" id="btnApply">申请客户</button>
+      </div>
+    </div>
+    ${all.length?`<div style="overflow:auto"><table><thead><tr>
+      ${canAssign?`<th><input type="checkbox" id="chkAll"></th>`:""}
+      <th>家庭编号</th><th>洋葱编号</th><th>客户手机号</th><th>意向度</th><th>外呼状态</th>
+      ${showAiCols()?`<th>人工智能外呼状态</th><th>意向等级</th><th>人工智能总结</th>`:""}
+      <th>外呼次数</th><th>最近一次拨打时间</th><th>来源</th><th>线索池</th><th>坐席名称</th><th>是否成功加微</th><th>所属任务</th><th>流转状态</th><th>承接账号</th><th>分层</th><th>操作</th>
+    </tr></thead><tbody>
+      ${rows.map(l=>renderLeadRow(l,canAssign)).join("")}
+    </tbody></table></div>
+    <div class="pager"><span>共 ${all.length} 条</span><button class="btn btn-sm" id="pgPrev" ${state.poolPage<=1?"disabled":""}>上一页</button><span>${state.poolPage} / ${pages}</span><button class="btn btn-sm" id="pgNext" ${state.poolPage>=pages?"disabled":""}>下一页</button></div>`:`<div class="empty">暂无符合条件的数据</div>`}
+  </div>`;
+}
+function renderLeadRow(l,canAssign){
+  const grade = (!showAiCols()||!l.aiIn||l.grade==="—"||!l.grade)?dash("—"):(l.grade==="未分层"?`未分层`:`<span class="tip">${esc(l.grade)}<span class="tipbox">${esc(INTENT_TIPS[l.grade]||"")}</span></span>`);
+  const sum = !showAiCols()?"": (!l.aiIn?'<span class="dash">—</span>': (l.summaryFail||l.summary==="生成失败"?'生成失败':`<div class="ellipsis" title="${esc(l.summary)}">${esc(l.summary||"—")}</div>`));
+  const assignable=l.flow==="意向待分配"||l.flow==="已加微";
+  const ops=[];
+  if(canAssign && state.poolView!=="人工智能处理中"){
+    ops.push(`<button class="btn-text" data-act="assign" data-id="${l.fid}">分配</button>`);
+  }
+  ops.push(`<button class="btn-text" data-act="call" data-id="${l.fid}">一键外呼</button>`);
+  ops.push(`<button class="btn-text" data-act="detailc" data-id="${l.fid}">查看详情</button>`);
+  return `<tr>
+    ${canAssign?`<td><input type="checkbox" class="chk" data-id="${l.fid}" ${state.selected.has(l.fid)?"checked":""} ${assignable&&state.poolView!=="人工智能处理中"?"":"disabled"}></td>`:""}
+    <td>${esc(l.fid)}</td><td>${esc(l.oid)}</td><td>${esc(l.phone)}</td>
+    <td>${dash(l.intentSale)}</td><td>${esc(l.callStatus)}</td>
+    ${showAiCols()?`<td>${l.aiIn?esc(l.aiStatus):dash("—")}</td><td>${grade}</td><td>${sum}</td>`:""}
+    <td>${l.calls||0}</td><td>${l.last?esc(l.last):"暂无呼叫记录"}</td>
+    <td>${esc(l.source)}</td><td>${l.pool?esc(l.pool):dash("—")}</td><td>${dash(l.seat)}</td>
+    <td>${l.added?"是":"否"}</td>
+    <td>${l.task&&l.task!=="—"?`${esc((taskById(l.task)||{}).name||l.task)}<div class="muted">${esc(l.task)}</div>`:dash("—")}</td>
+    <td>${flowTag(l.flow)}</td><td>${l.wecom&&l.wecom!=="—"?esc(l.wecom):dash("—")}</td><td>${dash(l.layer)}</td>
+    <td class="ops">${ops.join("")}</td>
+  </tr>`;
+}
+function readPoolFilter(){
+  state.poolFilter={
+    fid:val("pfFid"),oid:val("pfOid"),phone:val("pfPhone"),task:val("pfTask"),
+    aiStatus:val("pfAi"),grade:val("pfGrade"),flow:val("pfFlow"),layer:val("pfLayer"),wecom:val("pfWecom")
+  };
+}
+function val(id){const el=document.getElementById(id);return el?el.value.trim():"";}
+function applyLead(){
+  const cands=state.leads.filter(l=>l.public || l.flow==="人工智能处理中" || l.locked);
+  showModal(`<div class="modal modal-sm"><div class="modal-h"><span>申请客户（演示）</span><button class="close-x" data-close>×</button></div>
+    <div class="modal-b"><p class="hint mb12">选择一条演示线索以验证领取规则。不会发起真实领取。</p>
+      <div class="form-item"><label>线索</label><select class="select" id="apLead">${cands.map(l=>`<option value="${l.fid}">${l.fid} · ${l.flow==="人工智能处理中"||l.locked?"人工智能处理中":"公共未领取"}</option>`).join("")}</select></div>
+    </div>
+    <div class="modal-f"><button class="btn" data-close>取消</button><button class="btn btn-primary" id="apOk">申请</button></div></div>`,()=>{
+      document.getElementById("apOk").onclick=()=>{
+        const l=state.leads.find(x=>x.fid===document.getElementById("apLead").value);
+        if(!l) return;
+        if(l.locked||l.flow==="人工智能处理中"){toast("该线索正在由人工智能外呼处理，不能领取","err");return;}
+        if(state.role==="testseat"){toast("当前为 AI 外呼测试坐席，公海线索由 AI 领取，不能手动申请","err");return;}
+        l.seat = (state.role==="sales"||state.role==="other")?"周敏":"李强";
+        l.source="销售领取"; l.public=false;
+        toast("申请成功");
+        closeOverlay(); render();
+      };
+    });
+}
+function oneClickCall(fid){
+  const l=state.leads.find(x=>x.fid===fid); if(!l) return;
+  if(l.flow==="人工智能处理中"||l.locked){toast("该线索仍在人工智能处理中，不能外呼","err");return;}
+  if(!l.hasPhone){toast("此线索没有手机号","err");return;}
+  l.calls=(l.calls||0)+1;
+  l.last="刚才（演示）";
+  if(l.aiStatus==="有效接通未加微") toast("已发起外呼。之后即使加上企业微信，也不再自动改状态","warn");
+  else toast("已发起外呼");
+  // never actually dial
+  render();
+}
+function tryAssign(ids){
+  if(!canConfig()){toast("当前角色不能指定承接人","err");return;}
+  const leads=ids.map(id=>state.leads.find(l=>l.fid===id)).filter(Boolean);
+  if(!leads.length){toast("请选择要分配的线索","err");return;}
+  const bad=leads.filter(l=>l.flow!=="意向待分配"&&l.flow!=="已加微");
+  if(bad.length){
+    toast("请只勾选意向待分配或已加微的线索："+bad.map(l=>`${l.fid}为${l.flow||"不可分配"}`).join("、"),"err");
+    return;
+  }
+  const batch=leads.length>1;
+  showModal(`
+    <div class="modal modal-sm">
+      <div class="modal-h"><span>指定承接人${batch?"（批量）":""}</span><button class="close-x" data-close>×</button></div>
+      <div class="modal-b">
+        <div class="form-item mb12"><label>已选线索</label><div>${leads.length} 条${batch?"（批量）":""}：${esc(leads.map(l=>l.fid).join("、"))}</div></div>
+        <div class="form-item mb12"><label><em>*</em>指定承接人 / 销售</label><select class="select" id="asSeat"><option value="">请选择</option>${SALES.map(s=>`<option>${s}</option>`).join("")}</select><div class="err" id="eSeat"></div></div>
+        <div class="form-item mb12"><label>入库后锁定</label><select class="select" id="asLock"><option>锁定 2 小时</option><option>不锁定</option><option>锁定至首次跟进</option></select></div>
+        <div class="form-item"><label><input type="checkbox" id="asRemind" checked> 写入待跟进提醒</label><div class="hint">演示环境只做提示，不外发真实消息。</div></div>
+      </div>
+      <div class="modal-f"><button class="btn" data-close>取消</button><button class="btn btn-primary" id="asOk">确认分配</button></div>
+    </div>`,()=>{
+      document.getElementById("asOk").onclick=()=>{
+        const seat=document.getElementById("asSeat").value;
+        if(!seat){document.getElementById("eSeat").textContent="请选择承接人";return;}
+        const again=leads.filter(l=>l.flow==="已分配");
+        if(again.length){toast("该线索已分配，不改写已成功的承接人。若需改人，请走现网转交","warn");return;}
+        leads.forEach(l=>{l.flow="已分配";l.seat=seat;l.source="人工智能机器人";});
+        toast(`已分配给${seat}，总结已同步`);
+        state.selected=new Set();
+        closeOverlay(); render();
+      };
+    });
+}
+function openCustomer(fid){
+  const l=state.leads.find(x=>x.fid===fid); if(!l) return;
+  const sum = !l.aiIn ? "这条线索不是人工智能外呼入库，没有人工智能总结。" : (l.summaryFail||l.summary==="生成失败"?"生成失败":(l.summary||"—"));
+  const canGo=canConfig()&&(l.flow==="意向待分配"||l.flow==="已加微");
+  showDrawer(`
+    <div class="drawer-h"><span>客户详情 · ${esc(l.fid)}</span><button class="close-x" data-close>×</button></div>
+    <div class="drawer-b"><div class="kv">
+      <div class="k">家庭编号</div><div>${esc(l.fid)}</div>
+      <div class="k">洋葱编号</div><div>${esc(l.oid)}</div>
+      <div class="k">手机号</div><div>${esc(l.phone)}</div>
+      <div class="k">学段</div><div>${esc(l.stage)}</div>
+      <div class="k">分层</div><div>${esc(l.layer)}</div>
+      <div class="k">坐席</div><div>${esc(l.seat||"—")}</div>
+      <div class="k">意向度</div><div>${esc(l.intentSale||"—")}</div>
+      <div class="k">外呼状态</div><div>${esc(l.callStatus)}</div>
+      <div class="k">人工智能外呼状态</div><div>${l.aiIn?esc(l.aiStatus):"—"}</div>
+      <div class="k">意向等级</div><div>${l.aiIn?esc(l.grade):"—"}</div>
+      <div class="k">是否成功加微</div><div>${l.added?"是":"否"}（口头答应不算已加微）</div>
+      <div class="k">来源</div><div>${esc(l.source)}（正式展示名与现网字典对齐，待确认）</div>
+      <div class="k">线索池</div><div>${esc(l.pool||"—")}</div>
+      <div class="k">所属任务</div><div>${l.task&&l.task!=="—"?esc((taskById(l.task)||{}).name||l.task)+" / "+esc(l.task):"—"}</div>
+      <div class="k">流转状态</div><div>${esc(l.flow||"—")}</div>
+      <div class="k">承接账号</div><div>${esc(l.wecom||"—")}</div>
+      <div class="k">入库说明</div><div>${esc(l.note||"—")}</div>
+      <div class="k">总结全文</div><div>${esc(sum)}</div>
+    </div></div>
+    <div class="drawer-f">
+      <button class="btn" data-close>关闭</button>
+      <button class="btn" id="cdCall">一键外呼</button>
+      ${canGo?`<button class="btn btn-primary" id="cdAssign">去分配</button>`:""}
+    </div>
+  `,()=>{
+    document.getElementById("cdCall").onclick=()=>{oneClickCall(l.fid);};
+    const a=document.getElementById("cdAssign");
+    if(a) a.onclick=()=>{closeOverlay(); tryAssign([l.fid]);};
+  });
+}
+
+/* ---------- 企微 ---------- */
+function renderWecom(){
+  const tab=state.wecomTab;
+  return `<div class="card">
+    <div class="tabs">
+      <button class="tab ${tab==="members"?"active":""}" data-wtab="members">承接账号</button>
+      <button class="tab ${tab==="policy"?"active":""}" data-wtab="policy">加微通知策略</button>
+      <button class="tab ${tab==="quota"?"active":""}" data-wtab="quota">额度与豁免</button>
+    </div>
+    ${tab==="members"?renderMembers():tab==="policy"?renderPolicy():renderQuota()}
+  </div>`;
+}
+function renderMembers(){
+  const org=state.orgFilter;
+  const list=state.members.filter(m=>org==="全部"||m.org.endsWith(org));
+  const orgs=["全部","一组","二组","三组"];
+  return `
+    <div class="toolbar mb12">
+      <div class="row">${orgs.map(o=>`<span class="chip ${state.orgFilter===o?"on":""}" data-org="${o}">${o}</span>`).join("")}</div>
+      <div class="row">
+        <button class="btn" id="btnRefreshDev">刷新设备状态</button>
+        <button class="btn btn-primary" id="btnAddMem">添加成员</button>
+        <button class="btn btn-primary" id="btnSaveWecom">保存</button>
+      </div>
+    </div>
+    <p class="hint">本页配置与销售侧企微机器人全局配置分开。不设今日漏斗页签。</p>
+    <table><thead><tr><th>成员</th><th>账号标识</th><th>组织架构</th><th>云设备</th><th>今日承接与上限</th><th>账号状态</th><th>承接开关</th><th>操作</th></tr></thead><tbody>
+      ${list.map(m=>`<tr>
+        <td><span class="member"><span class="avatar">${esc(m.name[0])}</span>${esc(m.name)}</span></td>
+        <td>${esc(m.account)}</td><td>${esc(m.org)}</td>
+        <td class="${m.online?"online":"offline"}">${m.online?"在线":"离线"}</td>
+        <td>${m.today} / ${m.cap}${m.today>=m.cap?"（已达上限，不再进入轮询）":""}</td>
+        <td>${esc(m.status)}</td>
+        <td><label class="switch"><input type="checkbox" data-tog="${m.id}" ${m.on?"checked":""}><i></i></label></td>
+        <td><button class="btn-text" data-editcap="${m.id}">编辑</button><button class="btn-text" data-rm="${m.id}">移除</button></td>
+      </tr>`).join("")}
+    </tbody></table>`;
+}
+function renderPolicy(){
+  const p=state.policy;
+  return `<div class="form-grid">
+    <div class="form-item"><label><em>*</em>分配方式</label><input class="input" value="轮询" disabled><div class="hint">本期仅此方式，不提供按额度加权或指定账号。</div></div>
+    <div class="form-item"><label>活码渠道标记</label><input class="input" id="pChannel" value="${esc(p.channel)}"></div>
+    <div class="form-item"><label><em>*</em>加微昵称</label><input class="input" id="pNick" value="${esc(p.nick)}"><div class="err" id="eNick"></div></div>
+    <div class="form-item"><label>意向门槛</label><select class="select" id="pTh">${["A 及以上","B 及以上","C 及以上"].map(x=>`<option ${p.threshold===x?"selected":""}>${x}</option>`).join("")}</select><div class="hint">任务级门槛优先于本页默认。</div></div>
+    <div class="form-item full"><label><em>*</em>企业微信邀请通知模版</label><textarea class="input" id="pInvite">${esc(p.invite)}</textarea><div class="err" id="eInvite"></div></div>
+    <div class="form-item full"><label><em>*</em>加微通过欢迎语</label><textarea class="input" id="pWelcome">${esc(p.welcome)}</textarea><div class="err" id="eWelcome"></div></div>
+    <div class="form-item"><label>失败重试</label><select class="select" id="pRetry">${["失败后换账号重试 1 次","失败后换账号重试 2 次","记入待人工"].map(x=>`<option ${p.retry===x?"selected":""}>${x}</option>`).join("")}</select></div>
+    <div class="form-item"><label>静默时段不发加微</label><input class="input" id="pQuiet" value="${esc(p.quiet)}"><div class="hint">例如 22:00 至 08:00；静默期内等到时段结束后再发。</div></div>
+  </div>
+  <div class="mt12"><button class="btn btn-primary" id="btnSaveWecom">保存</button></div>`;
+}
+function renderQuota(){
+  const p=state.policy;
+  return `
+    <div class="quota mb16">
+      <div class="stat"><div class="n">12</div><div class="k">今日人工智能承接入库（演示）</div></div>
+      <div class="stat"><div class="n">9</div><div class="k">豁免未拨打额度（演示）</div></div>
+      <div class="stat"><div class="n">3</div><div class="k">销售名下因此占用（演示）</div></div>
+    </div>
+    <div class="form-item mb12"><label class="row"><label class="switch"><input type="checkbox" id="pExempt" ${p.exempt?"checked":""}><i></i></label> 启用企微承接不占未拨打领取额度</label><div class="hint">默认开启；关闭须二次确认。</div></div>
+    <div class="form-item mb12"><label class="row"><label class="switch"><input type="checkbox" id="pAutoSrc" ${p.autoSource?"checked":""}><i></i></label> 分配入库时自动将来源记为人工智能机器人</label></div>
+    <div class="form-item"><label>单账号日承接上限默认值</label><input class="input" id="pCap" type="number" value="${p.defaultCap}"></div>
+    <div class="mt12"><button class="btn btn-primary" id="btnSaveWecom">保存</button></div>`;
+}
+function collectPolicy(){
+  const p=state.policy;
+  if(document.getElementById("pChannel")) p.channel=document.getElementById("pChannel").value;
+  if(document.getElementById("pNick")) p.nick=document.getElementById("pNick").value.trim();
+  if(document.getElementById("pInvite")) p.invite=document.getElementById("pInvite").value.trim();
+  if(document.getElementById("pWelcome")) p.welcome=document.getElementById("pWelcome").value.trim();
+  if(document.getElementById("pRetry")) p.retry=document.getElementById("pRetry").value;
+  if(document.getElementById("pQuiet")) p.quiet=document.getElementById("pQuiet").value;
+  if(document.getElementById("pTh")) p.threshold=document.getElementById("pTh").value;
+  if(document.getElementById("pCap")) p.defaultCap=Number(document.getElementById("pCap").value||0);
+  if(document.getElementById("pAutoSrc")) p.autoSource=document.getElementById("pAutoSrc").checked;
+}
+function saveWecom(){
+  collectPolicy();
+  const p=state.policy;
+  let bad=false;
+  if(state.wecomTab==="policy"||true){
+    if(!p.nick){if(document.getElementById("eNick")) document.getElementById("eNick").textContent="请填写加微昵称";bad=true;}
+    if(!p.invite){if(document.getElementById("eInvite")) document.getElementById("eInvite").textContent="请填写企业微信邀请通知模版";bad=true;}
+    if(!p.welcome){if(document.getElementById("eWelcome")) document.getElementById("eWelcome").textContent="请填写加微通过欢迎语";bad=true;}
+  }
+  if(bad){ if(state.wecomTab!=="policy"){state.wecomTab="policy";render(); setTimeout(()=>{collectPolicy();saveWecom();},0);} else toast("请先填写策略页必填项","err"); return; }
+  toast("承接配置已保存");
+  state.wecomSaved=true;
+}
+function toggleMember(id){
+  const m=state.members.find(x=>x.id===id); if(!m) return;
+  if(!m.online){toast("云设备离线，默认不承接，无法开启","err"); render(); return;}
+  m.on=!m.on; if(!m.on) toast("已关闭承接，该账号不再被轮询到"); render();
+}
+function removeMember(id){
+  const m=state.members.find(x=>x.id===id); if(!m) return;
+  showModal(`<div class="modal modal-sm"><div class="modal-h"><span>移除成员</span><button class="close-x" data-close>×</button></div>
+    <div class="modal-b">确认将「${esc(m.name)}」移出承接名单？已发出未完成的加微不回滚历史。</div>
+    <div class="modal-f"><button class="btn" data-close>取消</button><button class="btn btn-primary" id="rmOk">确认移除</button></div></div>`,()=>{
+      document.getElementById("rmOk").onclick=()=>{state.members=state.members.filter(x=>x.id!==id);toast("已移除");closeOverlay();render();};
+    });
+}
+function editCap(id){
+  const m=state.members.find(x=>x.id===id); if(!m) return;
+  showModal(`<div class="modal modal-sm"><div class="modal-h"><span>编辑日上限</span><button class="close-x" data-close>×</button></div>
+    <div class="modal-b"><div class="form-item"><label>单账号日承接上限</label><input class="input" id="capVal" type="number" value="${m.cap}"><div class="hint">加微文案在策略页签维护。</div></div></div>
+    <div class="modal-f"><button class="btn" data-close>取消</button><button class="btn btn-primary" id="capOk">确定</button></div></div>`,()=>{
+      document.getElementById("capOk").onclick=()=>{m.cap=Number(document.getElementById("capVal").value||m.cap);toast("已更新日上限");closeOverlay();render();};
+    });
+}
+function openAddMember(){
+  let q="",onf="全部";
+  const already=new Set(state.members.map(m=>m.id));
+  const paint=()=>{
+    const list=seed.orgPeople.filter(p=>{
+      if(q && !p.name.includes(q)&&!p.account.includes(q)) return false;
+      if(onf==="在线"&&!p.online) return false;
+      if(onf==="离线"&&p.online) return false;
+      return true;
+    });
+    document.getElementById("orgList").innerHTML=list.map(p=>`<div class="org-item ${p.online?"":"off"}">
+      <input type="checkbox" data-orgp="${p.id}" ${p.online?"":"disabled"} ${already.has(p.id)?"disabled":""}>
+      <span class="avatar">${esc(p.name[0])}</span>
+      <div><b>${esc(p.name)}</b> · ${esc(p.account)}<div class="muted">${esc(p.org)} · ${p.online?"在线":"离线"}</div></div>
+    </div>`).join("")||'<div class="empty">没有符合条件的成员</div>';
+    document.getElementById("orgList").onclick=e=>{
+      const id=e.target.dataset.orgp; if(!id) return;
+      const p=seed.orgPeople.find(x=>x.id===id);
+      if(p&&!p.online){e.preventDefault();e.target.checked=false;toast("云设备离线，不可添加为承接成员","err");}
+    };
+  };
+  showModal(`<div class="modal"><div class="modal-h"><span>组织架构选人</span><button class="close-x" data-close>×</button></div>
+    <div class="modal-b">
+      <div class="row mb12"><input class="input" id="orgQ" placeholder="搜索姓名或账号"><select class="select" id="orgOn"><option>全部</option><option>在线</option><option>离线</option></select></div>
+      <div id="orgList"></div>
+    </div>
+    <div class="modal-f"><button class="btn" data-close>取消</button><button class="btn btn-primary" id="orgOk">确定</button></div></div>`,()=>{
+      document.getElementById("orgQ").oninput=e=>{q=e.target.value.trim();paint();};
+      document.getElementById("orgOn").onchange=e=>{onf=e.target.value;paint();};
+      paint();
+      document.getElementById("orgOk").onclick=()=>{
+        const ids=[...document.querySelectorAll("[data-orgp]:checked")].map(x=>x.dataset.orgp);
+        const picked=ids.map(id=>seed.orgPeople.find(p=>p.id===id)).filter(Boolean);
+        if(!picked.length){toast("确定时至少选择一名在线成员","err");return;}
+        if(picked.some(p=>!p.online)){toast("云设备离线，不可添加为承接成员","err");return;}
+        const exist=picked.filter(p=>already.has(p.id));
+        const fresh=picked.filter(p=>!already.has(p.id));
+        if(!fresh.length){toast("所选成员已在列表中","warn");return;}
+        fresh.forEach(p=>state.members.push({id:p.id,name:p.name,account:p.account,org:p.org,online:p.online,today:0,cap:state.policy.defaultCap,status:"启用",on:true}));
+        toast(exist.length?`已新加 ${fresh.length} 人，其余已在列表中`:`已新加 ${fresh.length} 人`);
+        closeOverlay(); render();
+      };
+    });
+}
+
+function maybeExemptOff(e){
+  if(e.target.checked){state.policy.exempt=true;return;}
+  e.target.checked=true;
+  showModal(`<div class="modal modal-sm"><div class="modal-h"><span>关闭额度豁免</span><button class="close-x" data-close>×</button></div>
+    <div class="modal-b">关闭后，人工智能加微并指定承接人入库将占用销售的未拨打领取额度。确认关闭？</div>
+    <div class="modal-f"><button class="btn" data-close>取消</button><button class="btn btn-primary" id="exOk">确认关闭</button></div></div>`,()=>{
+      document.getElementById("exOk").onclick=()=>{state.policy.exempt=false;closeOverlay();render();};
+    });
+}
+
+/* ---------- 系统说明 ---------- */
+function renderGuide(){
+  return `<div class="card guide">
+    <h3>系统说明（对照规则，非业务操作台）</h3>
+    <p class="hint">本页用于对照二期规则。侧栏不提供通话明细、外呼数据看板、任务明细。本期采用方案 A 独立板块，不引入人工优先或超时兜底。</p>
+    <h4>主流程</h4>
+    <ol>
+      <li>运营新建并启动外呼任务，按分层比例抽取并锁定公共未领取线索。</li>
+      <li>在可外呼时段按档发起外呼；未接通且仍有档次则按再呼规则排下一档。</li>
+      <li>接通后回传沟通结果与意向等级；达到任务意向门槛则按轮询向承接账号发起加微。</li>
+      <li>客户池出现意向待分配或已加微线索，运营指定承接人入库，不占用该销售未拨打领取额度。</li>
+    </ol>
+    <h4>关键规则</h4>
+    <ol>
+      <li>有效接通不少于 10 秒；不足 10 秒为无效接通，之后即使加微仍保持无效接通。</li>
+      <li>加微以企业微信好友关系为准，口头答应不算已加微。</li>
+      <li>意向门槛：A 及以上仅 A；B 及以上为 A、B；C 及以上为 A、B、C。D 及未分层不因本门槛进入意向待分配。</li>
+      <li>查看客户从任务进入客户池并带上该任务，不另开任务客户页。</li>
+      <li>人工智能处理中只读，销售申请时拦截。同一条线索不能进入两个进行中的任务。</li>
+      <li>创建失败或结果未回，本档不入库、不跳档、不按未接通处理，可在失败重试摘要中重试。</li>
+      <li>政策禁呼为每日 21:00 至次日 09:00。演示条可切换模拟时间。</li>
+    </ol>
+    <h4>待确认事项</h4>
+    <ol>
+      <li>意向门槛默认值建议为「B 及以上」。</li>
+      <li>来源正式展示名与现网字典对齐。</li>
+      <li>一期测试开关与正式任务如何并行。</li>
+      <li>非意向但已入库线索的默认归属。</li>
+      <li>「人工智能处理中」视图是否对销售开放（本演示仅管理员和运营可见）。</li>
+    </ol>
+  </div>`;
+}
+
+/* ---------- overlay / bind ---------- */
+function showModal(html,after){showOverlay(html,after);}
+function showDrawer(inner,after){showOverlay(`<div class="drawer">${inner}</div>`,after,true);}
+function showOverlay(html,after,drawer){
+  const box=document.getElementById("overlay");
+  box.innerHTML=`<div class="mask" id="mask">${html}</div>`;
+  const close=()=>closeOverlay();
+  document.getElementById("mask").addEventListener("click",e=>{if(e.target.id==="mask") close();});
+  box.querySelectorAll("[data-close]").forEach(b=>b.onclick=close);
+  if(after) after();
+}
+function closeOverlay(){document.getElementById("overlay").innerHTML="";}
+
+function bindPage(){
+  document.querySelectorAll(".nav-item").forEach(b=>b.onclick=()=>setPage(b.dataset.page));
+  if(state.page==="tasks"){
+    const ot=document.getElementById("obsToggle"); if(ot) ot.onclick=()=>{state.obsOpen=!state.obsOpen;render();};
+    const q=()=>{state.taskFilter={name:val("tfName"),channel:val("tfChannel"),status:val("tfStatus"),date:""};render();};
+    const tq=document.getElementById("tfQuery"); if(tq) tq.onclick=q;
+    const rf=document.getElementById("tfRefresh"); if(rf) rf.onclick=()=>{toast("已刷新任务列表");render();};
+    const n1=document.getElementById("btnNewTask"), n2=document.getElementById("btnNewTaskEmpty");
+    if(n1) n1.onclick=()=>openTaskModal(); if(n2) n2.onclick=()=>openTaskModal();
+    document.querySelectorAll("[data-act]").forEach(b=>{
+      const id=b.dataset.id,act=b.dataset.act;
+      b.onclick=()=>{
+        if(act==="viewcust") viewCustomers(id);
+        if(act==="detail") openTaskDetail(id);
+        if(act==="edit") openTaskModal(id);
+        if(act==="start") startTask(id);
+        if(act==="pause") pauseTask(id);
+      };
+    });
+  }
+  if(state.page==="pool"){
+    document.querySelectorAll("[data-view]").forEach(t=>t.onclick=()=>{state.poolView=t.dataset.view;state.selected=new Set();state.poolPage=1;render();});
+    const pq=document.getElementById("pfQuery"); if(pq) pq.onclick=()=>{readPoolFilter();state.poolPage=1;render();toast("查询完成");};
+    const pr=document.getElementById("pfReset"); if(pr) pr.onclick=()=>{state.poolFilter={fid:"",oid:"",phone:"",task:"",aiStatus:"",grade:"",flow:"",layer:"",wecom:""};state.poolView="全部客户";state.selected=new Set();state.poolPage=1;render();};
+    const ps=document.getElementById("pfSaveView"); if(ps) ps.onclick=()=>toast("已另存为当前视图");
+    const ba=document.getElementById("btnBatch"); if(ba) ba.onclick=()=>tryAssign([...state.selected]);
+    const ap=document.getElementById("btnApply"); if(ap) ap.onclick=applyLead;
+    const ca=document.getElementById("chkAll"); if(ca) ca.onchange=e=>{
+      visibleLeads().forEach(l=>{if(l.flow==="意向待分配"||l.flow==="已加微"){if(e.target.checked) state.selected.add(l.fid); else state.selected.delete(l.fid);}});
+      render();
+    };
+    document.querySelectorAll(".chk").forEach(c=>c.onchange=e=>{if(e.target.checked) state.selected.add(c.dataset.id); else state.selected.delete(c.dataset.id); render();});
+    document.querySelectorAll("[data-act]").forEach(b=>{
+      const act=b.dataset.act,id=b.dataset.id;
+      b.onclick=()=>{
+        if(act==="assign"){ if(!(state.leads.find(l=>l.fid===id).flow==="意向待分配"||state.leads.find(l=>l.fid===id).flow==="已加微")) toast("当前流转状态不可分配","err"); else tryAssign([id]); }
+        if(act==="call") oneClickCall(id);
+        if(act==="detailc") openCustomer(id);
+      };
+    });
+    const prev=document.getElementById("pgPrev"), next=document.getElementById("pgNext");
+    if(prev) prev.onclick=()=>{state.poolPage--;render();};
+    if(next) next.onclick=()=>{state.poolPage++;render();};
+  }
+  if(state.page==="wecom"){
+    document.querySelectorAll("[data-wtab]").forEach(t=>t.onclick=()=>{collectPolicy();state.wecomTab=t.dataset.wtab;render();});
+    document.querySelectorAll("[data-org]").forEach(c=>c.onclick=()=>{state.orgFilter=c.dataset.org;render();});
+    const rd=document.getElementById("btnRefreshDev"); if(rd) rd.onclick=()=>{toast("已刷新云设备与活码状态");render();};
+    const am=document.getElementById("btnAddMem"); if(am) am.onclick=openAddMember;
+    const sv=document.getElementById("btnSaveWecom"); if(sv) sv.onclick=saveWecom;
+    document.querySelectorAll("[data-tog]").forEach(sw=>sw.onchange=()=>toggleMember(sw.dataset.tog));
+    document.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>removeMember(b.dataset.rm));
+    document.querySelectorAll("[data-editcap]").forEach(b=>b.onclick=()=>editCap(b.dataset.editcap));
+    const ex=document.getElementById("pExempt"); if(ex) ex.onchange=maybeExemptOff;
+  }
+}
+
+document.getElementById("roleSel").onchange=e=>{
+  state.role=e.target.value;
+  state.selected=new Set();
+  if(!canConfig() && (state.page==="tasks"||state.page==="wecom")) setPage("pool");
+  else render();
+};
+document.getElementById("btnSimDay").onclick=()=>{state.now=new Date(2026,10,12,10,0,0);toast("已切换到工作时段 10:00");render();};
+document.getElementById("btnSimNight").onclick=()=>{state.now=new Date(2026,10,12,21,30,0);toast("已切换到政策禁呼时段 21:30，新的拨打不会发起");render();};
+document.querySelectorAll(".nav-item").forEach(b=>b.onclick=()=>setPage(b.dataset.page));
+(function applyLaunch(){
+  const q=new URLSearchParams(location.search);
+  if(q.get("role")){state.role=q.get("role");const s=document.getElementById("roleSel");if(s)s.value=state.role;}
+  if(q.get("sim")==="night") state.now=new Date(2026,10,12,21,30,0);
+  if(q.get("view")) state.poolView=q.get("view");
+  if(q.get("task")) state.poolFilter.task=q.get("task");
+  if(q.get("wtab")) state.wecomTab=q.get("wtab");
+  const page=q.get("page");
+  if(page) setPage(page);
+  else render();
+  const shot=q.get("shot");
+  if(shot==="newtask") openTaskModal();
+  if(shot==="edittask") openTaskModal("T20261112-001");
+  if(shot==="detail") openTaskDetail("T20261112-001");
+  if(shot==="assign") tryAssign(["F10021"]);
+  if(shot==="cust") openCustomer("F10021");
+  if(shot==="addmem") {state.page="wecom";render();openAddMember();}
+  if(shot==="apply") {state.page="pool";render();applyLead();}
+})();
+</script>
+</body>
+</html>
